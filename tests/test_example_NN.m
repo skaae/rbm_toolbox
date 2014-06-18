@@ -106,5 +106,21 @@ opts.batchsize = 100;  %  Take a mean gradient step over this many samples
 
 assert(er < 0.08, 'Too big error');
 
+% ex8 vanilla net with increasing momentum
+rand('state',0)
+nn = nnsetup([784 100 10]);
+opts.plot=0;
+nn.momentum = @(epoch) ifelse(epoch > 5,0.5,0.1*epoch); 
+opts.numepochs =  10;   %  Number of full sweeps through data
+opts.batchsize = 100;  %  Take a mean gradient step over this many samples
+[nn, L] = nntrain(nn, train_x, train_y, opts);
+
+[er, bad] = nntest(nn, test_x, test_y);
+
+assert(er < 0.08, 'Too big error');
+
+
+
+
 
 

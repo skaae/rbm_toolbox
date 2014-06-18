@@ -12,8 +12,8 @@ function nn = nnapplygrads(nn)
         
         dW = nn.currentLearningRate * dW;
         
-        if(nn.momentum>0)
-            nn.vW{i} = nn.momentum*nn.vW{i} + dW;
+        if(nn.currentMomentum>0)
+            nn.vW{i} = nn.currentMomentum*nn.vW{i} + dW;
             dW = nn.vW{i};
         end
             
