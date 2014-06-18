@@ -136,6 +136,8 @@ test_y  = double(test_y);
 
 nn = nnsetup([784 1200 1200 10]);
 opts.plot=1;
+nn.activation_function = 'sigm';
+nn.output = 'softmax';
 T = 500;    % momentum ramp up
 p_f = 0.99;  % final momentum
 p_i = 0.5;    % initial momentum
