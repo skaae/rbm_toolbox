@@ -2,6 +2,9 @@ function nn = nnff(nn, x, y)
 %NNFF performs a feedforward pass
 % nn = nnff(nn, x, y) returns an neural network structure with updated
 % layer activations, error and loss (nn.a, nn.e and nn.L)
+%
+% nn = nnff(nn,x) returns the output without calculating the error
+%   mostly for use with RBM's
 
     n = nn.n;
     m = size(x, 1);
@@ -48,13 +51,15 @@ function nn = nnff(nn, x, y)
             nn.a{n} = bsxfun(@rdivide, nn.a{n}, sum(nn.a{n}, 2)); 
     end
 
-    %error and loss
-    nn.e = y - nn.a{n};
-    
-    switch nn.output
-        case {'sigm', 'linear'}
-            nn.L = 1/2 * sum(sum(nn.e .^ 2)) / m; 
-        case 'softmax'
-            nn.L = -sum(sum(y .* log(nn.a{n}))) / m;
+    %error and loss if y exists
+    if exist('y','var')
+        nn.e = y - nn.a{n};
+
+        switch nn.output
+            case {'sigm', 'linear'}
+                nn.L = 1/2 * sum(sum(nn.e .^ 2)) / m; 
+            case 'softmax'
+                nn.L = -sum(sum(y .* log(nn.a{n}))) / m;
+        end
     end
 end
