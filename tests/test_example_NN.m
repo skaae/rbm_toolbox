@@ -110,10 +110,57 @@ assert(er < 0.08, 'Too big error');
 rand('state',0)
 nn = nnsetup([784 100 10]);
 opts.plot=0;
-nn.momentum = @(epoch) ifelse(epoch > 5,0.5,0.1*epoch); 
+nn.momentum = @(epoch) ifelse(epoch < 5,0.1*epoch,0.5); 
 opts.numepochs =  10;   %  Number of full sweeps through data
 opts.batchsize = 100;  %  Take a mean gradient step over this many samples
 [nn, L] = nntrain(nn, train_x, train_y, opts);
+
+[er, bad] = nntest(nn, test_x, test_y);
+
+assert(er < 0.08, 'Too big error');
+
+
+
+
+% Hinton replication
+
+rand('state',0)
+load mnist_uint8;
+
+train_x = double(train_x) / 255;
+test_x  = double(test_x)  / 255;
+train_y = double(train_y);
+test_y  = double(test_y);
+
+
+
+nn = nnsetup([784 1200 1200 10]);
+opts.plot=1;
+T = 500;    % momentum ramp up
+p_f = 0.99;  % final momentum
+p_i = 0.5;    % initial momentum
+eps = 10;   % initial learning rate
+f = 0.998;  %learning rate decay
+nn.learningRate = @(t,momentum) eps.*f.^t*(1-momentum); 
+nn.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f); 
+opts.numepochs =  3000;   %  Number of full sweeps through data
+opts.batchsize = 100;  %  Take a mean gradient step over this many samples
+nn.dropoutFraction                  = 0.5; 
+nn.weightPenaltyL2                  = 0; 
+nn.weightMaxL2norm                  = 15;
+
+%init weights with zero mean and sigma 0.01
+    for i = 2 : nn.n   
+        % weights and weight momentum
+        nn.W{i - 1} = normrnd(0,0.01,size(nn.W{i - 1}));
+        nn.vW{i - 1} = zeros(size(nn.W{i - 1}));
+        
+        % average activations (for use with sparsity)
+        nn.p{i}     = zeros(1, nn.size(i));   
+    end
+
+
+[nn, L] = nntrain(nn, train_x, train_y,opts,test_x,test_y);
 
 [er, bad] = nntest(nn, test_x, test_y);
 

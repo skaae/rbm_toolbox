@@ -37,8 +37,9 @@ n = 1;
 for i = 1 : numepochs
     
     %calculate current learning rate and momentum
-    nn.currentLearningRate = nn.learningRate(i);
     nn.currentMomentum     = nn.momentum(i);
+    nn.currentLearningRate = nn.learningRate(i,nn.currentMomentum);
+    
     
     tic;
     
