@@ -10,13 +10,15 @@ function rbm = rbmtrain(rbm, x, opts)
         kk = randperm(m);
         err = 0;
         for l = 1 : numbatches
-            batch = x(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
+            v1 = x(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
             
-            v1 = batch;
-            h1 = sigmrnd(repmat(rbm.c', opts.batchsize, 1) + v1 * rbm.W');
-            v2 = sigmrnd(repmat(rbm.b', opts.batchsize, 1) + h1 * rbm.W);
-            h2 = sigm(repmat(rbm.c', opts.batchsize, 1) + v2 * rbm.W');
 
+            h1 = rbmup(rbm,v1,@sigmrnd);
+            v2 = rbmdown(rbm,h1,@sigmrnd);
+            h2 = rbmup(rbm,v2,@sigm);
+
+
+            
             c1 = h1' * v1;
             c2 = h2' * v2;
 
