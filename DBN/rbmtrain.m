@@ -12,9 +12,10 @@ function rbm = rbmtrain(rbm, x, opts)
         for l = 1 : numbatches
             v1 = x(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
             
-
-            h1 = rbmup(rbm,v1,@sigmrnd);
-            v2 = rbmdown(rbm,h1,@sigmrnd);
+            for j = 1:opts.cdn
+                h1 = rbmup(rbm,v1,@sigmrnd);
+                v2 = rbmdown(rbm,h1,@sigmrnd);
+            end
             h2 = rbmup(rbm,v2,@sigm);
 
 
