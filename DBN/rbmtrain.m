@@ -22,7 +22,7 @@ function rbm = rbmtrain(rbm, x, opts)
             
                 case 'CD' 
                     %contrastive divergence sampling
-                    [v2,h1,h2] = cdn(rbm,v1,opts.cdn);
+                    [dW,db,dc,curr_err] = cdk(rbm,v1,opts.cdn);
                 case 'PCD'
                     %persistent CD se
                     error('Not implemented')
@@ -31,18 +31,17 @@ function rbm = rbmtrain(rbm, x, opts)
             end
 
 
-            c1 = h1' * v1;
-            c2 = h2' * v2;
 
-            rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * (c1 - c2)     / opts.batchsize;
-            rbm.vb = rbm.momentum * rbm.vb + rbm.alpha * sum(v1 - v2)' / opts.batchsize;
-            rbm.vc = rbm.momentum * rbm.vc + rbm.alpha * sum(h1 - h2)' / opts.batchsize;
+
+            rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * dW / opts.batchsize;
+            rbm.vb = rbm.momentum * rbm.vb + rbm.alpha * db / opts.batchsize;
+            rbm.vc = rbm.momentum * rbm.vc + rbm.alpha * dc / opts.batchsize;
 
             rbm.W = rbm.W + rbm.vW;
             rbm.b = rbm.b + rbm.vb;
             rbm.c = rbm.c + rbm.vc;
 
-            err = err + sum(sum((v1 - v2) .^ 2)) / opts.batchsize;
+            err = err + curr_err / opts.batchsize;
         end
         
         disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)  '. Average reconstruction error is: ' num2str(err / numbatches)]);
