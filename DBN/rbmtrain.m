@@ -14,6 +14,7 @@ assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
 
 init_chains = 1;
+chains = [];
 for i = 1 : opts.numepochs
     kk = randperm(m);
     err = 0;
@@ -26,23 +27,11 @@ for i = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        switch opts.traintype
-            
-            case 'CD'
-                %contrastive divergence sampling
-                [dW,db,dc,curr_err] = cdk(rbm,v0,opts.cdn);
-            case 'PCD'
-                % persistent CD, note that we reuse the current state of 
-                % of the chains
-                [dW,db,dc,curr_err,chains] = pcd(rbm,v0,opts.cdn,chains);
-            otherwise
-                error('opts.traintype must be CD|PCD')
-        end
+        % Collect rbm statistics with either CD or PCD
+        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,...
+                                                opts.cdn,opts.traintype,chains);
         
-        
-        
-        
-        rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * dW / opts.batchsize;
+        rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * dw / opts.batchsize;
         rbm.vb = rbm.momentum * rbm.vb + rbm.alpha * db / opts.batchsize;
         rbm.vc = rbm.momentum * rbm.vc + rbm.alpha * dc / opts.batchsize;
         
@@ -50,7 +39,7 @@ for i = 1 : opts.numepochs
         rbm.b = rbm.b + rbm.vb;
         rbm.c = rbm.c + rbm.vc;
         
-        err = err + curr_err / opts.batchsize;
+        err = err + c_err / opts.batchsize;
     end
     
     disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)  '. Average reconstruction error is: ' num2str(err / numbatches)]);
