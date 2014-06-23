@@ -1,4 +1,9 @@
 function rbm = rbmtrain(rbm, x, opts)
+%%RBMTRAIN trains a single RBM
+% notation:
+%    w  : weights    
+%    b  : bias of visible layer
+%    c  : bias of hidden layer
     assert(isfloat(x), 'x must be a float');
     assert(all(x(:)>=0) && all(x(:)<=1), 'all data in x must be in [0:1]');
     m = size(x, 1);
@@ -12,14 +17,20 @@ function rbm = rbmtrain(rbm, x, opts)
         for l = 1 : numbatches
             v1 = x(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
             
-            for j = 1:opts.cdn
-                h1 = rbmup(rbm,v1,@sigmrnd);
-                v2 = rbmdown(rbm,h1,@sigmrnd);
-            end
-            h2 = rbmup(rbm,v2,@sigm);
-
-
             
+            switch opts.traintype
+            
+                case 'CD' 
+                    %contrastive divergence sampling
+                    [v2,h1,h2] = cdn(rbm,v1,opts.cdn);
+                case 'PCD'
+                    %persistent CD se
+                    error('Not implemented')
+                otherwise
+                    error('opts.traintype must be CD|PCD')
+            end
+
+
             c1 = h1' * v1;
             c2 = h2' * v2;
 
