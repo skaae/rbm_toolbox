@@ -10,11 +10,10 @@ function nn = nnsetup(architecture)
     
     nn.activation_function              = 'tanh_opt';   %  Activation functions of hidden layers: 'sigm' (sigmoid) or 'tanh_opt' (optimal tanh).
     
-       % learningRate is a function that takes epoch number as input and return
-       % the desired learning rate for that epoch.
-    nn.learningRate                     = @(epoch) 2;   
-    nn.momentum                         = 0.5;          %  Momentum
-    %nn.scaling_learningRate             = 1;            %  Scaling factor for the learning rate (each epoch)
+    % learningRate and momentrum are a functions that takes epoch number as 
+    % input and return the desired learning rate or momentum for that epoch.
+    nn.learningRate                     = @(epoch,momentum) 2;   
+    nn.momentum                         = @(epoch) 0.5;   
     nn.weightPenaltyL2                  = 0;            %  L2 regularization
     nn.nonSparsityPenalty               = 0;            %  Non sparsity penalty
     nn.sparsityTarget                   = 0.05;         %  Sparsity target
@@ -22,7 +21,9 @@ function nn = nnsetup(architecture)
     nn.dropoutFraction                  = 0;            %  Dropout level (http://www.cs.toronto.edu/~hinton/absps/dropout.pdf)
     nn.testing                          = 0;            %  Internal variable. nntest sets this to one.
     nn.output                           = 'sigm';       %  output unit 'sigm' (=logistic), 'softmax' and 'linear'
-
+    nn.weightMaxL2norm                  = 0;
+    
+    
     for i = 2 : nn.n   
         % weights and weight momentum
         nn.W{i - 1} = (rand(nn.size(i), nn.size(i - 1)+1) - 0.5) * 2 * 4 * sqrt(6 / (nn.size(i) + nn.size(i - 1)));
