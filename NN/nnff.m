@@ -5,7 +5,7 @@ function nn = nnff(nn, x, y)
 %
 % nn = nnff(nn,x) returns the output without calculating the error
 %   mostly for use with RBM's
-
+% Modified by Søren Sønderby June 2014
     n = nn.n;
     m = size(x, 1);
     

@@ -4,6 +4,7 @@ function rbm = rbmtrain(rbm, x, opts)
 %    w  : weights
 %    b  : bias of visible layer
 %    c  : bias of hidden layer
+%  Modified by Søren Sønderby June 2014
 assert(isfloat(x), 'x must be a float');
 assert(all(x(:)>=0) && all(x(:)<=1), 'all data in x must be in [0:1]');
 m = size(x, 1);

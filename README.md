@@ -1,6 +1,14 @@
 
-DeepLearnToolbox
-================
+# Fork of DeepLearnToolbox
+
+This repository is a fork of the [Deeplearntoolbox](https://github.com/rasmusbergpalm/DeepLearnToolbox).
+
+It improves on the Deeplearn toolbox by allowing
+* NN: Variable momentum and learning rate
+* NN: l2wight norm constraint as used by hinton in the dropout paper
+* DBN: add CD_k training
+* DBN: add persistive contrastive divergence 
+
 
 A Matlab toolbox for Deep Learning.
 
@@ -290,9 +298,4 @@ nn = nntrain(nn, tx, ty, opts, vx, vy);                %  nntrain takes validati
 assert(er < 0.1, 'Too big error');
 
 ```
-
-
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/rasmusbergpalm/deeplearntoolbox/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 

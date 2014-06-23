@@ -28,6 +28,7 @@ function [dW,db,dc,curr_err,chains] = pcd(rbm,v0,k,chains)
 %     likelihood gradient." 
 %     Proceedings of the 25th international conference on Machine learning. 
 %     ACM, 2008.
+% Copyright Søren Sønderby June 2014
 
 % keep h1 for calculation of  of positive phase
 h0 = rbmup(rbm,v0,@sigmrnd);  

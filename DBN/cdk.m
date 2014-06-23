@@ -15,6 +15,7 @@ function [dw,db,dc,curr_err] = cdk(rbm,v0,k )
 % See also
 %   Hinton, G. (2002). Training Products of Experts by Minimizing Contrastive
 %   Divergence. Neural Compu- tation, 14, 1771?1800.
+% Copyright Søren Sønderby June 2014
 
 % keep h1 for calculation of  of positive phase
 h0 = rbmup(rbm,v0,@sigmrnd);  
