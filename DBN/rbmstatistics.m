@@ -1,19 +1,19 @@
-function [dw,db,dc,curr_err,chains] = rbmstatistics(rbm,v0,k,type,chains)
-%RBMSTATISTICS collect statistics for RBM
+function [dw,db,dc,curr_err,chains] = rbmstatistics(rbm,v0,opts,type,chains)
+%RBMSTATISTICS collect statistics for RBM and calculate weight changes
 % SEE sections contrastive divergence(CD) and persistent contrastive
 % divergence (PCD), determined by the type parameter
 %
 %   INPUTS:
 %       rbm       : a rbm struct
-%       v0        ; the initial state of the hidden units
-%       k         : number of gibbs steps / CD updates
+%       v0        : the initial state of the hidden units
+%       opts      : opts struct
 %       type      : PCD|CD persistent CD or CD
-%       chains    ; current state of markov chains
+%       chains    _ current state of markov chains
 %
 %   OUTPUTS
-%       dw         : w weights chainge
-%       db         : bias of visible layer weight change
-%       dc         : bias of hidden layer weight change
+%       dw         : w weights chainge normalized by minibatch size
+%       db         : bias of visible layer weight change norm by minibatch size
+%       dc         : bias of hidden layer weight change norm by minibatch size
 %       curr_err   : current squared error
 %       chains     : current value of chains
 %
@@ -74,6 +74,11 @@ negative_phase = hk' * vk;
 dw = positive_phase - negative_phase;
 db =  sum(v0 - vk)';
 dc =  sum(h0 - hk)';
+
+% normalize by minibatch size
+dw = dw / opts.batchsize;
+db = db / opts.batchsize;
+dc = dc / opts.batchsize;
 curr_err = sum(sum((v0 - vk) .^ 2));
 end
 

@@ -26,20 +26,13 @@ for i = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        %update learningrates
-        currentMomentum     = rbm.momentum(i);
-        currentLR = rbm.learningrate(i,currentMomentum);
-        
         % Collect rbm statistics with either CD or PCD
-        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts.cdn,opts.traintype,chains);
+        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts,opts.traintype,chains);
         
-        rbm.vW = currentMomentum * rbm.vW + currentLR * dw / opts.batchsize;
-        rbm.vb = currentMomentum * rbm.vb + currentLR * db / opts.batchsize;
-        rbm.vc = currentMomentum * rbm.vc + currentLR * dc / opts.batchsize;
+        %update weights, LR and momentum
+        rbm = rbmapplygrads(rbm,dw,db,dc,i)
         
-        rbm.W = rbm.W + rbm.vW;
-        rbm.b = rbm.b + rbm.vb;
-        rbm.c = rbm.c + rbm.vc;
+
         
         err = err + c_err / opts.batchsize;
     end
