@@ -36,7 +36,11 @@ for i = 1 : opts.numepochs
         err = err + c_err;
     end
     
-    disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)  '. Average reconstruction error is: ' num2str(err / numbatches)]);
-    
+    % display output
+    epochnr = ['Epoch ' num2str(i) '/' num2str(opts.numepochs,4) '.'];
+    avg_err = [' Avg recon. err: ' num2str(err / numbatches,4) '|'];
+    lr_mom  = [' LR: ' num2str(rbm.curLR,4) '. Mom.: ' num2str(rbm.curMomentum,4)];
+    disp([epochnr avg_err lr_mom]);
+        
 end
 end
