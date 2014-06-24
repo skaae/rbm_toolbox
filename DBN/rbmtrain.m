@@ -30,7 +30,7 @@ for i = 1 : opts.numepochs
         [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts,opts.traintype,chains);
         
         %update weights, LR and momentum
-        rbm = rbmapplygrads(rbm,dw,db,dc,i)
+        rbm = rbmapplygrads(rbm,dw,db,dc,i);
         
 
         
