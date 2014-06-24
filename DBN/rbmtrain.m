@@ -5,13 +5,15 @@ function rbm = rbmtrain(rbm, x, opts)
 %    b  : bias of visible layer
 %    c  : bias of hidden layer
 %  Modified by Søren Sønderby June 2014
+
+% SETUP and checking
 assert(isfloat(x), 'x must be a float');
 assert(all(x(:)>=0) && all(x(:)<=1), 'all data in x must be in [0:1]');
 m = size(x, 1);
 numbatches = m / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
-
+% RUN epochs
 init_chains = 1;
 chains = [];
 for i = 1 : opts.numepochs
@@ -26,14 +28,11 @@ for i = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        % Collect rbm statistics with either CD or PCD
+        % Collect rbm statistics with CD or PCD
         [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts,opts.traintype,chains);
         
         %update weights, LR and momentum
         rbm = rbmapplygrads(rbm,dw,db,dc,i);
-        
-
-        
         err = err + c_err;
     end
     
