@@ -9,7 +9,6 @@ assert(isfloat(x), 'x must be a float');
 assert(all(x(:)>=0) && all(x(:)<=1), 'all data in x must be in [0:1]');
 m = size(x, 1);
 numbatches = m / opts.batchsize;
-
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
 
@@ -27,13 +26,16 @@ for i = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        % Collect rbm statistics with either CD or PCD
-        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,...
-                                                opts.cdn,opts.traintype,chains);
+        %update learningrates
+        currentMomentum     = rbm.momentum(i);
+        currentLR = rbm.learningrate(i,currentMomentum);
         
-        rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * dw / opts.batchsize;
-        rbm.vb = rbm.momentum * rbm.vb + rbm.alpha * db / opts.batchsize;
-        rbm.vc = rbm.momentum * rbm.vc + rbm.alpha * dc / opts.batchsize;
+        % Collect rbm statistics with either CD or PCD
+        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts.cdn,opts.traintype,chains);
+        
+        rbm.vW = currentMomentum * rbm.vW + currentLR * dw / opts.batchsize;
+        rbm.vb = currentMomentum * rbm.vb + currentLR * db / opts.batchsize;
+        rbm.vc = currentMomentum * rbm.vc + currentLR * dc / opts.batchsize;
         
         rbm.W = rbm.W + rbm.vW;
         rbm.b = rbm.b + rbm.vb;
