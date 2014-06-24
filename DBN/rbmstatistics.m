@@ -62,7 +62,7 @@ switch type
 end
 
 vk = rbmdown(rbm,hid,@sigmrnd);
-hk = rbmup(rbm,vis_sampled,@sigmrnd);
+hk = rbmup(rbm,vk,@sigmrnd);
 
 %update the state of the persistent chains
 chains = vk;
