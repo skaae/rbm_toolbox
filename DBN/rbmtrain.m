@@ -34,7 +34,7 @@ for i = 1 : opts.numepochs
         
 
         
-        err = err + c_err / opts.batchsize;
+        err = err + c_err;
     end
     
     disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)  '. Average reconstruction error is: ' num2str(err / numbatches)]);

@@ -14,7 +14,7 @@ function [dw,db,dc,curr_err,chains] = rbmstatistics(rbm,v0,opts,type,chains)
 %       dw         : w weights chainge normalized by minibatch size
 %       db         : bias of visible layer weight change norm by minibatch size
 %       dc         : bias of hidden layer weight change norm by minibatch size
-%       curr_err   : current squared error
+%       curr_err   : current squared error normalized by minibatch size
 %       chains     : current value of chains
 %
 %
@@ -79,6 +79,6 @@ dc =  sum(h0 - hk)';
 dw = dw / opts.batchsize;
 db = db / opts.batchsize;
 dc = dc / opts.batchsize;
-curr_err = sum(sum((v0 - vk) .^ 2));
+curr_err = sum(sum((v0 - vk) .^ 2)) / opts.batchsize;
 end
 
