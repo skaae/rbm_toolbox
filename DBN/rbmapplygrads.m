@@ -15,7 +15,7 @@ function [ rbm ] = rbmapplygrads(rbm,dw,db,dc,epoch)
 
 % update learningrates
 rbm.curMomentum     = rbm.momentum(epoch);
-rbm.curLR           = rbm.learningrate(epoch,currentMomentum);
+rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
 
 % update momentum and wight change
 rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * dw; 
