@@ -19,6 +19,7 @@ function [ rbm ] = rbmapplygrads(rbm,dw,db,dc,epoch)
 %   the reconstruction error. If this causes a more lasting instability, keep 
 %   reducing the learning rate by factors of 2 until the instability disappears.
 %
+%  SETTING WEIGHT DECAY
 %   
 % Copyright Søren Sønderby June 2014
 
@@ -26,12 +27,17 @@ function [ rbm ] = rbmapplygrads(rbm,dw,db,dc,epoch)
 rbm.curMomentum     = rbm.momentum(epoch);
 rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
 
-% update momentum and wight change
-rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * dw; 
+% update momentum and wight change and weight decay
+
+
+% dw, db,dv are negative gradients
+dw = dw -  rbm.L2 * rbm.W;  %apply weight decay
+rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * dw ; 
 rbm.vb = rbm.curMomentum * rbm.vb + rbm.curLR * db;
 rbm.vc = rbm.curMomentum * rbm.vc + rbm.curLR * dc;
 
 % update weights
+
 rbm.W = rbm.W + rbm.vW;
 rbm.b = rbm.b + rbm.vb;
 rbm.c = rbm.c + rbm.vc;

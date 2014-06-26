@@ -12,7 +12,7 @@ dbn.sizes = [100];
 opts.numepochs =   1;
 opts.batchsize = 100;
 opts.momentum  =   0;
-opts.alpha     =   1;
+opts.alpha     =   100;
 dbn = dbnsetup(dbn, train_x, opts);
 dbn = dbntrain(dbn, train_x, opts);
 figure; visualize(dbn.rbm{1}.W');   %  Visualize the RBM weights

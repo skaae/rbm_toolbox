@@ -61,8 +61,14 @@ switch type
         hid= rbmup(rbm,chains,@sigmrnd);
 end
 
+for i = 1:(opts.cdn - 1)
+    vis = rbmdown(rbm,hid,@sigmrnd);
+    hid = rbmup(rbm,vis,@sigmrnd);
+end
+
+% in last up/down dont sample hidden because it introduces sampling noise
 vk = rbmdown(rbm,hid,@sigmrnd);
-hk = rbmup(rbm,vk,@sigmrnd);
+hk = rbmup(rbm,vk,@sigm);
 
 %update the state of the persistent chains
 chains = vk;

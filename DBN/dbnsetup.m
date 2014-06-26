@@ -9,19 +9,21 @@ function dbn = dbnsetup(dbn, x, opts)
         
         % if one learningrate/momentum function use this for all 
         % otherwise use individual learningrate/momentum for each rbm
-        if numel(opts.learningrate) == n_rbm
+        if numel(opts.learningrate) == n_rbm && n_rbm ~=1
             dbn.rbm{u}.learningrate = opts.learningrate{u};
         else
             assert(numel(opts.learningrate)==1,'learnfunc. should be 1 or nrbm')
             dbn.rbm{u}.learningrate = opts.learningrate;
         end
         
-        if numel(opts.momentum) == n_rbm
+        if numel(opts.momentum) == n_rbm && n_rbm ~= 1
             dbn.rbm{u}.momentum = opts.momentum{u};
         else
             assert(numel(opts.momentum)==1,'Momen. func should be 1 or nrbm')
             dbn.rbm{u}.momentum = opts.momentum;
         end
+        
+        dbn.rbm{u}.L2 = opts.L2;
         
         dbn.rbm{u}.W  = normrnd(0,0.01,dbn.sizes(u + 1), dbn.sizes(u));
         dbn.rbm{u}.vW = zeros(dbn.sizes(u + 1), dbn.sizes(u));
