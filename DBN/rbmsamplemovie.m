@@ -1,9 +1,11 @@
-function [vis_sampled] = rbmsample(rbm,n,k)
-%RBMSAMPLE generate n samples from RBM using gibbs sampling with k steps
+function rbmsamplemovie(rbm,n,k,fout,samplefreq,visualizer)
+%RBMSAMPLEMOVIE generate n samples from RBM using gibbs sampling with k steps
 %   INPUTS:
 %       rbm               : a rbm struct
 %       n                 : number of samples
 %       k                 : number of gibbs steps 
+%       samplefreq        : samples between a picture is captured
+%       visualizer        : a function which returns a plot
 %   OUTPUTS
 %       vis_samples       : samples as a samples-by-n matrix
 %
@@ -39,10 +41,29 @@ function [vis_sampled] = rbmsample(rbm,n,k)
 bx = repmat(rbm.b',n,1);
 vis_sampled = double(bx > rand(size(bx)));
 
+close all
+figure;
+nFrames = floor(k/10);
+vidObj = VideoWriter(fout);
+vidObj.Quality = 100;
+vidObj.FrameRate = 10;
+open(vidObj);
+
+
+frame = 0;
 for i = 1:k
     hid_sampled = rbmup(rbm,vis_sampled,@sigmrnd);
     vis_sampled = rbmdown(rbm,hid_sampled,@sigmrnd);
-
+    
+    if mod(i-1,samplefreq) == 0
+        frame = frame+1;
+        fprintf('Gibbs steps: %i\n',i)
+        digits = rbmdown(rbm,hid_sampled,@sigm);
+        visualizer(digits');
+        axis equal
+        writeVideo(vidObj, getframe(gca));
+    end
+    
 end
     hid_sampled = rbmup(rbm,vis_sampled,@sigmrnd);
     vis_sampled = rbmdown(rbm,hid_sampled,@sigm);
