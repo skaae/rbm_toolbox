@@ -1,23 +1,26 @@
-function rbm = rbmtrain(rbm, x, opts)
+function rbm = rbmtrain(rbm, x_train,opts,x_val)
 %%RBMTRAIN trains a single RBM
 % notation:
 %    w  : weights
 %    b  : bias of visible layer
 %    c  : bias of hidden layer
-assert(isfloat(x), 'x must be a float');
-assert(all(x(:)>=0) && all(x(:)<=1), 'all data in x must be in [0:1]');
-m = size(x, 1);
-numbatches = m / opts.batchsize;
+%  Modified by Søren Sønderby June 2014
 
+% SETUP and checking
+assert(isfloat(x_train), 'x must be a float');
+assert(all(x_train(:)>=0) && all(x_train(:)<=1), 'all data in x must be in [0:1]');
+m = size(x_train, 1);
+numbatches = m / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
-
+% RUN epochs
 init_chains = 1;
+chains = [];
 for i = 1 : opts.numepochs
     kk = randperm(m);
     err = 0;
     for l = 1 : numbatches
-        v0 = x(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
+        v0 = x_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
         
         if strcmp(opts.traintype,'PCD') && init_chains == 1
             % init chains in first epoch if Persistent contrastive divergence
@@ -25,34 +28,34 @@ for i = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        switch opts.traintype
-            
-            case 'CD'
-                %contrastive divergence sampling
-                [dW,db,dc,curr_err] = cdk(rbm,v0,opts.cdn);
-            case 'PCD'
-                % persistent CD, note that we reuse the current state of 
-                % of the chains
-                [dW,db,dc,curr_err,chains] = pcd(rbm,v0,opts.cdn,chains);
-            otherwise
-                error('opts.traintype must be CD|PCD')
-        end
+        % Collect rbm statistics with CD or PCD
+        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts,opts.traintype,chains);
         
-        
-        
-        
-        rbm.vW = rbm.momentum * rbm.vW + rbm.alpha * dW / opts.batchsize;
-        rbm.vb = rbm.momentum * rbm.vb + rbm.alpha * db / opts.batchsize;
-        rbm.vc = rbm.momentum * rbm.vc + rbm.alpha * dc / opts.batchsize;
-        
-        rbm.W = rbm.W + rbm.vW;
-        rbm.b = rbm.b + rbm.vb;
-        rbm.c = rbm.c + rbm.vc;
-        
-        err = err + curr_err / opts.batchsize;
+        %update weights, LR and momentum
+        rbm = rbmapplygrads(rbm,dw,db,dc,i);
+        err = err + c_err;
     end
     
-    disp(['epoch ' num2str(i) '/' num2str(opts.numepochs)  '. Average reconstruction error is: ' num2str(err / numbatches)]);
+
+    
+    % if the training data energy is much lower than the validation energy
+    % rasie a overfitting warning. (i.e the ratio becomes <1)
+    if mod(i,5) == 0 && nargin == 4
+        e_val = rbmenergy(rbm,x_val);
+        e_train = rbmenergy(rbm,x_train(1:size(x_val,1),:));
+        ratio = e_val / e_train;
+        oft = ifelse(ratio<0.8,'(overfitting)','(OK)');
+        energy = sprintf('. E_Val / E_train %4.3f %s',ratio,oft);
+    else
+        energy = '.';
+    end
+    
+    % display output
+    epochnr = ['Epoch ' num2str(i) '/' num2str(opts.numepochs) '.'];
+    avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
+    lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
+    disp([epochnr avg_err lr_mom energy]);
+    
     
 end
 end

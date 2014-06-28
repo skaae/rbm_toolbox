@@ -1,5 +1,7 @@
 function nnupdatefigures(nn,fhandle,L,opts,i)
-%NNUPDATEFIGURES updates figures during training
+% NNUPDATEFIGURES updates figures during training
+% copyright by Søren Sønderby June 2014
+
 if i > 1 %dont plot first point, its only a point   
     x_ax = 1:i;
     % create legend
