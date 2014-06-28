@@ -31,8 +31,7 @@ rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
 
 
 % dw, db,dv are negative gradients
-dw = dw -  rbm.L2 * rbm.W;  %apply weight decay
-rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * dw ; 
+rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * (dw -  rbm.L2 * rbm.W); 
 rbm.vb = rbm.curMomentum * rbm.vb + rbm.curLR * db;
 rbm.vc = rbm.curMomentum * rbm.vc + rbm.curLR * dc;
 
