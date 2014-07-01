@@ -1,11 +1,12 @@
-function rbmsamplemovie(rbm,n,k,fout,samplefreq,visualizer)
-%RBMSAMPLEMOVIE generate n samples from RBM using gibbs sampling with k steps
+function samplerbmmovie(rbm,n,k,fout,samplefreq,visualizer,sampleclass)
+%%SAMPLERBMMOVIE generate n samples from RBM using gibbs sampling with k steps
 %   INPUTS:
 %       rbm               : a rbm struct
 %       n                 : number of samples
 %       k                 : number of gibbs steps 
 %       samplefreq        : samples between a picture is captured
 %       visualizer        : a function which returns a plot
+%       sampleclass       : given as onehot
 %   OUTPUTS
 %       vis_samples       : samples as a samples-by-n matrix
 %
@@ -32,9 +33,7 @@ function rbmsamplemovie(rbm,n,k,fout,samplefreq,visualizer)
 %         opts.L2 = 0.00;
 %         dbn = dbnsetup(dbn, train_x, opts);
 %         dbn = dbntrain(dbn, train_x, opts,test_x);
-%         rbm = dbn.rbm{1};
-%         digits = rbmsample(rbm,50,10000);
-%         visualize(digits')
+%         rbmsampledbnmovie(dbn,50,1000,'vid.avi',10,@visualize);
 % Copyright Søren Sønderby June 2014
 
 % create n random binary starting vectors based on bias
@@ -65,7 +64,7 @@ for i = 1:k
     end
     
 end
-    hid_sampled = rbmup(rbm,vis_sampled,@sigmrnd);
-    vis_sampled = rbmdown(rbm,hid_sampled,@sigm);
+    %hid_sampled = rbmup(rbm,vis_sampled,@sigmrnd);
+    %vis_sampled = rbmdown(rbm,hid_sampled,@sigm);
 end
 
