@@ -38,35 +38,35 @@ bx = repmat(toprbm.b',n,1);
 vis_sampled = double(bx > rand(size(bx)));
 vis_sampled = [vis_sampled class_vec];
 
+
 for i = 1:k
     hid_sampled = rbmup(toprbm,vis_sampled,@sigmrnd);
-    
-    % if one RBM "DBN" dont sample last layer binary.
-    if n_rbm == 1
-        vis_sampled = rbmdown(toprbm,hid_sampled,@sigm);
-    else
-        vis_sampled = rbmdown(toprbm,hid_sampled,@sigmrnd);
-    end
+    vis_sampled = rbmdown(toprbm,hid_sampled,@sigm);
     
     if mod(i-1,samplefreq) == 0
         samples = vis_sampled;
-        
         % in the hintonDBN nclasses was augmented to the visible layer of
         % the last RBM, remove these before down pass...
         if nargin == 7
             samples = samples(:,1:dbn.sizes(end-1));
         end
+        
+        if n_rbm ~= 1 % if non-single DBN sample values before pass down
+            samples = double(samples > rand(size(samples)));
+        end
+            
+        
         for j = (n_rbm - 1):-1:1
             rbm = dbn.rbm{j};
-            samples = rbmdown(rbm,samples,@sigm);
-            
+            samples = rbmdown(rbm,samples,@sigm);    
         end
-        
+ 
         fprintf('Gibbs steps: %i\n',i)
         visualizer(samples');
         axis equal
         writeVideo(vidObj, getframe(gca));    
     end
+    vis_sampled = double(vis_sampled > rand(size(vis_sampled)));
     
 end
 
