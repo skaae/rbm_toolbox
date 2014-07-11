@@ -1,47 +1,30 @@
-function [samples] = dbnsample(dbn,n,k,sampleclass)
-%%DBNSAMPLE generates samples from a dbn
+function [vis_sampled] = dbnsample(dbn,n,k,sampleclass)
+%%DBNSAMPLE generate n samples from DBN using gibbs sampling with k steps
 %   INPUTS:
-%       dbn               : a rbm struct
-%       n                 : number of samples
-%       k                 : number of gibbs steps
-%       sampleclass       : class to sample if hintonDBN, an integer
+%       dbn           : a rbm struct
+%       n             : number of samples
+%       k             : number of gibbs steps befor sampling
+%       sampleclass   : Class to sample. This is either a scalar giving the
+%                       class or a vector of size [n x n_classes] with each 
+%                       row corresponding to the one hot encoding of the desired 
+%                       class
 %   OUTPUTS
-%       vis_samples       : samples as a samples-by-n matrix
+%       vis_sampled       : samples as a [n x #vis_in_bottom_rbm]
 %
-%   EXAMPLE
-        %   The following set up will give you a model that can generate digits:
-%   ------CODE------
-%         load mnist_uint8;
-%         train_x = double(train_x) / 255;
-%         test_x  = double(test_x)  / 255;
-%         opts = dbncreateopts();
-%         dbn = dbnsetup(dbn, train_x, opts);
-%         dbn = dbntrain(dbn, train_x, opts);
-%         digits = dbnsample(dbn,50,1000);
-%         visualize(digits')
 %
 % Copyright Søren Sønderby June 2014
 
 n_rbm = numel(dbn.rbm);
 toprbm = dbn.rbm{end};
 
-if nargin == 4   % sample class is given, assume that hintonDBN = 1
-    class_vec     = dbnmakeonehot( dbn,n,sampleclass);
-    samples       = rbmsample(toprbm,n,k,class_vec);
-    
-    % the samples are n_classes too big to pass through the remaining layers
-    samples = samples(:,1:dbn.sizes(end-1));
-else
-    samples = rbmsample(toprbm,n,k);
-end
 
+%sample top RBM
+vis_sampled       = rbmsample(toprbm,n,k,sampleclass);
 
 % deterministicly pass this down the network
 for i = (n_rbm - 1):-1:1
     rbm = dbn.rbm{i};
-    samples = rbmdown(rbm,samples,@sigm);  
+    [vis_sampled,~] = rbmdown(rbm,vis_sampled,@sigm);  
 end
-
-
 end
 

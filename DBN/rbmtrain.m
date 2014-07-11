@@ -1,9 +1,12 @@
 function rbm = rbmtrain(rbm, x_train,opts)
 %%RBMTRAIN trains a single RBM
 % notation:
-%    w  : weights
-%    b  : bias of visible layer
-%    c  : bias of hidden layer
+% data  : all data given as      [n_samples   x #vis]
+%    W  : vis - hid weights      [ #hid       x #vis ]
+%    U  : label - hid weights    [ #hid       x #n_classes ]
+%    b  : bias of visible layer  [ #vis       x 1]
+%    c  : bias of hidden layer   [ #hid       x 1]
+%    d  : bias of label layer    [ #n_classes x 1]
 %  Modified by Søren Sønderby June 2014
 
 % SETUP and checking
@@ -14,47 +17,59 @@ numbatches = m / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
 % use validation set or not
-use_val = ifelse(~isempty(opts,'x_val'),1,0);
-
-
-
+if ~isempty(opts.x_val)
+    use_val = 1;
+    samples = randperm(size(x_train,1));
+    val_samples = samples(1:size(opts.x_val,1));  
+end
 
 % RUN epochs
 init_chains = 1;
 chains = [];
+chainsy = [];
+
 for i = 1 : opts.numepochs
     kk = randperm(m);
     err = 0;
     for l = 1 : numbatches
         v0 = x_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
         
+        if rbm.hintonDBN == 1
+            ey = opts.y_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
+        else
+            ey = [];
+        end
+        
+        
         if strcmp(opts.traintype,'PCD') && init_chains == 1
             % init chains in first epoch if Persistent contrastive divergence
             chains = v0;
+            chainsy = ey;
             init_chains = 0;
         end
         
         % Collect rbm statistics with CD or PCD
-        [dw,db,dc,c_err,chains] = rbmstatistics(rbm,v0,opts,opts.traintype,chains);
+        [dw,db,dc,du,dd,c_err,chains,chainsy] = rbmstatistics(rbm,v0,ey,opts,...
+                                                            chains,chainsy);
+
+        
+        err = err + c_err;
         
         %update weights, LR,decay and momentum 
-        rbm = rbmapplygrads(rbm,dw,db,dc,v0,i);
-        err = err + c_err;
+        rbm = rbmapplygrads(rbm,dw,db,dc,du,dd,v0,ey,i);
     end
-    
+    rbm.error(end+1) = err / numbatches;
 
-    
     % if the training data energy is much lower than the validation energy
     % rasie a overfitting warning. (i.e the ratio becomes <1)
-    if mod(i,5) == 0 && use_val == 1
-        e_val = rbmenergy(rbm,opts.x_val);
-        e_train = rbmenergy(rbm,x_train(1:size(opts.x_val,1),:));
-        ratio = e_val / e_train;
-        oft = ifelse(ratio<0.8,'(overfitting)','(OK)');
-        energy = sprintf('. E_Val / E_train %4.3f %s',ratio,oft);
+    if mod(i,opts.ratio_interval) == 0 && use_val == 1
+        rbm = rbmoverfitting( rbm,x_train,val_samples,opts,i);
+        overfit = ifelse(rbm.ratioy(end)<0.8,'(overfitting)','(OK)');
+        energy = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
     else
         energy = '.';
     end
+    
     
     % display output
     epochnr = ['Epoch ' num2str(i) '/' num2str(opts.numepochs) '.'];
