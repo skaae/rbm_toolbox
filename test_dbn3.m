@@ -1,6 +1,6 @@
 if ~ismac
-    cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
-    addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
+cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
+addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
 end
 %set up a deepbelief network
 load mnist_uint8;

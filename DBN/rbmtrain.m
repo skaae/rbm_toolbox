@@ -20,7 +20,7 @@ assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 if ~isempty(opts.x_val)
     use_val = 1;
     samples = randperm(size(x_train,1));
-    val_samples = samples(1:size(opts.x_val,1));  
+    val_samples = samples(1:size(opts.x_val,1));
 end
 
 % RUN epochs
@@ -49,23 +49,32 @@ for i = 1 : opts.numepochs
         end
         
         % Collect rbm statistics with CD or PCD
-        [dw,db,dc,du,dd,c_err,chains,chainsy] = rbmstatistics(rbm,v0,ey,opts,...
-                                                            chains,chainsy);
-
+        [dw,db,dc,du,dd,c_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,...
+            chains,chainsy);
+        
         
         err = err + c_err;
         
-        %update weights, LR,decay and momentum 
+        %update weights, LR,decay and momentum
         rbm = rbmapplygrads(rbm,dw,db,dc,du,dd,v0,ey,i);
     end
     rbm.error(end+1) = err / numbatches;
-
+    
     % if the training data energy is much lower than the validation energy
     % rasie a overfitting warning. (i.e the ratio becomes <1)
     if mod(i,opts.ratio_interval) == 0 && use_val == 1
-        rbm = rbmoverfitting( rbm,x_train,val_samples,opts,i);
-        overfit = ifelse(rbm.ratioy(end)<0.8,'(overfitting)','(OK)');
-        energy = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
+        %rbm = rbmoverfitting( rbm,x_train,val_samples,opts,i);
+        %overfit = ifelse(rbm.ratioy(end)<0.8,'(overfitting)','(OK)');
+        %energy = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
+            [ train_labels ] = rbmpredict( rbm,x_train);
+            [ val_labels ] = rbmpredict( rbm,opts.x_val);
+            train_perf = mean(max(opts.y_train,[],2)==train_labels);
+            val_perf = mean(max(opts.y_val,[],2)==val_labels);
+            rbm.val_perf(end+1) = val_perf;
+            rbm.train_perf(end+1) = train_perf;
+            
+            %sum(class_labels == true_class)
+            energy = ['  |  ' ,num2str(train_perf), ' - ' num2str(val_perf)];
     else
         energy = '.';
     end

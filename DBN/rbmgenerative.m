@@ -1,5 +1,5 @@
-function [dw,db,dc,du,dd,curr_err,chains,chainsy] = rbmstatistics(rbm,v0,ey,opts,chains,chainsy,avg)
-%RBMSTATISTICS collect statistics for RBM and calculate weight changes
+function [dw,db,dc,du,dd,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
+%RBMGENERATIVE collect statistics for generative RBM and calculate weight chngs.
 % SEE sections contrastive divergence(CD) and persistent contrastive
 % divergence (PCD), determined by the type parameter
 %
@@ -75,12 +75,12 @@ end
 
 for i = 1:(opts.cdn - 1)
     [visx, visy] = rbmdown(rbm,hid,@sigmrnd);
-     hid = rbmup(rbm,visx,visy,@sigmrnd);
+    hid = rbmup(rbm,visx,visy,@sigmrnd);
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
 [vk, vky] = rbmdown(rbm,hid,@sigmrnd);
- hk       = rbmup(rbm,vk,vky,@sigm);
+hk       = rbmup(rbm,vk,vky,@sigm);
 
 %update the state of the persistent chains if PCD othwise return empty chains
 switch type

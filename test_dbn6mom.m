@@ -1,9 +1,9 @@
 if ~ismac
-    cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
-    addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
-    thrds  = str2num(getenv('PBS_NUM_PPN'));
+cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
+addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
+thrds  = str2num(getenv('PBS_NUM_PPN'));
 else
-    thrds = 2;
+thrds = 2;
 end
 
 disp(thrds)
@@ -35,8 +35,8 @@ n_experiments = size(experiments,1);
 
 matlabpool('open',thrds);
 parfor t = 1:n_experiments
-    
-    %extract this experiments learningrate and training type
+
+%extract this experiments learningrate and training type
 lr = all_lr(t);     
 traintype = ifelse(all_tt(t) == 1, 'CD','PCD');
 
@@ -83,7 +83,7 @@ dbn = dbntrain(dbn, train_x, opts);
 %figure; visualize(digits');
 hinton = ifelse(opts.hintonDBN == 1,'hintonDBN','notHintonDBN')
 outstr = ['dbn_singlelayer_' opts.traintype '_lr' strrep(num2str(lr),'.','-')...
-          '_' hinton '.mat']
+'_' hinton '.mat']
 
 parsave(outstr);
 end

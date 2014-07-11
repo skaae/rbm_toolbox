@@ -22,10 +22,10 @@ if nargin == 7   % sample class is given, assume that hintonDBN = 1
             error('Given class matrix does not match n');
         end
         class_vec = sampleclass;
-    end  
+    end
     
 else
-   class_vec = [];
+    class_vec = [];
 end
 
 
@@ -43,13 +43,13 @@ vidObj.Quality = 100;
 vidObj.FrameRate = 30;
 open(vidObj);
 
-for i = 1:k    
+for i = 1:k
     hid_sampled = rbmup(toprbm,vis_sampled,class_vec,@sigmrnd);
     [vis_sampled,~] = rbmdown(toprbm,hid_sampled,@sigm);
     
     if mod(i-1,samplefreq) == 0
         samples = vis_sampled;
-
+        
         if n_rbm ~= 1 % if non-single DBN sample values before pass down
             samples = double(samples > rand(size(samples)));
         end

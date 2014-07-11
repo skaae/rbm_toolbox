@@ -26,10 +26,10 @@ function [act_vis_x, act_vis_label] = rbmdown(rbm,hid,act_func)
 % Modified by Søren Sønderby June 2014
 
 % rep vis bias n_samples times then calculate act of vis from hid
-vis_x_bias = repmat(rbm.b', size(hid, 1), 1); 
+vis_x_bias = repmat(rbm.b', size(hid, 1), 1);
 act_vis_x = act_func(vis_x_bias + hid * rbm.W);  % activation of visible units
 
-% for classRBM calculate act of label visible units
+% for hintonDBN calculate act of label visible units
 if rbm.hintonDBN == 1
     vis_label_bias = repmat(rbm.d', size(hid, 1), 1);
     act_vis_label = act_func(vis_label_bias + hid * rbm.U);

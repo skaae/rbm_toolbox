@@ -1,6 +1,6 @@
 if ~ismac
-    cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
-    addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
+cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
+addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
 end
 %set up a deepbelief network
 load mnist_uint8;
@@ -33,7 +33,7 @@ p_i = 0.5;    % initial momentum
 eps = 0.01;    % initial learning rate
 f = 0.9;     % learning rate decay
 %opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum); 
- opts.learningrate = @(t,momentum) 0.1;
+opts.learningrate = @(t,momentum) 0.1;
 %opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 opts.momentum     = @(t) 0;
 opts.L1 = 0.00;

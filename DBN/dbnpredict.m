@@ -3,7 +3,7 @@ function [ predictions ] = dbnpredict(dbn,x)
 %  INPUTS
 %   dbn : A dbn struct
 %   x   : matrix of samples  (n_samlples-by-n_features)
-%   
+%
 %  OUTPUT
 %   predictions : [n_samples x 1] vector of predicted labels
 %

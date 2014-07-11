@@ -3,7 +3,7 @@ function  class_probs = dbnclassprobs( dbn,x )
 %  INPUTS
 %   dbn : A dbn struct
 %   x   : matrix of samples  (n_samlples-by-n_features)
-%   
+%
 %  OUTPUT
 %   class_probs : class probabilites for each class (n_samples-by-n_classes)
 %
@@ -11,16 +11,16 @@ function  class_probs = dbnclassprobs( dbn,x )
 
 n_rbm = numel(dbn.rbm);
 
-if ~dbn.rbm{n_rbm}.hintonDBN 
+if ~dbn.rbm{n_rbm}.hintonDBN
     error('Class probabilities can only be calc. for classification DBN');
 end
 % pass data deterministicly from input to top RBM
 for i = 1 : n_rbm-1
-    x = rbmup(dbn.rbm{i},x,[],@sigm);  
+    x = rbmup(dbn.rbm{i},x,[],@sigm);
 end
 
 % at top RBM calculate class probabilities
-class_probs = rbmclassprops( dbn.rbm{n_rbm},x);
+class_probs = rbmclassprobs( dbn.rbm{n_rbm},x);
 
 
 

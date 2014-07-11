@@ -2,23 +2,23 @@ function freeenergy = rbmfreeenergy(rbm,v,ey)
 %RBMFREEENERGY calculates the free energy of a RBM
 % use log free energy to avoid numerical issues
 %
-%  NOTATION:
-%    w  : weights
-%    b  : bias of visible layer
-%    c  : bias of hidden layer
+% NOTATION:
+% w : weights
+% b : bias of visible layer
+% c : bias of hidden layer
 %
 %
 % see https://dl.dropboxusercontent.com/u/19557502/5_03_free_energy.pdf
 %
 % NOTATION
-% data  : all data given as      [n_samples   x #vis]
-%    v  : all data given as      [n_samples   x #vis]
-%   ey  : all data given as      [n_samples   x #n_classes]
-%    W  : vis - hid weights      [ #hid       x #vis ]
-%    U  : label - hid weights    [ #hid       x #n_classes ]
-%    b  : bias of visible layer  [ #vis       x 1]
-%    c  : bias of hidden layer   [ #hid       x 1]
-%    d  : bias of label layer    [ #n_classes x 1]
+% data : all data given as [n_samples x #vis]
+% v : all data given as [n_samples x #vis]
+% ey : all data given as [n_samples x #n_classes]
+% W : vis - hid weights [ #hid x #vis ]
+% U : label - hid weights [ #hid x #n_classes ]
+% b : bias of visible layer [ #vis x 1]
+% c : bias of hidden layer [ #hid x 1]
+% d : bias of label layer [ #n_classes x 1]
 % Copyright Søren Sønderby july 2014
 
 
@@ -34,13 +34,13 @@ n_samples = size(v,1);
 
     
 freeenergy = 0; % acuumulator over samples
-for t = 1:n_samples  
+for t = 1:n_samples
     x_t = v(t,:);
     if rbm.hintonDBN == 1
         y_idx = find(ey(t,:));
-        res = -rbm.d(y_idx);    % accumulator over hidden 
+        res = -rbm.d(y_idx); % accumulator over hidden
     else
-        res = -  x_t*rbm.b;
+        res = - x_t*rbm.b;
     end
     
     for j = 1:n_hidden
@@ -51,7 +51,7 @@ for t = 1:n_samples
         end
          
     end
-    freeenergy = freeenergy + res/n_samples;  % acumulate    
+    freeenergy = freeenergy + res/n_samples; % acumulate
 end
 
 end

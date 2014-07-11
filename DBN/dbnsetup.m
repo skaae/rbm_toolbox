@@ -47,6 +47,8 @@ for u = 1 : n_rbm
     dbn.rbm{u}.ratiox = [];
     dbn.rbm{u}.ratioy = [];
     dbn.rbm{u}.error = [];
+    dbn.rbm{u}.val_perf = [];
+    dbn.rbm{u}.train_perf  = [];
     
     
     vis_size =  dbn.sizes(u);
@@ -70,7 +72,7 @@ for u = 1 : n_rbm
         dbn.rbm{u}.vd  = [];
     end
     
-
+    
     
     dbn.rbm{u}.W  = normrnd(0,0.01,hid_size, vis_size);
     dbn.rbm{u}.vW = zeros(hid_size, vis_size);

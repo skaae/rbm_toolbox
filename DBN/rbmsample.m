@@ -5,8 +5,8 @@ function [vis_sampled] = rbmsample(rbm,n,k,sampleclass)
 %       n             : number of samples
 %       k             : number of gibbs steps before sampling
 %       sampleclass   : Class to sample. This is either a scalar giving the
-%                       class or a vector of size [n x n_classes] with each 
-%                       row corresponding to the one hot encoding of the desired 
+%                       class or a vector of size [n x n_classes] with each
+%                       row corresponding to the one hot encoding of the desired
 %
 %   OUTPUTS
 %       vis_samples       : samples as a samples-by-n matrix
@@ -26,10 +26,10 @@ if nargin == 4   % sample class is given, assume that hintonDBN = 1
             error('Given class matrix does not match n');
         end
         class_vec = sampleclass;
-    end  
+    end
     
 else
-   class_vec = [];
+    class_vec = [];
 end
 
 
@@ -42,7 +42,7 @@ vis_sampled = double(bx > rand(size(bx)));
 % do updown passes k-1 times
 for i = 1:k-1
     hid_sampled = rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
-    [vis_sampled,~] = rbmdown(rbm,hid_sampled,@sigmrnd);   
+    [vis_sampled,~] = rbmdown(rbm,hid_sampled,@sigmrnd);
     if mod(i,500) == 1
         fprintf('.')
     end
@@ -50,8 +50,8 @@ for i = 1:k-1
 end
 fprintf('.OK\n')
 % in last down pass dont sample binary.
-    hid_sampled = rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
-    [vis_sampled,~] = rbmdown(rbm,hid_sampled,@sigm);  
+hid_sampled = rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
+[vis_sampled,~] = rbmdown(rbm,hid_sampled,@sigm);
 
 end
 
