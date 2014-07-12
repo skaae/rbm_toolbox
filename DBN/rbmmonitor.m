@@ -14,10 +14,10 @@ if mod(epoch,opts.test_interval) == 0 && ~isempty(opts.x_val)
     % b) generativeRBM  calculate ratio of free energy fe_val /fe_train, if
     %    much lower than 1 we are overfitting
     if rbm.classRBM
-        rbm.train_perf(end+1) = rbmcalcerr(rbm,x,opts.y_train);
-        rbm.val_perf(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
+        rbm.train_error(end+1) = rbmcalcerr(rbm,x,opts.y_train);
+        rbm.val_error(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
         perf = sprintf('  | Tr: %5f - Val: %5f' ,...
-            rbm.train_perf(end),rbm.val_perf(end));
+            rbm.train_error(end),rbm.val_error(end));
     else
         warning('Remimpelent rbmfreeenergy');
         e_val = rbmfreeenergy(rbm,opts.x_val,opts.y_val);

@@ -23,7 +23,7 @@ if ~isempty(opts.x_val)
 end
 
 if rbm.early_stopping
-    best_perf = -Inf;
+    best_error = Inf;
     patience  = rbm.patience;
 end
 
@@ -67,10 +67,10 @@ for epoch = 1 : opts.numepochs
     [
         perf,rbm] = rbmmonitor(rbm,x_train,opts,val_samples,epoch);
     
-    if rbm.early_stopping && ~isempty(rbm.val_perf) 
-        if best_perf < rbm.val_perf(end)
+    if rbm.early_stopping && ~isempty(rbm.val_error) 
+        if best_error > rbm.val_error(end)
             best = ' ***';
-            best_perf = rbm.val_perf(end);
+            best_error = rbm.val_error(end);
             best_rbm = rbm;
             patience = rbm.patience;
         else

@@ -55,8 +55,8 @@ for u = 1 : n_rbm
     dbn.rbm{u}.L2norm = opts.L2norm;
     dbn.rbm{u}.sparsity = opts.sparsity;
     dbn.rbm{u}.error = [];
-    dbn.rbm{u}.val_perf = [];
-    dbn.rbm{u}.train_perf  = [];
+    dbn.rbm{u}.val_error = [];
+    dbn.rbm{u}.train_error  = [];
     dbn.rbm{u}.energy_ratio = [];
     
     % i havent implemented early stopping for non top layers because 
