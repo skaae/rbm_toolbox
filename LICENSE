@@ -1,5 +1,16 @@
 Modifications by Søren Kaae Sønderby:
-Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
+
+Significiant modiciations:
+ * add support for training RBM's with class labels 
+ * CD - k (contrastive divergence k)
+ * PCD (persistent contrastive divergence)
+ * Various rbm sampling functions
+ * Classiciation support
+ * Regularization: L1, L2, sparsity
+ * discriminative RBM training (work in progress)
+
+
+ Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
