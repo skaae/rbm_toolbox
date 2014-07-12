@@ -16,7 +16,7 @@ function [vis_sampled] = rbmsample(rbm,n,k,sampleclass)
 %
 % Copyright Søren Sønderby June 2014
 
-if nargin == 4   % sample class is given, assume that hintonDBN = 1
+if nargin == 4   % sample class is given, assume that classRBM = 1
     
     % check wether a scalar or a matrix is given
     if isscalar(sampleclass)

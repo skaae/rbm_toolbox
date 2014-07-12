@@ -6,7 +6,7 @@ function [dw,db,dc,du,dd,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts
 %   INPUTS:
 %       rbm       : a rbm struct
 %       v0        : the initial state of the hidden units
-%       ey        : one hot encoded labels if hintonDBN otherwise empty
+%       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct
 %       chains    : current state of markov chains
 %
@@ -107,7 +107,7 @@ db = db / opts.batchsize;
 dc = dc / opts.batchsize;
 
 % for hinton DBN update bias and variables for du and dd
-if rbm.hintonDBN == 1
+if rbm.classRBM == 1
     positive_phasey = h0' * ey;
     negative_phasey = hk' * vky;
     du = positive_phasey - negative_phasey;

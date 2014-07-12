@@ -12,11 +12,11 @@ dbn.sizes = [n, dbn.sizes];
 n_rbm = numel(dbn.sizes) - 1;
 
 valid = @(f) isfield(opts,'x_val') == 1 && ~isempty(opts.(f));
-if valid('hintonDBN') && opts.hintonDBN == 1
+if valid('classRBM') && opts.classRBM == 1
     if ~valid('y_train')
-        error('HintonDBN  requires y_train to be specified in opts')
+        error('classRBM  requires y_train to be specified in opts')
     elseif ~(valid('x_val') &&  valid('y_val'))
-        error('HintonDBN with x_val must also specify y_val in opts')
+        error('classRBM with x_val must also specify y_val in opts')
     end
 end
 
@@ -44,19 +44,18 @@ for u = 1 : n_rbm
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.L2norm = opts.L2norm;
     dbn.rbm{u}.sparsity = opts.sparsity;
-    dbn.rbm{u}.ratiox = [];
-    dbn.rbm{u}.ratioy = [];
     dbn.rbm{u}.error = [];
     dbn.rbm{u}.val_perf = [];
     dbn.rbm{u}.train_perf  = [];
     
     
+    
     vis_size =  dbn.sizes(u);
     hid_size = dbn.sizes(u + 1);
     
-    if opts.hintonDBN == 1 && u == n_rbm
+    if opts.classRBM == 1 && u == n_rbm
         % init bias and weights for class vectors
-        dbn.rbm{u}.hintonDBN = 1;
+        dbn.rbm{u}.classRBM = 1;
         n_classes = size(opts.y_train,2);
         dbn.rbm{u}.U  = normrnd(0,0.01,hid_size, n_classes);
         dbn.rbm{u}.vU  = normrnd(0,0.01,hid_size, n_classes);
@@ -65,7 +64,7 @@ for u = 1 : n_rbm
         dbn.rbm{u}.vd  = normrnd(0,0.01,n_classes, 1);
         
     else
-        dbn.rbm{u}.hintonDBN = 0;
+        dbn.rbm{u}.classRBM = 0;
         dbn.rbm{u}.U  = [];
         dbn.rbm{u}.vU  = [];
         dbn.rbm{u}.d  = [];

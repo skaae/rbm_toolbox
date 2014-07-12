@@ -7,12 +7,12 @@ function [] = sampledbnmovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
 %       fout              : location of output movie
 %       samplefreq        : samples between a picture is captured
 %       visualizer        : a function which returns a plot
-%       sampleclass       : class to sample if hintonDBN, an integer
+%       sampleclass       : class to sample if classRBM, an integer
 % Copyright Søren Sønderby June 2014
 
 n_rbm = numel(dbn.rbm);
 
-if nargin == 7   % sample class is given, assume that hintonDBN = 1
+if nargin == 7   % sample class is given, assume that classRBM = 1
     
     % check wether a scalar or a matrix is given
     if isscalar(sampleclass)

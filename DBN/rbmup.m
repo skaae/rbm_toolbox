@@ -3,7 +3,7 @@ function act_hid = rbmup(rbm, vis,ey,act_func)
 % INPUTS
 %   rbm        : A rbm struct
 %   vis        : the activation of the visible layer
-%   ey         : if hintonDBN the activation of the class labels
+%   ey         : if classRBM the activation of the class labels
 %   act_func   : the activation function, either @sigm or @sigmrnd
 %
 % OUTPUTS
@@ -28,7 +28,7 @@ hid_bias = repmat(rbm.c', size(vis, 1), 1);
 act_hid = hid_bias + vis * rbm.W';        %activation of from visible units
 
 % for the hinton DBN add the activation coming from the label visible units
-if rbm.hintonDBN == 1
+if rbm.classRBM == 1
     act_hid  = act_hid +  ey * rbm.U';
 end
 act_hid = act_func(act_hid); %apply activation function

@@ -1,5 +1,5 @@
 function [ predictions ] = dbnpredict(dbn,x)
-%DBNPREDICT predict labels using hintonDBN
+%DBNPREDICT predict labels using classDBN
 %  INPUTS
 %   dbn : A dbn struct
 %   x   : matrix of samples  (n_samlples-by-n_features)

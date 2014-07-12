@@ -11,7 +11,7 @@ function  class_probs = dbnclassprobs( dbn,x )
 
 n_rbm = numel(dbn.rbm);
 
-if ~dbn.rbm{n_rbm}.hintonDBN
+if ~dbn.rbm{n_rbm}.classRBM
     error('Class probabilities can only be calc. for classification DBN');
 end
 % pass data deterministicly from input to top RBM

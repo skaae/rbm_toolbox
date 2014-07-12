@@ -36,7 +36,7 @@ n_samples = size(v,1);
 freeenergy = 0; % acuumulator over samples
 for t = 1:n_samples
     x_t = v(t,:);
-    if rbm.hintonDBN == 1
+    if rbm.classRBM == 1
         y_idx = find(ey(t,:));
         res = -rbm.d(y_idx); % accumulator over hidden
     else
@@ -44,7 +44,7 @@ for t = 1:n_samples
     end
     
     for j = 1:n_hidden
-        if rbm.hintonDBN == 1
+        if rbm.classRBM == 1
             res = res - softplus(rbm.c(j)+rbm.W(j,:)*x_t'+rbm.U(j,y_idx));
         else
             res = res - softplus(rbm.c(j)+rbm.W(j,:)*x_t' );

@@ -1,5 +1,5 @@
 function [ predictions ] = rbmpredict(rbm,x)
-%RBMPREDICT predict labels using hintonDBN
+%RBMPREDICT predict labels using classRBM
 %  INPUTS
 %   rbm : A rbm struct
 %   x   : matrix of samples  (n_samlples-by-n_features)

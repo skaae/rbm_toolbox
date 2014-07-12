@@ -34,7 +34,7 @@ for i = 1 : opts.numepochs
     for l = 1 : numbatches
         v0 = x_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
         
-        if rbm.hintonDBN == 1
+        if rbm.classRBM == 1
             ey = opts.y_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
         else
             ey = [];
@@ -62,21 +62,16 @@ for i = 1 : opts.numepochs
     
     % if the training data energy is much lower than the validation energy
     % rasie a overfitting warning. (i.e the ratio becomes <1)
-    if mod(i,opts.ratio_interval) == 0 && use_val == 1
+    if mod(i,opts.test_interval) == 0 && use_val == 1
         %rbm = rbmoverfitting( rbm,x_train,val_samples,opts,i);
         %overfit = ifelse(rbm.ratioy(end)<0.8,'(overfitting)','(OK)');
-        %energy = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
-            [ train_labels ] = rbmpredict( rbm,x_train);
-            [ val_labels ] = rbmpredict( rbm,opts.x_val);
-            train_perf = mean(max(opts.y_train,[],2)==train_labels);
-            val_perf = mean(max(opts.y_val,[],2)==val_labels);
-            rbm.val_perf(end+1) = val_perf;
-            rbm.train_perf(end+1) = train_perf;
-            
-            %sum(class_labels == true_class)
-            energy = ['  |  ' ,num2str(train_perf), ' - ' num2str(val_perf)];
+        %perf = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
+        
+        rbm.train_perf(end+1) = rbmcalcerr(rbm,x_train,opts.y_train);
+        rbm.val_perf(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
+        perf = sprintf('  | Tr: %5f - Val: %5f' ,rbm.train_perf(end),rbm.val_perf(end));
     else
-        energy = '.';
+        perf = '.';
     end
     
     
@@ -84,7 +79,7 @@ for i = 1 : opts.numepochs
     epochnr = ['Epoch ' num2str(i) '/' num2str(opts.numepochs) '.'];
     avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
     lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
-    disp([epochnr avg_err lr_mom energy]);
+    disp([epochnr avg_err lr_mom perf]);
     
     
 end

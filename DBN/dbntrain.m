@@ -9,7 +9,7 @@ n_rbm = numel(dbn.rbm);
 line = repmat('-',1,80);
 fprintf('%s\n                  TRAINING RBM 1\n %s\n',line,line);
 
-if dbn.rbm{1}.hintonDBN == 1 && n_rbm == 1
+if dbn.rbm{1}.classRBM == 1 && n_rbm == 1
     ye = opts.y_train;
 else
     ye = [];
@@ -20,7 +20,7 @@ dbn.rbm{1} = rbmtrain(dbn.rbm{1},x_train,opts);
 
 for i = 2 : n_rbm
     
-    if dbn.rbm{i}.hintonDBN == 1 && n_rbm == i
+    if dbn.rbm{i}.classRBM == 1 && n_rbm == i
         ye = opts.y_train;
     else
         ye = [];

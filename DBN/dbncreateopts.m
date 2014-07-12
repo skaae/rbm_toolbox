@@ -28,18 +28,16 @@ function [ opts ] = dbncreateopts()
 %                     hidden biases after each update. see
 %                     "Classification using Discriminative Restricted Boltzmann
 %                     Machines. A suitable value might be pow(10,-4)
-%         hintonDBN : If this field exists and is 1 then train the DBN where the
+%         classRBM : If this field exists and is 1 then train the DBN where the
 %                     visible layer of the last RBM has the training labels
 %                     added. See "To recognize shapes, first learn to generate
 %                     images" Requires y_train to be spcified.
-%    ratio_interval : how often the ratio of free energies between the
-%                     validation set and training set should be calculated
-%                     (default = 5 epochs)
-%           y_train : Must be specified if hintonDBN is 1
+%    test_interval  : how often the performance should be measured
+%           y_train : Must be specified if classRBM is 1
 %             x_val : If specified the energy ratio between a training set the
 %                     and the validation set will be caluclated every
 %                     ratio_interval epoch
-%             y_val : if hintonDBN is a field and x_val is a field this field
+%             y_val : if classRBM is a field and x_val is a field this field
 %                     must be specified
 %
 
@@ -61,8 +59,8 @@ opts.L1 = 0.00;
 opts.L2 = 0;
 opts.L2norm = 0;
 opts.sparsity = 0;
-opts.hintonDBN = 0;
-opts.ratio_interval = 5;
+opts.classRBM = 0;
+opts.test_interval = 5;
 opts.y_train = [];
 opts.x_val = [];
 opts.y_val = [];

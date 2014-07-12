@@ -22,12 +22,9 @@ function [ class_prob ] = rbmclassprobs( rbm,x)
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
-%  TODO
-%    vectorize code?
-%
 % Copyright Søren Sønderby july 2014
 n_visible = size(rbm.W,2);
-if ~rbm.hintonDBN
+if ~rbm.classRBM
     error('Class probabilities can only be calc. for classification RBM´s');
 end
 if size(x,2) ~= n_visible
@@ -38,27 +35,20 @@ n_hidden  = size(rbm.W,1);
 n_classes = size(rbm.d,1);
 n_samples = size(x,1);
 
-% calculate probabilities for all samples
-% class_probs = zeros(n_samples,n_classes);
-% for t = 1:n_samples
-%     class_probs(t,:) = calcprobs(x(t,:));
-% end
-
-class_probs = zeros(n_samples,n_classes);
 
 %pre calculate
-o = repmat(rbm.c,1,n_samples)+rbm.W*x';
-
-
-
+cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
+F = zeros(n_samples,n_classes);
 for y = 1:n_classes
     rep_U = repmat(rbm.U(:,y),1,n_samples);
-    act = o + rep_U;
-    class_probs(:,y) =  sum( softplus(act ) )+ rbm.d(y);
+    oyj = cwx + rep_U;
+    F(:,y) =  sum( softplus(oyj ) )+ rbm.d(y);
 end
-class_normalizer = log_sum_exp_over_rows(class_probs'); 
-log_class_prob = class_probs - repmat(class_normalizer',1,n_classes); 
+class_normalizer = log_sum_exp_over_rows(F'); 
+log_class_prob = F - repmat(class_normalizer',1,n_classes); 
 class_prob = exp(log_class_prob);
+
+end
 %
 %the top implementation seems to be slighly faster
 
@@ -109,7 +99,7 @@ class_prob = exp(log_class_prob);
 %
 % end
 
-end
+
 
 
 
