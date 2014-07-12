@@ -34,7 +34,7 @@ l = 5*10.^(-[2 3 4 5]);
 train_type = [0 1];
 hin        = 1;
 l1 = [0 0.0001];
-n_hid = [100, 500,2000];
+n_hid = [100, 500];
 experiments = combvec(l,train_type,hin,l1,n_hid)';
 
 all_lr = experiments(:,1);
@@ -79,7 +79,7 @@ for t = 1:n_experiments
     opts.y_train = train_y;
     opts.x_val = test_x;
     opts.y_val = test_y;
-    opts.ratio_interval = 1;
+    opts.test_interval = 1;
     
     hinton = ifelse(opts.classRBM == 1,'classRBM','notclassRBM');
     outstr = ['rbm_' opts.traintype '_lr' num2str(lr)...
@@ -89,9 +89,9 @@ for t = 1:n_experiments
     dbn = dbnsetup(dbn, train_x, opts);
     
     if exist([opts.outstr '.mat'], 'file') == 2
-        disp(['already calculated: ' opts.outstr]);
+        disp(['experiment already calculated: ' opts.outstr]);
     else
-        disp(['add: ' opts.outstr]);
+        disp(['add experiment: ' opts.outstr]);
         all_dbn{end+1} = dbn;
         all_opts{end+1} = opts;
     end

@@ -1,6 +1,6 @@
 function freeenergy = rbmfreeenergy(rbm,v,ey)
 %RBMFREEENERGY calculates the free energy of a RBM
-% use log free energy to avoid numerical issues
+% NOT WORKING ATM
 %
 % NOTATION:
 % w : weights

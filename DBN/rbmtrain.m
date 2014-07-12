@@ -18,24 +18,28 @@ assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
 % use validation set or not
 if ~isempty(opts.x_val)
-    use_val = 1;
     samples = randperm(size(x_train,1));
     val_samples = samples(1:size(opts.x_val,1));
+end
+
+if rbm.early_stopping
+    best_perf = -Inf;
+    patience  = rbm.patience;
 end
 
 % RUN epochs
 init_chains = 1;
 chains = [];
 chainsy = [];
+best = '';
 
-for i = 1 : opts.numepochs
+for epoch = 1 : opts.numepochs
     kk = randperm(m);
     err = 0;
-    for l = 1 : numbatches
-        v0 = x_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
-        
+    for l = 1 : numbatches     
+        v0 = extractminibatch(kk,l,opts.batchsize,x_train);
         if rbm.classRBM == 1
-            ey = opts.y_train(kk((l - 1) * opts.batchsize + 1 : l * opts.batchsize), :);
+            ey = extractminibatch(kk,l,opts.batchsize,opts.y_train);
         else
             ey = [];
         end
@@ -51,36 +55,45 @@ for i = 1 : opts.numepochs
         % Collect rbm statistics with CD or PCD
         [dw,db,dc,du,dd,c_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,...
             chains,chainsy);
-        
-        
+
         err = err + c_err;
         
         %update weights, LR,decay and momentum
-        rbm = rbmapplygrads(rbm,dw,db,dc,du,dd,v0,ey,i);
+        rbm = rbmapplygrads(rbm,dw,db,dc,du,dd,v0,ey,epoch);
     end
     rbm.error(end+1) = err / numbatches;
     
-    % if the training data energy is much lower than the validation energy
-    % rasie a overfitting warning. (i.e the ratio becomes <1)
-    if mod(i,opts.test_interval) == 0 && use_val == 1
-        %rbm = rbmoverfitting( rbm,x_train,val_samples,opts,i);
-        %overfit = ifelse(rbm.ratioy(end)<0.8,'(overfitting)','(OK)');
-        %perf = sprintf('. E_Val / E_train %4.3f %s',rbm.ratioy(end),overfit);
-        
-        rbm.train_perf(end+1) = rbmcalcerr(rbm,x_train,opts.y_train);
-        rbm.val_perf(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
-        perf = sprintf('  | Tr: %5f - Val: %5f' ,rbm.train_perf(end),rbm.val_perf(end));
-    else
-        perf = '.';
+    % calc train/val performance. 
+    [
+        perf,rbm] = rbmmonitor(rbm,x_train,opts,val_samples,epoch);
+    
+    if rbm.early_stopping && ~isempty(rbm.val_perf) 
+        if best_perf < rbm.val_perf(end)
+            best = ' ***';
+            best_perf = rbm.val_perf(end);
+            best_rbm = rbm;
+            patience = rbm.patience;
+        else
+            best = '';
+            patience = patience-1;
+        end
+        % stop training
+        if patience < 0
+            disp('No more Patience. Return best RBM')
+            rbm = best_rbm;
+            break;
+        end
     end
     
-    
     % display output
-    epochnr = ['Epoch ' num2str(i) '/' num2str(opts.numepochs) '.'];
+    epochnr = ['Epoch ' num2str(epoch) '/' num2str(opts.numepochs) '.'];
     avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
     lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
-    disp([epochnr avg_err lr_mom perf]);
+    disp([epochnr avg_err lr_mom perf best]);
     
     
 end
+
+
+
 end

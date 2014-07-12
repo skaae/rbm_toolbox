@@ -20,8 +20,18 @@ if valid('classRBM') && opts.classRBM == 1
     end
 end
 
-
-
+% if early stopping a validation set must be specified
+if opts.early_stopping
+    if opts.classRBM == 1
+        if ~(valid('y_val') && valid('x_val'))
+            error('Eearly stopping with classRBM requires x and y val sets')
+        end
+    end
+elseif opts.classRBM == 0
+    error('Early stopping is not implemented for generativeRBM')
+    
+end
+        
 for u = 1 : n_rbm
     
     % if one learningrate/momentum function use this for all
@@ -47,6 +57,17 @@ for u = 1 : n_rbm
     dbn.rbm{u}.error = [];
     dbn.rbm{u}.val_perf = [];
     dbn.rbm{u}.train_perf  = [];
+    dbn.rbm{u}.energy_ratio = [];
+    
+    % i havent implemented early stopping for non top layers because 
+    % they are not classRBMS
+    if n_rbm == u
+        dbn.rbm{u}.early_stopping = opts.early_stopping;
+    else
+        dbn.rbm{u}.early_stopping = 0;
+    end
+    dbn.rbm{u}.patience = opts.patience;
+
     
     
     

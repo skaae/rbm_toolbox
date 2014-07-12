@@ -39,8 +39,13 @@ function [ opts ] = dbncreateopts()
 %                     ratio_interval epoch
 %             y_val : if classRBM is a field and x_val is a field this field
 %                     must be specified
+%    early_stopping : Use earlystopping
+%          patience : Patience when using early stopping. Notice that 
+%                     epochs that will pass before we stop are 
+%                     patience * test_interval. E.g i you want a patience of 
+%                     5 epocs and the test_interval is 5 set patience to 1
+%   
 %
-
 dbn.sizes = [500 500 2000];
 opts.traintype = 'PCD';
 opts.numepochs =   100;
@@ -64,5 +69,7 @@ opts.test_interval = 5;
 opts.y_train = [];
 opts.x_val = [];
 opts.y_val = [];
+opts.early_stopping = 1;
+opts.patience = 5;
 end
 

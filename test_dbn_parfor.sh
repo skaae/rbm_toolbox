@@ -7,7 +7,6 @@
 #PBS -M skaaesonderby@gmail.com
 #PBS -m abe
 #PBS -l nodes=1:ppn=12
-#PBS -l vmem=32gb
 # Execute the job from the current working directory
 cd $PBS_O_WORKDIR
 
