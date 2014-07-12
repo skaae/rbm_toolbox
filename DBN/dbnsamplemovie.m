@@ -1,8 +1,8 @@
-function [] = sampledbnmovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
-%%SAMPLEDBNMOVIE generates movie of sampling from DBN
+function [] = dbnsamplemovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
+%%DBNSAMPLEMOVIE generates movie of sampling from DBN
 %   INPUTS:
 %       dbn               : a rbm struct
-%       n                 : number of samples
+%       n                 : number of samples 
 %       k                 : number of gibbs steps
 %       fout              : location of output movie
 %       samplefreq        : samples between a picture is captured
