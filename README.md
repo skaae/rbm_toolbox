@@ -37,6 +37,7 @@ Significiant additions:
 		dbn = dbntrain(dbn, train_x, opts);
 		digits = dbnsample(dbn,100,5000,class_vec);
 		dbnsamplemovie(dbn,100,3000,'test',1,@visualize,class_vec);
+		probs = dbnclassprobs(dbn,train_x);
 		preds = dbnpredict(dbn,train_x);
 
 
