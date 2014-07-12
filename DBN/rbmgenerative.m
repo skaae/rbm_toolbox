@@ -1,19 +1,21 @@
-function [dw,db,dc,curr_err,chains] = rbmstatistics(rbm,v0,opts,type,chains)
-%RBMSTATISTICS collect statistics for RBM and calculate weight changes
+function [dw,db,dc,du,dd,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
+%RBMGENERATIVE collect statistics for generative RBM and calculate weight chngs.
 % SEE sections contrastive divergence(CD) and persistent contrastive
 % divergence (PCD), determined by the type parameter
 %
 %   INPUTS:
 %       rbm       : a rbm struct
 %       v0        : the initial state of the hidden units
+%       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct
-%       type      : PCD|CD persistent CD or CD
-%       chains    _ current state of markov chains
+%       chains    : current state of markov chains
 %
 %   OUTPUTS
 %       dw         : w weights chainge normalized by minibatch size
 %       db         : bias of visible layer weight change norm by minibatch size
 %       dc         : bias of hidden layer weight change norm by minibatch size
+%       du         : class label layer weight change norm by minibatch size
+%       dd         : class label hidden bias weight change norm by minibatch size
 %       curr_err   : current squared error normalized by minibatch size
 %       chains     : current value of chains
 %
@@ -43,13 +45,23 @@ function [dw,db,dc,curr_err,chains] = rbmstatistics(rbm,v0,opts,type,chains)
 %     Proceedings of the 25th international conference on Machine learning.
 %     ACM, 2008.
 %
+% NOTATION
+% data  : all data given as      [n_samples   x #vis]
+%    v  : all data given as      [n_samples   x #vis]
+%   ey  : all data given as      [n_samples   x #n_classes]
+%    W  : vis - hid weights      [ #hid       x #vis ]
+%    U  : label - hid weights    [ #hid       x #n_classes ]
+%    b  : bias of visible layer  [ #vis       x 1]
+%    c  : bias of hidden layer   [ #hid       x 1]
+%    d  : bias of label layer    [ #n_classes x 1]
+%
 % Copyright Søren Sønderby June 2014
 
 % Collect postivite phase (we already have v0 as imput)
 % the positive phase is the same for CD and PCD
-h0 = rbmup(rbm,v0,@sigmrnd);
+type = opts.traintype;
 
-
+h0 = rbmup(rbm,v0,ey,@sigmrnd);
 
 % For contrastive divergence use the input vectors as starting point
 % for Persistent contrastive divergence we use the persistent chains as
@@ -58,20 +70,28 @@ switch type
     case 'CD'
         hid = h0;
     case 'PCD'
-        hid= rbmup(rbm,chains,@sigmrnd);
+        hid= rbmup(rbm,chains,chainsy,@sigmrnd);
 end
 
 for i = 1:(opts.cdn - 1)
-    vis = rbmdown(rbm,hid,@sigmrnd);
-    hid = rbmup(rbm,vis,@sigmrnd);
+    [visx, visy] = rbmdown(rbm,hid,@sigmrnd);
+    hid = rbmup(rbm,visx,visy,@sigmrnd);
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
-vk = rbmdown(rbm,hid,@sigmrnd);
-hk = rbmup(rbm,vk,@sigm);
+[vk, vky] = rbmdown(rbm,hid,@sigmrnd);
+hk       = rbmup(rbm,vk,vky,@sigm);
 
-%update the state of the persistent chains
-chains = vk;
+%update the state of the persistent chains if PCD othwise return empty chains
+switch type
+    case 'PCD'
+        chains = vk;
+        chainsy = vky;
+    case 'CD'
+        chains = [];
+        chainsy = [];
+end
+
 
 % calcualte the postive and negative gradient / aka positive and neg phase
 positive_phase = h0' * v0;
@@ -85,6 +105,21 @@ dc =  sum(h0 - hk)';
 dw = dw / opts.batchsize;
 db = db / opts.batchsize;
 dc = dc / opts.batchsize;
+
+% for hinton DBN update bias and variables for du and dd
+if rbm.classRBM == 1
+    positive_phasey = h0' * ey;
+    negative_phasey = hk' * vky;
+    du = positive_phasey - negative_phasey;
+    dd = sum(ey - vky)';
+    du = du / opts.batchsize;
+    dd = dd/ opts.batchsize;
+else
+    du = [];
+    dd = [];
+end
+
 curr_err = sum(sum((v0 - vk) .^ 2)) / opts.batchsize;
+
 end
 
