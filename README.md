@@ -3,8 +3,6 @@
 Toolbox for training RBM's and DBN's. 
 Support for joint training of features and labels. 
 
-Modifications by Søren Kaae Sønderby:
-
 Significiant additions:
  * add support for training RBM's with class labels 
  * CD - k (contrastive divergence k)

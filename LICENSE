@@ -1,6 +1,6 @@
-Modifications by Søren Kaae Sønderby:
+Modifications by Søren Kaae Sønderby.
 
-Significiant modiciations:
+Significiant modifcations:
  * add support for training RBM's with class labels 
  * CD - k (contrastive divergence k)
  * PCD (persistent contrastive divergence)
