@@ -15,29 +15,29 @@ Significiant additions:
  # Example usage
 
 
-	%load Data
-	rand('state',0);
-	load mnist_uint8;
+		%load Data
+		rand('state',0);
+		load mnist_uint8;
 
-	train_x = double(train_x) / 255;
-	test_x  = double(test_x)  / 255;
-	train_y = double(train_y);
-	test_y  = double(test_y);
+		train_x = double(train_x) / 255;
+		test_x  = double(test_x)  / 255;
+		train_y = double(train_y);
+		test_y  = double(test_y);
 
 
-	% for sampling from RBM
-	class_vec = zeros(100,size(train_y,2));
-	for i = 1:size(train_y,2)
-	    class_vec((i-1)*10+1:i*10,i) = 1;
-	end
+		% for sampling from RBM
+		class_vec = zeros(100,size(train_y,2));
+		for i = 1:size(train_y,2)
+		    class_vec((i-1)*10+1:i*10,i) = 1;
+		end
 
-	% SETUP and train
-	dbn.sizes = [500];
-	opts = dbncreateopts();
-	dbn = dbntrain(dbn, train_x, opts);
-	digits = dbnsample(dbn,100,5000,class_vec);
-	dbnsamplemovie(dbn,100,3000,'test',1,@visualize,class_vec);
-	preds = dbnpredict(dbn,train_x);
+		% SETUP and train
+		dbn.sizes = [500];
+		opts = dbncreateopts();
+		dbn = dbntrain(dbn, train_x, opts);
+		digits = dbnsample(dbn,100,5000,class_vec);
+		dbnsamplemovie(dbn,100,3000,'test',1,@visualize,class_vec);
+		preds = dbnpredict(dbn,train_x);
 
 
 This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
