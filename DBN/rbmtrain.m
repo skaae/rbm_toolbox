@@ -57,13 +57,12 @@ for epoch = 1 : opts.numepochs
         end
         
         % calculate rbm gradients
-        [grads,c_err,chains,chainsy] =... 
-            opts.train_func(rbm,v0,ey,opts,chains,chainsy);
+        [grads,c_err,chains,chainsy]= opts.train_func(rbm,v0,ey,opts,chains,chainsy);
         
         err = err + c_err;
         
         %update weights, LR,decay and momentum
-        rbm = rbmapplygrads(rbm,dw,db,dc,du,dd,v0,ey,epoch);
+        rbm = rbmapplygrads(rbm,grads,v0,ey,epoch);
     end
     rbm.error(end+1) = err / numbatches;
     

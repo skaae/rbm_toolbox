@@ -1,5 +1,5 @@
 function [ grads,curr_err,chains,chainsy ] = ...
-    rbmdiscriminative( rbm,x,ey,opts,chains,chainsy )
+                               rbmdiscriminative( rbm,x,ey,opts,chains,chainsy )
 %RBMDISCRIMINATIVE calcualte weight updates for discriminative RBM
 %
 %

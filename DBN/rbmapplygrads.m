@@ -1,16 +1,16 @@
-function [ rbm ] = rbmapplygrads(rbm,dw,db,dc,du,dd,x,ey,epoch)
+function [ rbm ] = rbmapplygrads(rbm,grads,x,ey,epoch)
 %RBMAPPLYGRADS applies momentum and learningrate and updates rbm weights
 %   INPUT
-%       rbm     : rbm struct
-%       opts    : opts struct
-%       dw      : w weights change
-%       db      : change of bias of visible layer
-%       dc      : change of bias of hidden layer
-%       du      : change of weights from class labels to hidden layer
-%       dd      : chainge of bias in class label hidden layer
-%       x       : current minibatch
-%       ey      : if classRBM one hot encoded class labels otherwise empty
-%       epoch   : current epoch number
+%       rbm        : rbm struct
+%       opts       : opts struct
+%       grads.dw   : w weights chainge normalized by minibatch size
+%       grads.db   : bias of visible layer weight change norm by minibatch size
+%       grads.dc   : bias of hidden layer weight change norm by minibatch size
+%       grads.du   : class label layer weight change norm by minibatch size
+%       grads.dd   : class label hidden bias weight change norm by minibatch size
+%       x          : current minibatch
+%       ey         : if classRBM one hot encoded class labels otherwise empty
+%       epoch      : current epoch number
 %
 %   OUTPUT
 %       rbm     :  rbm struct with updated weights, LR and momentum
@@ -27,6 +27,14 @@ function [ rbm ] = rbmapplygrads(rbm,dw,db,dc,du,dd,x,ey,epoch)
 % Copyright Søren Sønderby June 2014
 
 % update learningrates
+
+dw = grads.dw;
+db = grads.db;
+dc = grads.dc;
+dd = grads.dd;
+du = grads.du;
+
+
 rbm.curMomentum     = rbm.momentum(epoch);
 rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
 
