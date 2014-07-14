@@ -37,7 +37,8 @@ n_samples = size(x,1);
 
 
 %pre calculate
-cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
+%cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
+cwx = bsxfun(@plus,rbm.W*x',rbm.c); 
 F = zeros(n_samples,n_classes);
 for y = 1:n_classes
     rep_U = repmat(rbm.U(:,y),1,n_samples);

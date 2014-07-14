@@ -44,9 +44,15 @@ function [ opts ] = dbncreateopts()
 %                     epochs that will pass before we stop are 
 %                     patience * test_interval. E.g i you want a patience of 
 %                     5 epocs and the test_interval is 5 set patience to 1
-%   
-%
-dbn.sizes = [500 500 2000];
+%    train_func     : @rbmgenerative: Generative rbm training with or without 
+%                     labels. 
+%                     @rbmdiscriminative: discriminative training. Requires
+%                     training labels. 
+%                     reference "Learning algorithms for the classification 
+%                                restricted boltzmann machine"ª
+%                                                   
+
+% DEFAULT SETTINGS
 opts.traintype = 'PCD';
 opts.numepochs =   100;
 opts.batchsize = 100;
@@ -71,5 +77,6 @@ opts.x_val = [];
 opts.y_val = [];
 opts.early_stopping = 1;
 opts.patience = 5;
+opts.train_func = @rbmgenerative;
 end
 
