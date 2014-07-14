@@ -1,5 +1,5 @@
 function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
-%RBMGENERATIVE calcualte weight updates for generative RBM
+%RBMGENERATIVE calculate weight updates for generative RBM
 % SEE sections contrastive divergence(CD) and persistent contrastive
 % divergence (PCD), determined by opts.traintype
 %

@@ -30,10 +30,10 @@ test_y  = double(test_y);
 
 
 %%% for testing
-% train_x = train_x(1:1000,:);
-% test_x =  test_x(1:1000,:);
-% train_y = train_y(1:1000,:);
-% test_y =  test_y(1:1000,:);
+% train_x = train_x(1:100,:);
+% test_x =  test_x(1:100,:);
+% train_y = train_y(1:100,:);
+% test_y =  test_y(1:100,:);
 % [~, labs] = max(train_y,[],2);
 % 
 % A = prdataset(train_x,labs);
@@ -43,7 +43,7 @@ test_y  = double(test_y);
 dbn.sizes = [500];
 [opts valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmdiscriminative;
+opts.train_func = @rbmhybrid;
 
 opts.traintype = 'PCD';
 opts.numepochs =   100;

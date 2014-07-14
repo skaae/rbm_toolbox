@@ -1,6 +1,5 @@
-function [ grads,curr_err,chains,chainsy ] = ...
-                               rbmdiscriminative( rbm,x,ey,opts,chains,chainsy )
-%RBMDISCRIMINATIVE calcualte weight updates for discriminative RBM
+function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chains,chainsy)
+%RBMDISCRIMINATIVE calculate weight updates for discriminative RBM
 %
 %
 %   INPUTS:
@@ -105,7 +104,7 @@ end
 %% dd grad
 dd = sum(ey - class_prob,1)';
 
-
+%% return values
 grads.dw = dw / opts.batchsize;
 grads.db = db / opts.batchsize;
 grads.dc = dc / opts.batchsize;
@@ -113,5 +112,7 @@ grads.dd = dd / opts.batchsize;
 grads.du = du / opts.batchsize;
 
 curr_err = 0;
+chains   = [];
+chainsy  = [];
 end
 

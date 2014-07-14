@@ -4,9 +4,9 @@ function [ opts,valid_fields ] = dbncreateopts()
 %    The following fields are valid
 %
 %         traintype : CD for contrastive divergence, PCD for persistent
-%                     contrastive divergence.
-%               cdn : integer. Number of gibbs steps before negative statistics
-%                     is collected. Applies to both CD and PCD setting
+%                     contrastive divergence. see [3,4]
+%               cdn : integer. Number of gibbs steps.
+%                     Applies to both CD and PCD setting. see [3,4]
 %         numepochs : number of epochs
 %         batchsize : minibatch size. mod(n_samples,batchsize) must be 0
 %      learningrate : a function taking current epoch and current momentum as
@@ -22,13 +22,10 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                L2 : double specifying L2 weight decay
 %            L2norm : double specifying constraint on the incoming weight sizes
 %                     to each nuron. If the L2norm is above this value the
-%                     weights for this neuron is rescaled to L2norm. See
-%                     http://arxiv.org/abs/1207.0580
+%                     weights for this neuron is rescaled to L2norm. See [2]
 %          sparsity ; Use a simple sparsity measure. substract sparsity from the
-%                     hidden biases after each update. see
-%                     "Classification using Discriminative Restricted Boltzmann
-%                     Machines. A suitable value might be pow(10,-4)
-%         classRBM : If this field exists and is 1 then train the DBN where the
+%                     hidden biases after each update. see [1]
+%         classRBM  : If this field exists and is 1 then train the DBN where the
 %                     visible layer of the last RBM has the training labels
 %                     added. See "To recognize shapes, first learn to generate
 %                     images" Requires y_train to be spcified.
@@ -44,13 +41,28 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     epochs that will pass before we stop are 
 %                     patience * test_interval. E.g i you want a patience of 
 %                     5 epocs and the test_interval is 5 set patience to 1
-%    train_func     : @rbmgenerative: Generative rbm training with or without 
+%        train_func : @rbmgenerative: Generative rbm training with or without 
 %                     labels. 
 %                     @rbmdiscriminative: discriminative training. Requires
 %                     training labels. 
-%                     reference "Learning algorithms for the classification 
-%                                restricted boltzmann machine"ª
-%                                                   
+%                     @rbmhybrid mix of generative and discriminative, see [1]
+%                   
+%      hybrid_alpha : weigthing of generative and hybrid training objective see 
+%                     [1]
+%
+% References
+%     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
+%         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
+%     [2] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and 
+%         R. R. Salakhutdinov, ?Improving neural networks by preventing 
+%         co-adaptation of feature detectors,? Jul. 2012
+%     [3] T. Tieleman, ?Training restricted Boltzmann machines using 
+%         approximations to the likelihood gradient,? ? 
+%         25th Int. Conf. Mach. ?, 2008.
+%     [4] G. Hinton, ?Training products of experts by minimizing contrastive 
+%         divergence,? Neural Comput., 2002.
+%
+% copyright Søren Sønderby july 2014
 
 % DEFAULT SETTINGS
 opts.traintype = 'PCD';
@@ -78,6 +90,7 @@ opts.y_val = [];
 opts.early_stopping = 1;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
+opts.hybrid_alpha = 0.5;
 
 valid_fields = fieldnames(opts);
 
