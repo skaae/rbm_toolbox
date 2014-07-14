@@ -1,24 +1,26 @@
-function [dw,db,dc,du,dd,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
-%RBMGENERATIVE collect statistics for generative RBM and calculate weight chngs.
+function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
+%RBMGENERATIVE calcualte weight updates for generative RBM
 % SEE sections contrastive divergence(CD) and persistent contrastive
-% divergence (PCD), determined by the type parameter
+% divergence (PCD), determined by opts.traintype
 %
 %   INPUTS:
 %       rbm       : a rbm struct
 %       v0        : the initial state of the hidden units
 %       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct
-%       chains    : current state of markov chains
+%       chains    : current state of markov chains for visible units
+%       chainsy   : current state of markov chains for label visible units
 %
 %   OUTPUTS
-%       dw         : w weights chainge normalized by minibatch size
-%       db         : bias of visible layer weight change norm by minibatch size
-%       dc         : bias of hidden layer weight change norm by minibatch size
-%       du         : class label layer weight change norm by minibatch size
-%       dd         : class label hidden bias weight change norm by minibatch size
+%      A grads struct with the fields:
+%       grads.dw   : w weights chainge normalized by minibatch size
+%       grads.db   : bias of visible layer weight change norm by minibatch size
+%       grads.dc   : bias of hidden layer weight change norm by minibatch size
+%       grads.du   : class label layer weight change norm by minibatch size
+%       grads.dd   : class label hidden bias weight change norm by minibatch size
 %       curr_err   : current squared error normalized by minibatch size
-%       chains     : current value of chains
-%
+%       chains     : updated value of chains for visible units
+%       chainsy    : updated value of chains for label visible units.
 %
 %CONTRASTIVE DIVERGENCE (TYPE = 'CD')
 % Normal contrastive divergence with k CD updates
@@ -120,6 +122,12 @@ else
 end
 
 curr_err = sum(sum((v0 - vk) .^ 2)) / opts.batchsize;
+
+grads.dw = dw;
+grads.db = db;
+grads.dc = dc;
+grads.du = du;
+grads.dd = dd;
 
 end
 

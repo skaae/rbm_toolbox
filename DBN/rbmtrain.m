@@ -57,7 +57,7 @@ for epoch = 1 : opts.numepochs
         end
         
         % calculate rbm gradients
-        [dw,db,dc,du,dd,c_err,chains,chainsy] =... 
+        [grads,c_err,chains,chainsy] =... 
             opts.train_func(rbm,v0,ey,opts,chains,chainsy);
         
         err = err + c_err;
