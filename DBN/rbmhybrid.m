@@ -62,11 +62,9 @@ for i = 1:2
     if i == 1  % generative call
         [g,err,chainsupd,chainsyupd] = rbm_gen();
         results{i}.type = 'generative';
-        fprintf('.')
     else
         [g,err,chainsupd,chainsyupd]=rbm_dis();
         results{i}.type = 'discriminative';
-        fprintf('.')
     end
     
     
