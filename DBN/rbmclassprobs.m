@@ -38,16 +38,21 @@ n_samples = size(x,1);
 
 %pre calculate
 %cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
-cwx = bsxfun(@plus,rbm.W*x',rbm.c); 
-F = zeros(n_samples,n_classes);
+% precalcualte activation of hidden units
+cwx = bsxfun(@plus,rbm.W*x',rbm.c);
+
+% loop over all classes and caluclate energies and probabilities
+F = zeros(n_hidden,n_samples,n_classes);
+class_log_prob = zeros(n_samples,n_classes);
 for y = 1:n_classes
-    rep_U = repmat(rbm.U(:,y),1,n_samples);
-    oyj = cwx + rep_U;
-    F(:,y) =  sum( softplus(oyj ) )+ rbm.d(y);
+    F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
+    class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
 end
-class_normalizer = log_sum_exp_over_rows(F'); 
-log_class_prob = F - repmat(class_normalizer',1,n_classes); 
-class_prob = exp(log_class_prob);
+
+%normalize probabilities in numerically stable way
+class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
+class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
+
 
 end
 %

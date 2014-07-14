@@ -1,4 +1,4 @@
-function [ opts ] = dbncreateopts()
+function [ opts,valid_fields ] = dbncreateopts()
 %DBNCREATEOPTS creates a valid opts struct
 % The OPTS struct
 %    The following fields are valid
@@ -78,5 +78,8 @@ opts.y_val = [];
 opts.early_stopping = 1;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
+
+valid_fields = fieldnames(opts);
+
 end
 

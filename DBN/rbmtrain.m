@@ -12,14 +12,18 @@ function rbm = rbmtrain(rbm, x_train,opts)
 % SETUP and checking
 assert(isfloat(x_train), 'x must be a float');
 assert(all(x_train(:)>=0) && all(x_train(:)<=1), 'all data in x must be in [0:1]');
-m = size(x_train, 1);
-numbatches = m / opts.batchsize;
+n_samples = size(x_train, 1);
+numbatches = n_samples / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
 % use validation set or not
 if ~isempty(opts.x_val)
-    samples = randperm(size(x_train,1));
-    val_samples = samples(1:size(opts.x_val,1));
+    n_val_samples   = size(opts.x_val,1);
+    samples         = randperm(size(x_train,1));
+    % if size of val set is larger than train set use trainset size otherwise
+    % use size of validation set
+    size_val_sample = ifelse(n_samples>=n_val_samples, n_val_samples, n_samples);
+    val_samples     = samples(1:size_val_sample);
 end
 
 if rbm.early_stopping
@@ -34,7 +38,7 @@ chainsy = [];
 best = '';
 
 for epoch = 1 : opts.numepochs
-    kk = randperm(m);
+    kk = randperm(n_samples);
     err = 0;
     for l = 1 : numbatches
         v0 = extractminibatch(kk,l,opts.batchsize,x_train);
