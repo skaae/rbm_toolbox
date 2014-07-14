@@ -11,11 +11,21 @@ n = size(x, 2);
 dbn.sizes = [n, dbn.sizes];
 n_rbm = numel(dbn.sizes) - 1;
 
+
 valid = @(f) isfield(opts,'x_val') == 1 && ~isempty(opts.(f));
+reqboth =@(a,b) valid(a) && ~valid(b);
+
+% require that they are on togheter
+if  reqboth('y_val','x_val')
+    error('For validation specify both y_val and x_val')
+end
+
+
+% check if y is given if class rbm
 if valid('classRBM') && opts.classRBM == 1
     if ~valid('y_train')
         error('classRBM  requires y_train to be specified in opts')
-    elseif ~(valid('x_val') &&  valid('y_val'))
+    elseif reqboth('y_val','x_val')
         error('classRBM with x_val must also specify y_val in opts')
     end
 end
@@ -23,7 +33,7 @@ end
 % if early stopping a validation set must be specified
 if opts.early_stopping
     if opts.classRBM == 1
-        if ~(valid('y_val') && valid('x_val'))
+        if  reqboth('y_val','x_val')
             error('Eearly stopping with classRBM requires x and y val sets')
         end
     end
@@ -32,6 +42,14 @@ elseif opts.classRBM == 0
     
 end
         
+% if discriminitive training require labels
+if isequal(opts.train_func,@rbmdiscriminative)
+    if ~valid('y_train')
+        error('Discriminative training requires labels')
+    end
+end
+
+
 for u = 1 : n_rbm
     
     % if one learningrate/momentum function use this for all

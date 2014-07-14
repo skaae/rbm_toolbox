@@ -36,7 +36,7 @@ best = '';
 for epoch = 1 : opts.numepochs
     kk = randperm(m);
     err = 0;
-    for l = 1 : numbatches     
+    for l = 1 : numbatches
         v0 = extractminibatch(kk,l,opts.batchsize,x_train);
         if rbm.classRBM == 1
             ey = extractminibatch(kk,l,opts.batchsize,opts.y_train);
@@ -52,10 +52,10 @@ for epoch = 1 : opts.numepochs
             init_chains = 0;
         end
         
-        % Collect rbm statistics with CD or PCD
-        [dw,db,dc,du,dd,c_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,...
-            chains,chainsy);
-
+        % calculate rbm gradients
+        [dw,db,dc,du,dd,c_err,chains,chainsy] =... 
+            opts.train_func(rbm,v0,ey,opts,chains,chainsy);
+        
         err = err + c_err;
         
         %update weights, LR,decay and momentum
@@ -63,11 +63,10 @@ for epoch = 1 : opts.numepochs
     end
     rbm.error(end+1) = err / numbatches;
     
-    % calc train/val performance. 
-    [
-        perf,rbm] = rbmmonitor(rbm,x_train,opts,val_samples,epoch);
+    % calc train/val performance.
+    [perf,rbm] = rbmmonitor(rbm,x_train,opts,val_samples,epoch);
     
-    if rbm.early_stopping && ~isempty(rbm.val_error) 
+    if rbm.early_stopping && ~isempty(rbm.val_error)
         if best_error > rbm.val_error(end)
             best = ' ***';
             best_error = rbm.val_error(end);
