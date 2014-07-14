@@ -1,16 +1,16 @@
 function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chainsy )
 %RBMDISCRIMINATIVE calcualte weight updates for hybrid RBM
 %  for discription of hybrid training objective see ref [1,2]
-%  refer to RBMGENERATIVE and RBMDISCRIMINATIVE for description of the 
-%  training objectives. 
+%  refer to RBMGENERATIVE and RBMDISCRIMINATIVE for description of the
+%  training objectives.
 %
 %
 %   INPUTS:
 %       rbm       : a rbm struct
 %       v0        : the initial state of the hidden units
 %       ey        : one hot encoded labels if classRBM otherwise empty
-%       opts      : opts struct. opts.train_type determines if CD or PCD should 
-%                   be used for generative training. otps.cdn determines the 
+%       opts      : opts struct. opts.train_type determines if CD or PCD should
+%                   be used for generative training. otps.cdn determines the
 %                   number of gibbs steps.
 %                   opts.hybrid_alpha determines the weigthing of hybrid and
 %                   generative training.
@@ -32,11 +32,11 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %
 %
 % References
-%    [1] H. Larochelle and Y. Bengio, ?Classification using discriminative 
+%    [1] H. Larochelle and Y. Bengio, ?Classification using discriminative
 %        restricted Boltzmann machines,? ? 25th Int. Conf. Mach. ?, 2008.
-%    [2] H. Larochelle and M. Mandel, ?Learning algorithms for the 
-%        classification restricted boltzmann machine,? J. Mach.  ?, 2012.     
-%  
+%    [2] H. Larochelle and M. Mandel, ?Learning algorithms for the
+%        classification restricted boltzmann machine,? J. Mach.  ?, 2012.
+%
 % NOTATION
 % data  : all data given as      [n_samples   x #vis]
 %    v  : all data given as      [n_samples   x #vis]
@@ -57,16 +57,18 @@ rbm.classRBM = 1;
 rbm_dis = @() rbmdiscriminative(rbm,x,ey,opts,chains,chainsy);
 
 
-results = {};    
-parfor i = 1:2
-  if i == 1  % generative call
-   [g,err,chainsupd,chainsyupd] = rbm_gen();
-   results{i}.type = 'generative';
-  else
-       [g,err,chainsupd,chainsyupd]=rbm_dis();
-      results{i}.type = 'discriminative';
-  end
-  
+results = {};
+for i = 1:2
+    if i == 1  % generative call
+        [g,err,chainsupd,chainsyupd] = rbm_gen();
+        results{i}.type = 'generative';
+        fprintf('.')
+    else
+        [g,err,chainsupd,chainsyupd]=rbm_dis();
+        results{i}.type = 'discriminative';
+        fprintf('.')
+    end
+    
     
     results{i}.grads = g;
     results{i}.c_err = err;

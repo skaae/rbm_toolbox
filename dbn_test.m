@@ -71,6 +71,7 @@ opts.y_val = test_y;
 opts.test_interval = 1;
 opts.early_stopping = 0;
 opts.patience = 20;
+opts.hybrid_alpha = 0.5
 
 dbncheckopts(opts,valid_fields);
 dbn = dbnsetup(dbn, train_x, opts);
