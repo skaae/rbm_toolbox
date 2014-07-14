@@ -56,7 +56,7 @@ cwx = bsxfun(@plus,rbm.W*x',rbm.c);
 
 % loop over all classes and caluclate energies and probabilities
 %F = zeros(n_hidden,n_samples,n_classes);
- F = bsxfun(@plus, permute(U, [1 3 2]), cwx);
+ F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
 class_log_prob = zeros(n_samples,n_classes);
 for y = 1:n_classes
     %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
