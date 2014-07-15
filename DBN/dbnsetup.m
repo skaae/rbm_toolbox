@@ -67,9 +67,6 @@ for u = 1 : n_rbm
         assert(numel(opts.momentum)==1,'Momen. func should be 1 or nrbm')
         dbn.rbm{u}.momentum = opts.momentum;
     end
-    dbn.rbm{u}.dropout_in_fraction = opts.dropout_in_fraction;
-    dbn.rbm{u}.dropout_fraction = opts.dropout_fraction;
-    dbn.rbm{u}.dropout_mask = [];
     dbn.rbm{u}.L2 = opts.L2;
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.L2norm = opts.L2norm;

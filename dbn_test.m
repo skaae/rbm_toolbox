@@ -1,5 +1,3 @@
-%%% TODO
-warning('Check if i need to multiply the weights by 1-dropout_fraction during testing')
 
 if ~ismac
     cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
@@ -48,8 +46,6 @@ opts.traintype = 'PCD';
 opts.numepochs =   100;
 opts.batchsize = 100;
 opts.cdn = 1; % contrastive divergence
-opts.dropout_fraction = 0.5;
-opts.dropout_in_fraction = 0.2;
 
 T = 50;       % momentum ramp up
 p_f = 0.9;    % final momentum
