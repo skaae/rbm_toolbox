@@ -53,8 +53,6 @@ n_samples = size(x,1);
 % precalcualte activation of hidden units
 cwx = bsxfun(@plus,rbm.W*x',rbm.c);
 
-%apply dropout mask
-
 % loop over all classes and caluclate energies and probabilities
 %F = zeros(n_hidden,n_samples,n_classes);
  F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
@@ -64,11 +62,7 @@ cwx = bsxfun(@plus,rbm.W*x',rbm.c);
  class_log_prob = zeros(n_samples,n_classes);
  for y = 1:n_classes
      %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
-     if ~isempty(rbm.dropout_mask)
-         class_log_prob(:,y) =  sum( softplus(F(:,:,y).*rbm.dropout_fraction), 1)+ rbm.d(y);
-     else
          class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
-     end
  end
 
 %normalize probabilities in numerically stable way

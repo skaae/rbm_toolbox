@@ -42,7 +42,7 @@ test_y  = double(test_y);
 dbn.sizes = [256];
 [opts valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmdiscriminative;
+opts.train_func = @rbmgenerative;
 
 opts.traintype = 'PCD';
 opts.numepochs =   100;
