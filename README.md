@@ -47,6 +47,7 @@ Significiant additions:
 This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
 
 ## References
+
 [1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.
 
