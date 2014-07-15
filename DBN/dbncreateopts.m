@@ -49,6 +49,8 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                   
 %      hybrid_alpha : weigthing of generative and hybrid training objective see 
 %                     [1]
+%  dropout_fraction : 0 = no dropout. typical value is 0.5 see [5]
+%  dropout_in_frac  : dropout fraction on input typically 0.2
 %
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
@@ -61,7 +63,8 @@ function [ opts,valid_fields ] = dbncreateopts()
 %         25th Int. Conf. Mach. ?, 2008.
 %     [4] G. Hinton, ?Training products of experts by minimizing contrastive 
 %         divergence,? Neural Comput., 2002.
-%
+%     [5] N. Srivastava and G. Hinton, ?Dropout: A Simple Way to Prevent Neural
+%         Networks from Overfitting,? J. Mach.  ?, 2014.
 % copyright Søren Sønderby july 2014
 
 % DEFAULT SETTINGS
@@ -91,6 +94,8 @@ opts.early_stopping = 1;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
 opts.hybrid_alpha = 0.5;
+opts.dropout_fraction = 0;
+opts.dropout_in_fraction = 0;
 
 valid_fields = fieldnames(opts);
 

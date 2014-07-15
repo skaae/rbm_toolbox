@@ -63,6 +63,9 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 % the positive phase is the same for CD and PCD
 type = opts.traintype;
 
+
+
+
 h0 = rbmup(rbm,v0,ey,@sigmrnd);
 
 % For contrastive divergence use the input vectors as starting point
@@ -75,7 +78,7 @@ switch type
         hid= rbmup(rbm,chains,chainsy,@sigmrnd);
 end
 
-for i = 1:(opts.cdn - 1)
+for drop_out_mask = 1:(opts.cdn - 1)
     [visx, visy] = rbmdown(rbm,hid,@sigmrnd);
     hid = rbmup(rbm,visx,visy,@sigmrnd);
 end

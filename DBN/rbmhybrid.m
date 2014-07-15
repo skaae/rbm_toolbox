@@ -51,43 +51,17 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 % %   See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
 rbm.classRBM = 0;
-rbm_gen = @() rbmgenerative(rbm,x,ey,opts,chains,chainsy);
-
+[g_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
 rbm.classRBM = 1;
-rbm_dis = @() rbmdiscriminative(rbm,x,ey,opts,chains,chainsy);
-
-
-results = {};
-for i = 1:2
-    if i == 1  % generative call
-        [g,err,chainsupd,chainsyupd] = rbm_gen();
-        results{i}.type = 'generative';
-    else
-        [g,err,chainsupd,chainsyupd]=rbm_dis();
-        results{i}.type = 'discriminative';
-    end
-    
-    
-    results{i}.grads = g;
-    results{i}.c_err = err;
-    results{i}.chains= chainsupd;
-    results{i}.chainsy = chainsyupd;
-end
+[g_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,chains,chainsy);
 
 weight_grads = @(gen,dis) (1-opts.hybrid_alpha)*dis +  opts.hybrid_alpha*dis;
 
-gen = results{1};
-dis = results{2};
-grads.dw = weight_grads(gen.grads.dw,dis.grads.dw);
-grads.db = weight_grads(gen.grads.db,dis.grads.db);
-grads.dc = weight_grads(gen.grads.dc,dis.grads.dc);
-grads.du = weight_grads(gen.grads.du,dis.grads.du);
-grads.dd = weight_grads(gen.grads.dd,dis.grads.dd);
-
-chains = gen.chains;
-chainsy = gen.chainsy;
-curr_err = gen.c_err;
-
+grads.dw = weight_grads(g_gen.dw,g_dis.dw);
+grads.db = weight_grads(g_gen.db,0);
+grads.dc = weight_grads(g_gen.dc,g_dis.dc);
+grads.du = weight_grads(0,g_dis.du);
+grads.dd = weight_grads(0,g_dis.dd);
 
 end
 

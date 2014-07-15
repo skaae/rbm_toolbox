@@ -13,6 +13,8 @@ function rbm = rbmtrain(rbm, x_train,opts)
 assert(isfloat(x_train), 'x must be a float');
 assert(all(x_train(:)>=0) && all(x_train(:)<=1), 'all data in x must be in [0:1]');
 n_samples = size(x_train, 1);
+[n_hidden, n_visible] = size(rbm.W);
+
 numbatches = n_samples / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
@@ -56,9 +58,26 @@ for epoch = 1 : opts.numepochs
             init_chains = 0;
         end
         
+        % create dropout mask for hidden units and ey if available
+        if rbm.dropout_in_fraction > 0
+            v0 = v0.*(rand(size(v0))>rbm.dropout_in_fraction);
+            if rbm.classRBM == 1
+                ey = ey.*(rand(size(ey))>rbm.dropout_in_fraction);
+            end
+            
+        end
+        
+        
+        % create dropout mask for hidden units
+        if rbm.dropout_fraction > 0
+            rbm.dropout_mask = +(rand(size(v0,1),n_hidden)>rbm.dropout_fraction);
+        end
+        
+        
         % calculate rbm gradients
         [grads,c_err,chains,chainsy]= opts.train_func(rbm,v0,ey,opts,chains,chainsy);
         
+        rbm.dropout_mask = []; % remove dropout mask
         err = err + c_err;
         
         %update weights, LR,decay and momentum

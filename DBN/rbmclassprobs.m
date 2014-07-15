@@ -36,13 +36,16 @@ n_classes = size(rbm.d,1);
 n_samples = size(x,1);
 
 
+
+
+
+
 %pre calculate
 %cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
 % precalcualte activation of hidden units
 cwx = bsxfun(@plus,rbm.W*x',rbm.c);
 
 % loop over all classes and caluclate energies and probabilities
-F = zeros(n_hidden,n_samples,n_classes);
 class_log_prob = zeros(n_samples,n_classes);
 
  F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);

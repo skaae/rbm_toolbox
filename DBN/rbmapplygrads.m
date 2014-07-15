@@ -64,8 +64,10 @@ end
 
 %% update weights and momentum of regular weights
 rbm.vW = rbm.curMomentum * rbm.vW + rbm.curLR * dw;
-rbm.vb = rbm.curMomentum * rbm.vb + rbm.curLR * db;
 rbm.vc = rbm.curMomentum * rbm.vc + rbm.curLR * dc;
+if ~isempty(db)
+    rbm.vb = rbm.curMomentum * rbm.vb + rbm.curLR * db;
+end
 
 
 rbm.W = rbm.W + rbm.vW;

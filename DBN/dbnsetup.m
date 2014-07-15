@@ -41,7 +41,7 @@ elseif opts.classRBM == 0
     error('Early stopping is not implemented for generativeRBM')
     
 end
-        
+
 % if discriminitive training require labels
 if isequal(opts.train_func,@rbmdiscriminative)
     if ~valid('y_train')
@@ -67,7 +67,9 @@ for u = 1 : n_rbm
         assert(numel(opts.momentum)==1,'Momen. func should be 1 or nrbm')
         dbn.rbm{u}.momentum = opts.momentum;
     end
-    
+    dbn.rbm{u}.dropout_in_fraction = opts.dropout_in_fraction;
+    dbn.rbm{u}.dropout_fraction = opts.dropout_fraction;
+    dbn.rbm{u}.dropout_mask = [];
     dbn.rbm{u}.L2 = opts.L2;
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.L2norm = opts.L2norm;
@@ -77,7 +79,7 @@ for u = 1 : n_rbm
     dbn.rbm{u}.train_error  = [];
     dbn.rbm{u}.energy_ratio = [];
     
-    % i havent implemented early stopping for non top layers because 
+    % i havent implemented early stopping for non top layers because
     % they are not classRBMS
     if n_rbm == u
         dbn.rbm{u}.early_stopping = opts.early_stopping;
@@ -85,7 +87,7 @@ for u = 1 : n_rbm
         dbn.rbm{u}.early_stopping = 0;
     end
     dbn.rbm{u}.patience = opts.patience;
-
+    
     
     
     

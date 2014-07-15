@@ -32,4 +32,12 @@ act_hid = bsxfun(@plus,rbm.c',vis * rbm.W');
 if rbm.classRBM == 1
     act_hid  = act_hid +  ey * rbm.U';
 end
+
+
+
 act_hid = act_func(act_hid); %apply activation function
+
+% apply dropout mask if present
+if ~isempty(rbm.dropout_mask)
+   act_hid  = act_hid .* rbm.dropout_mask;
+end

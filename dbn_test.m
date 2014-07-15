@@ -1,3 +1,6 @@
+%%% TODO
+warning('Check if i need to multiply the weights by 1-dropout_fraction during testing')
+
 if ~ismac
     cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
     addpath(genpath('/zhome/f9/4/69552/DeepLearnToolbox_noGPU'))
@@ -34,22 +37,19 @@ test_y  = double(test_y);
 % test_x =  test_x(1:100,:);
 % train_y = train_y(1:100,:);
 % test_y =  test_y(1:100,:);
-% [~, labs] = max(train_y,[],2);
-% 
-% A = prdataset(train_x,labs);
-% prrbm =  drbmc(A, 100);
 
 
-dbn.sizes = [500];
+dbn.sizes = [256];
 [opts valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmhybrid;
+opts.train_func = @rbmdiscriminative;
 
 opts.traintype = 'PCD';
 opts.numepochs =   100;
 opts.batchsize = 100;
 opts.cdn = 1; % contrastive divergence
-
+opts.dropout_fraction = 0.5;
+opts.dropout_in_fraction = 0.2;
 
 T = 50;       % momentum ramp up
 p_f = 0.9;    % final momentum

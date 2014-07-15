@@ -14,7 +14,7 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 %      A grads struct with the fields:
 %       grads.dw   : w weights chainge normalized by minibatch size
 %       grads.db   : bias of visible layer weight change norm by minibatch size
-%                    (db is zero for the discriminative RBM)
+%                    (db is zero for the discriminative RBM, returns [])
 %       grads.dc   : bias of hidden layer weight change norm by minibatch size
 %       grads.du   : class label layer weight change norm by minibatch size
 %       grads.dd   : class label hidden bias weight change norm by minibatch size
@@ -53,14 +53,23 @@ n_samples = size(x,1);
 % precalcualte activation of hidden units
 cwx = bsxfun(@plus,rbm.W*x',rbm.c);
 
+%apply dropout mask
+
 % loop over all classes and caluclate energies and probabilities
 %F = zeros(n_hidden,n_samples,n_classes);
  F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
-class_log_prob = zeros(n_samples,n_classes);
-for y = 1:n_classes
-    %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
-    class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
-end
+ 
+ 
+
+ class_log_prob = zeros(n_samples,n_classes);
+ for y = 1:n_classes
+     %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
+     if ~isempty(rbm.dropout_mask)
+         class_log_prob(:,y) =  sum( softplus(F(:,:,y).*rbm.dropout_fraction), 1)+ rbm.d(y);
+     else
+         class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
+     end
+ end
 
 %normalize probabilities in numerically stable way
 class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
@@ -74,10 +83,10 @@ for i = 1:n_classes
     F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),class_prob(:,i)');
 end
 
+
 % init grads
 dw = zeros(size(rbm.W));
 du = zeros(size(rbm.U));
-db = zeros(size(rbm.b));
 dc = zeros(size(rbm.c));
 dd = zeros(size(rbm.d));
 
@@ -106,7 +115,7 @@ dd = sum(ey - class_prob,1)';
 
 %% return values
 grads.dw = dw / opts.batchsize;
-grads.db = db / opts.batchsize;
+%grads.db = db / opts.batchsize;
 grads.dc = dc / opts.batchsize;
 grads.dd = dd / opts.batchsize;
 grads.du = du / opts.batchsize;
@@ -114,5 +123,6 @@ grads.du = du / opts.batchsize;
 curr_err = 0;
 chains   = [];
 chainsy  = [];
+grads.db = [];
 end
 
