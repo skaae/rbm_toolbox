@@ -4,7 +4,7 @@ Toolbox for training RBM's and DBN's.
 Support for joint training of features and labels. 
 
 Significiant additions:
- * add support for training RBM's with class labels including, see [1]
+ * add support for training RBM's with class labels including, see [1,2]
     * generative training objective
     * discriminative training objective
     * hybrid training objective
@@ -47,8 +47,8 @@ Significiant additions:
 This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
 
 ## References
-
-
+[1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.
+[2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.
 
  Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
 All rights reserved.
