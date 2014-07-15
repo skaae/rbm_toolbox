@@ -28,19 +28,21 @@ train_x = double(train_x) / 255;
 test_x  = double(test_x)  / 255;
 train_y = double(train_y);
 test_y  = double(test_y);
-
+semisup_x = [];
 
 %%% for testing
+semisup_x = train_x(5001:5300,:);
 train_x = train_x(1:100,:);
 test_x =  test_x(1:100,:);
 train_y = train_y(1:100,:);
 test_y =  test_y(1:100,:);
 
 
+
 dbn.sizes = [256];
 [opts, valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmgenerative;
+opts.train_func = @rbmsemisuplearn;
 
 opts.traintype = 'PCD';
 opts.numepochs =   100;
@@ -64,6 +66,8 @@ opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = test_x;
 opts.y_val = test_y;
+opts.x_semisup = semisup_x;
+
 opts.test_interval = 5;
 opts.early_stopping = 0;
 opts.patience = 20;

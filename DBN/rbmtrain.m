@@ -41,8 +41,24 @@ chains = [];
 chainsy = [];
 best = '';
 
+
+if isequal(opts.train_func,@rbmsemisuplearn)
+    semisup = 1;
+    l_semisup = 0;
+    n_samples_semisup = size(opts.x_semisup,1);
+    numbatches_semisup = n_samples_semisup / opts.batchsize;
+    assert(rem(numbatches_semisup, 1) == 0, 'semisup numbatches not integer'); 
+else
+    semisup = 0;
+end
+
 for epoch = 1 : opts.numepochs
     kk = randperm(n_samples);
+    
+    if semisup
+        kk_semisup = randperm(n_samples_semisup);
+    end
+    
     err = 0;
     for l = 1 : numbatches
         v0 = extractminibatch(kk,l,opts.batchsize,x_train);
@@ -52,11 +68,26 @@ for epoch = 1 : opts.numepochs
             ey = [];
         end
         
+        % create batches for semisupervised leanring
+        if semisup == 1
+            l_semisup = l_semisup + 1;
+            if l_semisup > numbatches_semisup
+                l_semisup = 1;
+            end
+            opts.x_semisup_batch = extractminibatch(kk_semisup,...
+                numbatches_semisup,opts.batchsize,opts.x_semisup);
+        end
+        
         
         if strcmp(opts.traintype,'PCD') && init_chains == 1
             % init chains in first epoch if Persistent contrastive divergence
-            chains = v0;
             chainsy = ey;
+            % augment semisup PCD chains starting position
+            if semisup
+                chains = [opts.x_semisup_batch; v0;];
+            else
+                chains = v0;
+            end
             init_chains = 0;
         end
         % calculate rbm gradients

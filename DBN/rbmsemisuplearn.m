@@ -1,5 +1,5 @@
-function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chainsy )
-%RBMDISCRIMINATIVE calcualte weight updates for hybrid RBM
+function [ grads,curr_err,chains,chainsy_type ] = rbmsemisuplearn(rbm,x,ey,opts,chains,chainsy_type )
+%rbmsemisuplearn TODO write doc!
 %  for discription of hybrid training objective see ref [1,2]
 %  refer to RBMGENERATIVE and RBMDISCRIMINATIVE for description of the
 %  training objectives.
@@ -50,17 +50,40 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 % Copyright Søren Sønderby June 2014
 % %   See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
-[g_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
-[g_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,chains,chainsy);
+%split chains don't if it matters that i use the correct chains??
+chains_semisup = chains(1:opts.batchsize,:);
+chains_type    = chains(opts.batchsize+1:end,:);
 
-weight_grads = @(gen,dis) (1+opts.hybrid_alpha)*dis +  opts.hybrid_alpha * dis;
+rbm.classRBM = 0;
+[g_semisup,~,chains_semisup,~] = rbmgenerative(rbm,opts.x_semisup_batch,[],...
+    opts,chains_semisup,[]);
 
-grads.dw = weight_grads(g_gen.dw,g_dis.dw);
-grads.db = weight_grads(g_gen.db,0);
-grads.dc = weight_grads(g_gen.dc,g_dis.dc);
-grads.du = weight_grads(0,g_dis.du);
-grads.dd = weight_grads(0,g_dis.dd);
 
+% combine the generative unsupervised training with either @rbmhybrid,
+% @rbmgenerative or @rbmdiscriminative
+rbm.classRBM = 1;
+[g_type,~,chains_type,chainsy_type]= opts.semisup_type(rbm,x,ey,opts,...
+    chains_type,chainsy_type);
+
+chains = [chains_semisup; chains_type];
+
+
+weight_grads = @(type,semisup) type +  opts.semisup_beta * semisup;
+
+grads.dw = weight_grads(g_type.dw,g_semisup.dw);
+grads.dc = weight_grads(g_type.dc,g_semisup.dc);
+
+% if the opts.semisup_type is
+if isequal(opts.semisup_type,@rbmdiscriminative)
+    % rbmdiscriminative outputs empty b
+    grads.db = g_semisup.db;
+else
+    grads.db = weight_grads(g_type.db,g_semisup.db);
+end
+% these are not outputted from generative semisupervised training
+grads.du = g_type.du;
+grads.dd = g_type.dd;
+curr_err = 0;
 end
 
 

@@ -36,6 +36,8 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     ratio_interval epoch
 %             y_val : if classRBM is a field and x_val is a field this field
 %                     must be specified
+%         x_semisup : unsupervised training examples. For use when the training
+%                     function is @rbmsemisuplearn
 %    early_stopping : Use earlystopping
 %          patience : Patience when using early stopping. Notice that 
 %                     epochs that will pass before we stop are 
@@ -46,6 +48,13 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     @rbmdiscriminative: discriminative training. Requires
 %                     training labels. 
 %                     @rbmhybrid mix of generative and discriminative, see [1]
+%                     @rbmsemisublearn use unsupervised training. See [1] sec 8
+%                     requires x_unsup to be set. control importance of 
+%                     unsupervised training with the beta param
+%                     The semi_sup_type param determines if semisupervised 
+%                     training is combined with hybrid, generative or 
+%                     discriminative training.
+%                     
 %          err_func : A function which return a error measure. This applies only
 %                     to a classRBM. The error function 
 %                     takes a [2X2Xnclasses] confusion matrix as input and
@@ -55,7 +64,10 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                   
 %      hybrid_alpha : weigthing of generative and hybrid training objective see 
 %                     [1]
-%
+%      semisup_beta : importance of unupservised samples in semi-supervised
+%                     learning.
+%      semisup_type : either @rbmhybrid, @rbmgenerative or @rbmdiscriminative
+%                     see train_func for description.
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
 %         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
@@ -94,10 +106,13 @@ opts.test_interval = 5;
 opts.y_train = [];
 opts.x_val = [];
 opts.y_val = [];
+opts.x_semisup = [];
 opts.early_stopping = 1;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
 opts.hybrid_alpha = 0.5;
+opts.semisup_beta = 0.1;
+opts.semisup_type = @rbmhybrid;
 opts.err_func = @accuracy;
 
 valid_fields = fieldnames(opts);
