@@ -4,13 +4,16 @@ Toolbox for training RBM's and DBN's.
 Support for joint training of features and labels. 
 
 Significiant additions:
- * add support for training RBM's with class labels 
+ * add support for training RBM's with class labels including, see [1]
+    * generative training objective
+    * discriminative training objective
+    * hybrid training objective
  * CD - k (contrastive divergence k)
  * PCD (persistent contrastive divergence)
  * Various rbm sampling functions (pictures / movies)
  * Classiciation support
- * Regularization: L1, L2, sparsity
- * discriminative RBM training (work in progress)
+ * Regularization: L1, L2, maxL2norm, sparsity, early-stopping
+ * Support for custom error functions
 
  # Example usage
 
@@ -42,6 +45,9 @@ Significiant additions:
 
 
 This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
+
+## References
+
 
 
  Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)

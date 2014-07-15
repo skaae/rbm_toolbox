@@ -1,6 +1,11 @@
 function [ grads,curr_err,chains_comb,chainsy_type ] = rbmsemisuplearn(rbm,x,ey,opts,chains_comb,chainsy_type )
 %rbmsemisuplearn semisupervised learning function
-%  for discription of hybrid training objective see ref [2]
+% Combines unsupervised training objective with either 
+% hybrid, discriminative or generative trainign using the formula:
+%
+%  L = L_type + L_unsup*opts.semisup_beta
+%
+%  for discription of semisupervised training objective see ref [2]
 %   INPUTS:
 %       rbm       : a rbm struct
 %       x        : the initial state of the hidden units
