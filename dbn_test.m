@@ -62,9 +62,9 @@ opts.L2norm = 0;
 
 opts.classRBM = 1;
 opts.y_train = train_y;
-%opts.x_val = test_x;
-%opts.y_val = test_y;
-opts.test_interval = 1;
+opts.x_val = test_x;
+opts.y_val = test_y;
+opts.test_interval = 5;
 opts.early_stopping = 0;
 opts.patience = 20;
 opts.hybrid_alpha = 0.5

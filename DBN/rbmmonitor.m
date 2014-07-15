@@ -17,7 +17,7 @@ if mod(epoch,opts.test_interval) == 0
         rbm.train_error(end+1) = rbmcalcerr(rbm,x,opts.y_train);
         if ~isempty(opts.x_val)
             rbm.val_error(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
-            val_err = num2str(rbm.val_error(end+1));
+            val_err = num2str(rbm.val_error(end));
         else
             val_err = 'NA';
         end
