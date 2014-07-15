@@ -26,6 +26,8 @@ if ~isempty(opts.x_val)
     % use size of validation set
     size_val_sample = ifelse(n_samples>=n_val_samples, n_val_samples, n_samples);
     val_samples     = samples(1:size_val_sample);
+else
+    val_samples = [];
 end
 
 if rbm.early_stopping
