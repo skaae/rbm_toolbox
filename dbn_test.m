@@ -31,20 +31,20 @@ test_y  = double(test_y);
 semisup_x = [];
 
 %%% for testing
-semisup_x = train_x(5001:5300,:);
-train_x = train_x(1:100,:);
-test_x =  test_x(1:100,:);
-train_y = train_y(1:100,:);
-test_y =  test_y(1:100,:);
+semisup_x = train_x(30001:end,:);
+train_x = train_x(1:30000,:);
+test_x =  test_x(:,:);
+train_y = train_y(1:30000,:);
+test_y =  test_y(:,:);
 
 
 
-dbn.sizes = [256];
+dbn.sizes = [1000];
 [opts, valid_fields] = dbncreateopts();
 
 opts.train_func = @rbmsemisuplearn;
 
-opts.traintype = 'PCD';
+opts.traintype = 'CD';
 opts.numepochs =   100;
 opts.batchsize = 100;
 opts.cdn = 1; % contrastive divergence
@@ -68,9 +68,9 @@ opts.x_val = test_x;
 opts.y_val = test_y;
 opts.x_semisup = semisup_x;
 
-opts.test_interval = 5;
-opts.early_stopping = 0;
-opts.patience = 20;
+opts.test_interval = 1;
+opts.early_stopping = 1;
+opts.patience = 10;
 opts.hybrid_alpha = 0.5;
 opts.err_func = @accuracy;
 

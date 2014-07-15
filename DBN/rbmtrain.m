@@ -81,12 +81,18 @@ for epoch = 1 : opts.numepochs
         
         if strcmp(opts.traintype,'PCD') && init_chains == 1
             % init chains in first epoch if Persistent contrastive divergence
-            chainsy = ey;
+            
             % augment semisup PCD chains starting position
             if semisup
+                
+                % init semisup chains at mean training set values
+                % not sure if that is correct? 
+                meany  = repmat(mean(opts.y_train,1),opts.batchsize,1);
                 chains = [opts.x_semisup_batch; v0;];
+                chainsy = [meany;ey;];
             else
                 chains = v0;
+                chainsy = ey;
             end
             init_chains = 0;
         end

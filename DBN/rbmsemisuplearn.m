@@ -1,4 +1,4 @@
-function [ grads,curr_err,chains_comb,chainsy_type ] = rbmsemisuplearn(rbm,x,ey,opts,chains_comb,chainsy_type )
+function [ grads,curr_err,chains_comb,chainsy_comb ] = rbmsemisuplearn(rbm,x,ey,opts,chains_comb,chainsy_comb )
 %rbmsemisuplearn semisupervised learning function
 % Combines unsupervised training objective with either 
 % hybrid, discriminative or generative trainign using the formula:
@@ -50,41 +50,44 @@ function [ grads,curr_err,chains_comb,chainsy_type ] = rbmsemisuplearn(rbm,x,ey,
 %    d  : bias of label layer    [ #n_classes x 1]
 %
 % Copyright Søren Sønderby June 2014
-% %   See also RBMGENERATIVE, RBMDISCRIMINATIVE.
+%    See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
 %split chains don't if it matters that i use the correct chains??
-chains_semisup = chains_comb(1:opts.batchsize,:);
-chains_type    = chains_comb(opts.batchsize+1:end,:);
+if strcmp(opts.traintype,'PCD')
+    chains_semisup  = chains_comb(1:opts.batchsize,:);
+    chains_type     = chains_comb(opts.batchsize+1:end,:);
+    chainsy_semisup = chainsy_comb(1:opts.batchsize,:);
+    chainsy_type     = chainsy_comb(opts.batchsize+1:end,:);
+else
+    chains_semisup = []; chains_type = [];
+    chainsy_semisup = []; chainsy_type = [];
+end
 
-rbm.classRBM = 0;
-[g_semisup,~,chains_semisup,~] = rbmgenerative(rbm,opts.x_semisup_batch,[],...
-    opts,chains_semisup,[]);
+
+%sample p(y|x)
+p_y_given_x  = rbmclassprobs( rbm,x);
+
+[g_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
+         opts.x_semisup_batch, p_y_given_x,opts,chains_semisup,chainsy_semisup);
 
 
 % combine the generative unsupervised training with either @rbmhybrid,
 % @rbmgenerative or @rbmdiscriminative
-rbm.classRBM = 1;
 [g_type,~,chains_type,chainsy_type]= opts.semisup_type(rbm,x,ey,opts,...
     chains_type,chainsy_type);
 
 chains_comb = [chains_semisup; chains_type];
+chainsy_comb = [chainsy_semisup; chainsy_type];
 
 
 weight_grads = @(type,semisup) type +  opts.semisup_beta * semisup;
 
 grads.dw = weight_grads(g_type.dw,g_semisup.dw);
+grads.db = weight_grads(g_type.db,g_semisup.db);
 grads.dc = weight_grads(g_type.dc,g_semisup.dc);
+grads.du = weight_grads(g_type.du,g_semisup.du);
+grads.dd = weight_grads(g_type.dd,g_semisup.dd);
 
-% if the opts.semisup_type is
-if isequal(opts.semisup_type,@rbmdiscriminative)
-    % rbmdiscriminative outputs empty b
-    grads.db = g_semisup.db;
-else
-    grads.db = weight_grads(g_type.db,g_semisup.db);
-end
-% these are not outputted from generative semisupervised training
-grads.du = g_type.du;
-grads.dd = g_type.dd;
 curr_err = 0;
 end
 

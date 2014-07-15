@@ -56,7 +56,7 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 weight_grads = @(gen,dis) (1+opts.hybrid_alpha)*dis +  opts.hybrid_alpha * dis;
 
 grads.dw = weight_grads(g_gen.dw,g_dis.dw);
-grads.db = weight_grads(g_gen.db,0);
+grads.db = weight_grads(g_gen.db,0);  %db is allways zero for dis training
 grads.dc = weight_grads(g_gen.dc,g_dis.dc);
 grads.du = weight_grads(0,g_dis.du);
 grads.dd = weight_grads(0,g_dis.dd);
