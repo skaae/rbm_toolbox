@@ -4,7 +4,7 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 %
 %   INPUTS:
 %       rbm       : a rbm struct
-%       v0        : the initial state of the hidden units
+%       x        : the initial state of the hidden units
 %       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct
 %       chains    : not used, pass in anything

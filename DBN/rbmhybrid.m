@@ -7,7 +7,7 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %
 %   INPUTS:
 %       rbm       : a rbm struct
-%       v0        : the initial state of the hidden units
+%       x        : the initial state of the hidden units
 %       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct. opts.train_type determines if CD or PCD should
 %                   be used for generative training. otps.cdn determines the
