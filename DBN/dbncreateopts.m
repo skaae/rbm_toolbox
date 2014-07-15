@@ -46,6 +46,12 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     @rbmdiscriminative: discriminative training. Requires
 %                     training labels. 
 %                     @rbmhybrid mix of generative and discriminative, see [1]
+%          err_func : A function which return a error measure. This applies only
+%                     to a classRBM. The error function 
+%                     takes a [2X2Xnclasses] confusion matrix as input and
+%                     returs a erroror measure and a struct of other measure
+%                     that are stored, these may be []. See util/accuracy.m and
+%                     util/matthew.m for sample implementations.
 %                   
 %      hybrid_alpha : weigthing of generative and hybrid training objective see 
 %                     [1]
@@ -92,6 +98,7 @@ opts.early_stopping = 1;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
 opts.hybrid_alpha = 0.5;
+opts.err_func = @accuracy;
 
 valid_fields = fieldnames(opts);
 

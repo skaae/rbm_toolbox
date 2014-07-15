@@ -38,7 +38,7 @@ test_y =  test_y(1:100,:);
 
 
 dbn.sizes = [256];
-[opts valid_fields] = dbncreateopts();
+[opts, valid_fields] = dbncreateopts();
 
 opts.train_func = @rbmgenerative;
 
@@ -67,7 +67,8 @@ opts.y_val = test_y;
 opts.test_interval = 5;
 opts.early_stopping = 0;
 opts.patience = 20;
-opts.hybrid_alpha = 0.5
+opts.hybrid_alpha = 0.5;
+opts.err_func = @accuracy;
 
 dbncheckopts(opts,valid_fields);
 dbn = dbnsetup(dbn, train_x, opts);

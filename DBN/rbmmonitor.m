@@ -1,7 +1,7 @@
 function [ perf,rbm ] = rbmmonitor(rbm,x,opts,val_samples,epoch)
 %RBMMONITOR calculate perforamnce
-%   If the RBM is a classRBM the function augments rbm.train_perf and 
-%   rbm.val_perf with the newest accuracies. 
+%   If the RBM is a classRBM the function augments rbm.train_perf and
+%   rbm.val_perf with the newest accuracies.
 %   If generativeRBM calcualte the free energy ratio and update rbm.energy_ratio
 %
 %   val_samples is a vector of the same length as the number of  validation
@@ -14,9 +14,19 @@ if mod(epoch,opts.test_interval) == 0
     % b) generativeRBM  calculate ratio of free energy fe_val /fe_train, if
     %    much lower than 1 we are overfitting
     if rbm.classRBM
-        rbm.train_error(end+1) = rbmcalcerr(rbm,x,opts.y_train);
+        train_probs = rbmclassprobs( rbm,x);
+        train_confusion = confusionmatrix(train_probs,opts.y_train);
+        [train_acc_err, train_om] = rbm.err_func(train_confusion);
+        
+        rbm.train_error(end+1) = train_acc_err;
+        rbm.train_error_measures{end+1} = train_om;
         if ~isempty(opts.x_val)
-            rbm.val_error(end+1) = rbmcalcerr(rbm,opts.x_val,opts.y_val);
+            val_probs = rbmclassprobs( rbm,opts.x_val);
+            val_confusion = confusionmatrix(val_probs,opts.y_val);
+            [val_acc_err, val_om] = rbm.err_func(val_confusion);
+            
+            rbm.val_error(end+1) = val_acc_err;
+            rbm.val_error_measures{end+1} = val_om;
             val_err = num2str(rbm.val_error(end));
         else
             val_err = 'NA';

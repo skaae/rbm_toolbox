@@ -67,13 +67,20 @@ for u = 1 : n_rbm
         assert(numel(opts.momentum)==1,'Momen. func should be 1 or nrbm')
         dbn.rbm{u}.momentum = opts.momentum;
     end
+    
+    % regularization parameters
     dbn.rbm{u}.L2 = opts.L2;
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.L2norm = opts.L2norm;
     dbn.rbm{u}.sparsity = opts.sparsity;
+    
+    % error stuff
+    dbn.rbm{u}.err_func = opts.err_func;
     dbn.rbm{u}.error = [];
     dbn.rbm{u}.val_error = [];
     dbn.rbm{u}.train_error  = [];
+    dbn.rbm{u}.train_error_measures = {};
+    dbn.rbm{u}.val_error_measures = {};
     dbn.rbm{u}.energy_ratio = [];
     
     % i havent implemented early stopping for non top layers because
