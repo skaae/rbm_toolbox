@@ -27,7 +27,7 @@ The following example trains a generative RBM with 500 hidden units and visulize
 
 In the example the learningrate starts at *0.05* and decays with each epoch. The momentum ramps up over 25 epochs, as shown in the figure. 
 
- \centerline{\includegraphics[height=5in]{/uploads/learnmom.png}}
+$$\centerline{\includegraphics[height=5in]{/uploads/learnmom.png}}§§
  
 ```MATLAB
 rng('default');rng(0);
