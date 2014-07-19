@@ -16,14 +16,44 @@ RBM toolbox support among others:
  * Regularization: L1, L2, maxL2norm, sparsity, early-stopping
  * Support for custom error functions
 
-# Usage
+
+
+# Settings
+|Setting   			| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	|
+|---				|---	|---	|---				|---	|---
+|traintype   		|   	|   	|   				|   	|
+|cdn   				|   	|   	|   				|   	|
+|numepochs   		|   	|   	|   				|   	|
+]classRBM   				|   	|   	|   				|   	|
+|err_func   				|   	|   	|   				|   	|
+|test_interval
+|learningrate   				|   	|   	|   				|   	|
+|momentum   				|   	|   	|   				|   	|
+|L1			|   	|   	|   				|   	|
+|L2norm   				|   	|   	|   				|   	|
+|sparsity   				|   	|   	|   				|   	|
+|dropout_hidden   				|   	|   	|   				|   	|
+|early_stopping   				|   	|   	|   				|   	|
+|patience   				|   	|   	|   				|   	|
+|y_train   				|   	|   	|   				|   	|
+|x_val   				|   	|   	|   				|   	|
+|y_val  				|   	|   	|   				|   	|
+|x_semisup   				|   	|   	|   				|   	|
+|hybrid_alpha   				|   	|   	|   				|   	|
+|semisup_type   				|   	|   	|   				|   	|
+|semisup_beta   				|   	|   	|   				|   	|
+
+
+# Examples
+
+## Example 1 - generative training $$p(x)$$
 
 Training RBM's in RBM_toolbox is controlled through three functions:
   * `dbncreateopts` creates an opts struct. The opts struct control learningrate, number of epochs, reqularization, training type etc. The help for `dbncreateopts` descripes all valid fields in the opts struct.
   * `dbnsetup` setups the DBN network, a single layer RBM is equal to a DBN. 
   * `dbntrain` trains the DBN
 
-The following example trains a generative RBM with 500 hidden units and visulizes the found weights. Note that the learning rate is controlled through the `opts.learningrate` parameters. `opts.learningrate` is a function which takes the current epoch and current epoch as arguments and returns the learning rate. Similary  `opts.momentum` is a function that controls the current momentum. 
+The following example trains a generative RBM with 500 hidden units and visulizes the found weights. Note that the learning rate is controlled through the `opts.learningrate` parameters. `opts.learningrate` is a function which takes the current epoch and current epoch as arguments and returns the learning rate. Similary  `opts.momentum` is a function that controls the current momentum. When the `opts.train_func` is set to `@rbmgenerative` RBM outputs the reconstruction error after each epoch, the reconstruction error should not be interpreted as a measure of goodness of the model, see [3].
 
 ```MATLAB
 rng('default');rng(0);
@@ -34,6 +64,7 @@ sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
 opts.traintype = 'PCD';
+opts.classRBM = 0;
 opts.train_func = @rbmgenerative;
 
 
@@ -53,7 +84,8 @@ dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 figure;
-visualize(dbn.rbm{1}.W');
+figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
 ```
 
 In the example the learningrate (blue) starts at *0.05* and decays with each epoch. The momentum (green) ramps up over 25 epochs, as shown in the figure. 
@@ -61,11 +93,13 @@ In the example the learningrate (blue) starts at *0.05* and decays with each epo
 <html>
 <img src="/uploads/learnmom.png" height="350" width="350"> 
 
-Finally we 
+Finally the weights can be visualized:
 
 <html>
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
 
+
+For the 
 
  # Example usage
 
@@ -102,6 +136,6 @@ This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
 
 [1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.
-
+[3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.
  Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
 All rights reserved.

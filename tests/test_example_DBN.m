@@ -27,7 +27,7 @@ sizes = [500];
 
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
-opts.traintype = 'CD'
+opts.traintype = 'PCD'
 opts.train_func = @rbmgenerative;
 
 T = 25;       % momentum ramp up
@@ -35,7 +35,7 @@ p_f = 0.9;    % final momentum
 p_i = 0.5;    % initial momentum
 opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
-eps = 0.05;    % initial learning rate
+eps = 0.001;    % initial learning rate
 f = 0.97;     % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 
@@ -52,7 +52,8 @@ figure;visualize(dbn2.rbm{1}.W');
 
 opts.sparsity = 0.000;  
 dbn3 = dbntrain(dbn, train_x, opts);
-figure;visualize(dbn3.rbm{1}.W(1:144,:)');
+figure;visualize(dbn3.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
 
 opts.sparsity = 0.0001;  
 dbn4 = dbntrain(dbn, train_x, opts);
