@@ -47,7 +47,7 @@ if isequal(opts.train_func,@rbmsemisuplearn)
     l_semisup = 0;
     n_samples_semisup = size(opts.x_semisup,1);
     numbatches_semisup = n_samples_semisup / opts.batchsize;
-    assert(rem(numbatches_semisup, 1) == 0, 'semisup numbatches not integer'); 
+    assert(rem(numbatches_semisup, 1) == 0, 'semisup numbatches not integer');
 else
     semisup = 0;
 end
@@ -86,7 +86,7 @@ for epoch = 1 : opts.numepochs
             if semisup
                 
                 % init semisup chains at mean training set values
-                % not sure if that is correct? 
+                % not sure if that is correct?
                 meany  = repmat(mean(opts.y_train,1),opts.batchsize,1);
                 chains = [opts.x_semisup_batch; v0;];
                 chainsy = [meany;ey;];
@@ -96,10 +96,16 @@ for epoch = 1 : opts.numepochs
             end
             init_chains = 0;
         end
+        
+        if rbm.dropout_hidden > 0
+            rbm.hidden_mask = (rand(size(n_hidden,opts.batchsize)) > rbm.dropout_hidden);
+        end
+        
         % calculate rbm gradients
         [grads,c_err,chains,chainsy]= opts.train_func(rbm,v0,ey,opts,chains,chainsy);
         
         err = err + c_err;
+        %fprintf('%d\n',c_err)
         
         %update weights, LR,decay and momentum
         rbm = rbmapplygrads(rbm,grads,v0,ey,epoch);
@@ -122,7 +128,11 @@ for epoch = 1 : opts.numepochs
         % stop training
         if patience < 0
             disp('No more Patience. Return best RBM')
+            best_rbm.val_error = rbm.val_error;
+            best_rbm.train_error = rbm.train_error;
+            best_rbm.error = rbm.error;
             rbm = best_rbm;
+            
             break;
         end
     end

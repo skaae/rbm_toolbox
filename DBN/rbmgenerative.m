@@ -63,10 +63,16 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 % the positive phase is the same for CD and PCD
 type = opts.traintype;
 
+%% add dropout
+down = @rbmdown;
+if rbm.dropout_hidden > 0
+    up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;
+    
+else
+    up = @rbmup;
+end
 
-
-
-h0 = rbmup(rbm,v0,ey,@sigmrnd);
+h0 = up(rbm,v0,ey,@sigmrnd);
 
 % For contrastive divergence use the input vectors as starting point
 % for Persistent contrastive divergence we use the persistent chains as
@@ -75,17 +81,17 @@ switch type
     case 'CD'
         hid = h0;
     case 'PCD'
-        hid= rbmup(rbm,chains,chainsy,@sigmrnd);
+        hid= up(rbm,chains,chainsy,@sigmrnd);
 end
 
 for drop_out_mask = 1:(opts.cdn - 1)
-    [visx, visy] = rbmdown(rbm,hid,@sigmrnd);
-    hid = rbmup(rbm,visx,visy,@sigmrnd);
+    [visx, visy] = down(rbm,hid,@sigmrnd);
+    hid = up(rbm,visx,visy,@sigmrnd);
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
-[vk, vky] = rbmdown(rbm,hid,@sigmrnd);
-hk       = rbmup(rbm,vk,vky,@sigm);
+[vk, vky] = down(rbm,hid,@sigmrnd);
+hk        = up(rbm,vk,vky,@sigm);
 
 %update the state of the persistent chains if PCD othwise return empty chains
 switch type

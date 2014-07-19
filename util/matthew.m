@@ -28,5 +28,6 @@ for i = 1:n_classes
     
 end
 mcc_err = 1-mean(mcc);
-other_measures = struct();
+
+other_measures = mcc;
 end

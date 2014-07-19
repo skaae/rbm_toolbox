@@ -47,29 +47,35 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 n_classes = size(rbm.d,1);
 n_samples = size(x,1);
 
+% wx = rbm.W*x';
+% % add dropout  (is )
+%  if rbm.dropout_hidden > 0
+%      wx = wx.*rbm.hidden_mask;
+%  end
+% 
+% 
+% % calculate probailities
+% % precalcualte activation of hidden units
+% cwx = bsxfun(@plus,wx,rbm.c);
+% 
+% % loop over all classes and caluclate energies and probabilities
+% %F = zeros(n_hidden,n_samples,n_classes);
+% 
+%  F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
+%  
+%  
+% 
+%  class_log_prob = zeros(n_samples,n_classes);
+%  for y = 1:n_classes
+%      %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
+%          class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
+%  end
+% 
+% %normalize probabilities in numerically stable way
+% class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
+% class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
 
-% calculate probailities
-
-% precalcualte activation of hidden units
-cwx = bsxfun(@plus,rbm.W*x',rbm.c);
-
-% loop over all classes and caluclate energies and probabilities
-%F = zeros(n_hidden,n_samples,n_classes);
- F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
- 
- 
-
- class_log_prob = zeros(n_samples,n_classes);
- for y = 1:n_classes
-     %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
-         class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
- end
-
-%normalize probabilities in numerically stable way
-class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
-class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
-
-
+[class_prob,F]= rbmpyx(rbm,x,'train');
 
 F_sigm = sigm(F);
 F_sigm_prob = zeros(size(F_sigm));

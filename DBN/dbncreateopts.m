@@ -68,6 +68,7 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     learning.
 %      semisup_type : either @rbmhybrid, @rbmgenerative or @rbmdiscriminative
 %                     see train_func for description.
+%    dropout_hidden : dropout fraction of hidden units.
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
 %         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
@@ -114,6 +115,7 @@ opts.hybrid_alpha = 0.5;
 opts.semisup_beta = 0.1;
 opts.semisup_type = @rbmhybrid;
 opts.err_func = @accuracy;
+opts.dropout_hidden = 0;
 
 valid_fields = fieldnames(opts);
 

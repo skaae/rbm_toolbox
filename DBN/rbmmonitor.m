@@ -14,14 +14,14 @@ if mod(epoch,opts.test_interval) == 0
     % b) generativeRBM  calculate ratio of free energy fe_val /fe_train, if
     %    much lower than 1 we are overfitting
     if rbm.classRBM
-        train_probs = rbmclassprobs( rbm,x);
+        train_probs = rbmclassprobs( rbm,x,opts.batchsize);
         train_confusion = confusionmatrix(train_probs,opts.y_train);
         [train_acc_err, train_om] = rbm.err_func(train_confusion);
         
         rbm.train_error(end+1) = train_acc_err;
         rbm.train_error_measures{end+1} = train_om;
         if ~isempty(opts.x_val)
-            val_probs = rbmclassprobs( rbm,opts.x_val);
+            val_probs = rbmclassprobs( rbm,opts.x_val,opts.batchsize);
             val_confusion = confusionmatrix(val_probs,opts.y_val);
             [val_acc_err, val_om] = rbm.err_func(val_confusion);
             
@@ -35,12 +35,13 @@ if mod(epoch,opts.test_interval) == 0
         perf = sprintf('  | Tr: %5f - Val: %s' ,...
             rbm.train_error(end),val_err);
     else
-        warning('Remimpelent rbmfreeenergy');
-        e_val = rbmfreeenergy(rbm,opts.x_val,opts.y_val);
-        e_train = rbmfreeenergy(rbm,x(val_samples,:),...
-            opts.y_train(val_samples,:));
-        rbm.energy_ratio(end+1) = e_val / e_train;
-        perf = sprintf(' | Energy ratio %f5', e_val / e_train);
+        %         warning('Remimpelent rbmfreeenergy');
+        %         e_val = rbmfreeenergy(rbm,opts.x_val,opts.y_val);
+        %         e_train = rbmfreeenergy(rbm,x(val_samples,:),...
+        %             opts.y_train(val_samples,:));
+        %         rbm.energy_ratio(end+1) = e_val / e_train;
+        %         perf = sprintf(' | Energy ratio %f5', e_val / e_train);
+        perf = '';
     end
 else
     perf = '.';

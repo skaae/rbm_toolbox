@@ -1,11 +1,13 @@
-function [ class_prob ] = rbmclassprobs( rbm,x)
+function [ class_prob_res ] = rbmclassprobs( rbm,x,batchsize)
 %RBMCLASSPROBS calculate class probabilities in a classification RBM
 %  INPUTS
 %   rbm : A rbm struct
 %   x   : matrix of samples  (n_samlples-by-n_features)
+%   batchsize: optionally takes a minibatch size in which case the result
+%              is calculated in minibatches to save memory
 %
 %  OUTPUT
-%   class_probs : class probabilites for each class (n_samples-by-n_classes)
+%   class_prob_res : class probabilites for each class (n_samples-by-n_classes)
 %
 %  NOTES SEE
 %   see equation 2 of the paper:
@@ -37,78 +39,26 @@ n_samples = size(x,1);
 
 
 
-
-
-
-%pre calculate
-%cwx = repmat(rbm.c,1,n_samples)+rbm.W*x';
-% precalcualte activation of hidden units
-cwx = bsxfun(@plus,rbm.W*x',rbm.c);
-
-% loop over all classes and caluclate energies and probabilities
-class_log_prob = zeros(n_samples,n_classes);
-
- F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
-for y = 1:n_classes
-    %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
-    class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
+if nargin == 3
+    numbatches = n_samples / batchsize;
+    assert(rem(numbatches, 1) == 0, 'numbatches not integer');
+    chunks = chunkify(batchsize,x);
+    
+else
+    chunks = chunkify(n_samples,x);
 end
 
-%normalize probabilities in numerically stable way
-class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
-class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
+class_prob_res = [];
+for i = 1:numel(chunks)
+    minibatch = x(chunks{i}.start:chunks{i}.end,:);
+    [class_prob, ~] = rbmpyx(rbm,minibatch,'test');
+    class_prob_res = [class_prob_res;class_prob];
+end
+
 
 
 end
-%
-%the top implementation seems to be slighly faster
 
-% for t = 1:n_samples
-%     freeenergy = -sum( softplus(repmat(cwx(:,t),1,n_classes) +  rbm.U )) - rbm.d';
-%     probs = exp(-freeenergy);
-%     class_probs(t,:) = probs ./ sum(probs);
-% end
-
-% %%% FORDEBUGGING
-% class_probsb = zeros(n_samples,n_classes);
-% cprobs = zeros(n_samples,n_classes);
-% log_class_prob = zeros(n_samples,n_classes);
-% class_normalizer = [];
-% for t = 1:n_samples
-%     if t == 50
-%         a = 1;
-%     end
-%     [p cp lp cn] = calcprobs(x(t,:));
-%     class_probsb(t,:) = p;
-%     cprobs(t,:) = cp;
-%     log_class_prob(t,:) = lp;
-%     class_normalizer(end+1) = cn;
-% end
-%
-% a = 1;
-%     % function for calculating probabilities for single sample returns a vector
-%     % of size 1 x n_classes with class probabilities
-% function [class_prob cprobs log_class_prob class_normalizer] = calcprobs(x_t)
-% % precompute rbm.c(j)+rbm.W(j,:)*x; over all hidden units
-%         cwx = rbm.c + rbm.W * x_t';
-%
-%         cprobs = zeros(1,n_classes);
-%         for y_idx = 1:n_classes
-%             freeenergy = -rbm.d(y_idx);
-%             for j = 1:n_hidden
-%                 freeenergy = freeenergy - softplus(cwx(j)+rbm.U(j,y_idx));
-%
-%             end
-%         cprobs(y_idx) = -freeenergy;
-%         end
-%         class_normalizer = log_sum_exp_over_rows(cprobs'); % log(sum(exp of class_input)) is what we subtract to get properly normalized log class probabilities. size: <1> by <number of data cases>
-%         log_class_prob = cprobs - class_normalizer; % log of probability of each class. size: <number of classes, i.e. 10> by <number of data cases>
-%         class_prob = exp(log_class_prob); % probability of each class. Each column (i.e. each case) sums to 1. size: <number of classes, i.e. 10> by <number of data cases>
-%
-%
-%
-%
-% end
 
 
 

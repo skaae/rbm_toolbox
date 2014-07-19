@@ -65,7 +65,7 @@ end
 
 
 %sample p(y|x)
-p_y_given_x  = rbmclassprobs( rbm,x);
+[p_y_given_x, ~]  = rbmpyx( rbm,x,'train');
 
 [g_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
          opts.x_semisup_batch, p_y_given_x,opts,chains_semisup,chainsy_semisup);
@@ -89,6 +89,10 @@ grads.du = weight_grads(g_type.du,g_semisup.du);
 grads.dd = weight_grads(g_type.dd,g_semisup.dd);
 
 curr_err = 0;
+
+
+  
+
 end
 
 

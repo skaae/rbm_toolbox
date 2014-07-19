@@ -1,14 +1,12 @@
-function dbn = dbnsetup(dbn, x, opts)
+function dbn = dbnsetup(sizes, x, opts)
 %%DBNSETUP creates a propr dbn struct
-% INPUT: dbn : a struct with field sizes which should be a vector of RBM
-%              sizes. sizes(1) is the size fo the hidden layer of the first RBM
-%              sizes(2) is hidden layer of 2. rbm etc
+% INPUT: sizes : A vector with hidden layer sizes
 %        x   : used to specify size of first hidden layer
 %        opts: a struct with options see below
 %
 % modified june 2014 by Søren Sønderby
 n = size(x, 2);
-dbn.sizes = [n, dbn.sizes];
+dbn.sizes = [n, sizes];
 n_rbm = numel(dbn.sizes) - 1;
 
 
@@ -73,6 +71,7 @@ for u = 1 : n_rbm
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.L2norm = opts.L2norm;
     dbn.rbm{u}.sparsity = opts.sparsity;
+    dbn.rbm{u}.dropout_hidden = opts.dropout_hidden;
     
     % error stuff
     dbn.rbm{u}.err_func = opts.err_func;

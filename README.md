@@ -1,19 +1,48 @@
 # RBM Toolbox
 
-Toolbox for training RBM's and DBN's. 
-Support for joint training of features and labels. 
+RBM toolbox is a MATLAB toolbox for training RBM's. It builds on the DeepLearnToolbox by Rasmus Berg.
 
-Significiant additions:
+RBM toolbox support among others:
+
  * add support for training RBM's with class labels including, see [1,2]
     * generative training objective
     * discriminative training objective
     * hybrid training objective
+    * semi-supervised learning
  * CD - k (contrastive divergence k)
  * PCD (persistent contrastive divergence)
  * Various rbm sampling functions (pictures / movies)
  * Classiciation support
  * Regularization: L1, L2, maxL2norm, sparsity, early-stopping
  * Support for custom error functions
+
+ # Usage
+ 
+ ```
+ rng('default');rng(0);
+sizes = [500];
+
+[opts, valid_fields] = dbncreateopts();
+opts.numepochs = 50;
+opts.traintype = 'CD'
+
+T = 25;       % momentum ramp up
+p_f = 0.9;    % final momentum
+p_i = 0.5;    % initial momentum
+opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+
+eps = 0.05;    % initial learning rate
+f = 0.97;     % learning rate decay
+opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
+
+%opts.momentum = @(t) 0;
+dbncheckopts(opts,valid_fields);
+dbn = dbnsetup(sizes, train_x, opts);
+opts.sparsity = 0.1;  
+dbn1 = dbntrain(dbn, train_x, opts);
+figure;visualize(dbn1.rbm{1}.W');
+ ```
+
 
  # Example usage
 
