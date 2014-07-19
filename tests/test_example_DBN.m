@@ -50,9 +50,9 @@ opts.sparsity = 0.01;
 dbn2 = dbntrain(dbn, train_x, opts);
 figure;visualize(dbn2.rbm{1}.W');
 
-opts.sparsity = 0.001;  
+opts.sparsity = 0.000;  
 dbn3 = dbntrain(dbn, train_x, opts);
-figure;visualize(dbn3.rbm{1}.W(1:100,:)');
+figure;visualize(dbn3.rbm{1}.W(1:144,:)');
 
 opts.sparsity = 0.0001;  
 dbn4 = dbntrain(dbn, train_x, opts);
@@ -81,11 +81,11 @@ figure;visualize(dbn8.rbm{1}.W');
 
 % visualize learning rate and momentum
 l = []; m = [];
-for i = 1:25
+for i = 1:50
     m(end+1) = opts.momentum(i);
     l(end+1) = opts.learningrate(i,m(i));  
 end
-[AX,H1,H2] = plotyy(1:25,m,1:25,l,'plot');
+[AX,H1,H2] = plotyy(1:50,m,1:50,l,'plot');
 set(get(AX(1),'Ylabel'),'String','Momentum') 
 set(get(AX(2),'Ylabel'),'String','Learning rate') 
 set(get(AX(1),'Xlabel'),'String','Epoch') 

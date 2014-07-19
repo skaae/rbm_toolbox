@@ -25,11 +25,6 @@ Training RBM's in RBM_toolbox is controlled through three functions:
 
 The following example trains a generative RBM with 500 hidden units and visulizes the found weights. Note that the learning rate is controlled through the `opts.learningrate` parameters. `opts.learningrate` is a function which takes the current epoch and current epoch as arguments and returns the learning rate. Similary  `opts.momentum` is a function that controls the current momentum. 
 
-In the example the learningrate starts at *0.05* and decays with each epoch. The momentum ramps up over 25 epochs, as shown in the figure. 
-
-<html>
-<center><img src="/uploads/learnmom.png" alt="Smiley face" height="350" width="350"> 
- 
 ```MATLAB
 rng('default');rng(0);
 
@@ -56,8 +51,15 @@ dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 figure;
-visualize(dbn1.rbm{1}.W');
+visualize(dbn.rbm{1}.W');
 ```
+
+In the example the learningrate (blue) starts at *0.05* and decays with each epoch. The momentum (green) ramps up over 25 epochs, as shown in the figure. 
+
+<html>
+<img src="/uploads/learnmom.png" height="350" width="350"> 
+
+Finally we 
 
 
  # Example usage
