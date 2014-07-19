@@ -16,31 +16,42 @@ RBM toolbox support among others:
  * Regularization: L1, L2, maxL2norm, sparsity, early-stopping
  * Support for custom error functions
 
- # Usage
+# Usage
+
+The RBM toolbox uses tree functions to control training. 
+  * `dbncreateopts` creates an opts struct. The opts struct control learningrate, number of epochs, reqularization, training type etc. The help for `dbncreateopts` descripes all valid fields in the opts struct.
+  * `dbnsetup` setups the DBN network, a single layer RBM is equal to a DBN. 
+  * `dbntrain` trains the DBN
+
+
  
 ```MATLAB
 rng('default');rng(0);
-sizes = [500];
 
+sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
 opts.traintype = 'CD'
+opts.sparsity = 0.1; 
 
-T = 25;       % momentum ramp up
-p_f = 0.9;    % final momentum
-p_i = 0.5;    % initial momentum
-opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+% Set momentum
+T             = 25;       % momentum ramp up
+p_f 		  = 0.9;    % final momentum
+p_i           = 0.5;    % initial momentum
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
-eps = 0.05;    % initial learning rate
-f = 0.97;     % learning rate decay
+%% Set learningrate
+eps       		  = 0.05;    % initial learning rate
+f                 = 0.97;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 
-%opts.momentum = @(t) 0;
-dbncheckopts(opts,valid_fields);
-dbn = dbnsetup(sizes, train_x, opts);
-opts.sparsity = 0.1;  
-dbn1 = dbntrain(dbn, train_x, opts);
-figure;visualize(dbn1.rbm{1}.W');
+
+
+dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbntrain(dbn, train_x, opts);
+figure;
+visualize(dbn1.rbm{1}.W');
 ```
 
 
