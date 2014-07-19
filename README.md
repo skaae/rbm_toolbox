@@ -64,7 +64,7 @@ In the example the learningrate (blue) starts at *0.05* and decays with each epo
 Finally we 
 
 <html>
-<img src="/uploads/example1_weights.png" height="350" width="350"> 
+<img src="/uploads/example1_weights.png" height="500" width="500"> 
 
 
  # Example usage
