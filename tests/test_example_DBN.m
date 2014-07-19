@@ -22,12 +22,13 @@ load mnist_uint8;
 % This allows for decaying learningrate and momentum rampup.
 % The example uses momentum with rampup and decaying learning rate
 
-rng('default');rng(0);
+rng('default');rng(1);
 sizes = [500];
 
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
 opts.traintype = 'CD'
+opts.train_func = @rbmgenerative;
 
 T = 25;       % momentum ramp up
 p_f = 0.9;    % final momentum
@@ -51,7 +52,7 @@ figure;visualize(dbn2.rbm{1}.W');
 
 opts.sparsity = 0.001;  
 dbn3 = dbntrain(dbn, train_x, opts);
-figure;visualize(dbn3.rbm{1}.W');
+figure;visualize(dbn3.rbm{1}.W(1:100,:)');
 
 opts.sparsity = 0.0001;  
 dbn4 = dbntrain(dbn, train_x, opts);
