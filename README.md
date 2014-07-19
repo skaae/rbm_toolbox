@@ -18,8 +18,8 @@ RBM toolbox support among others:
 
  # Usage
  
- ```
- rng('default');rng(0);
+```
+rng('default');rng(0);
 sizes = [500];
 
 [opts, valid_fields] = dbncreateopts();
@@ -41,7 +41,7 @@ dbn = dbnsetup(sizes, train_x, opts);
 opts.sparsity = 0.1;  
 dbn1 = dbntrain(dbn, train_x, opts);
 figure;visualize(dbn1.rbm{1}.W');
- ```
+```
 
 
  # Example usage
