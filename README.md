@@ -27,11 +27,13 @@ The following example trains a generative RBM with 500 hidden units and visulize
 
 ```MATLAB
 rng('default');rng(0);
+load mnist_uint8;
+ train_x = double(train_x(1:30000,:)) / 255;
 
 sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
-opts.traintype = 'CD';
+opts.traintype = 'PCD';
 opts.train_func = @rbmgenerative;
 
 
@@ -60,6 +62,9 @@ In the example the learningrate (blue) starts at *0.05* and decays with each epo
 <img src="/uploads/learnmom.png" height="350" width="350"> 
 
 Finally we 
+
+<html>
+<img src="/uploads/example1_weights.png" height="350" width="350"> 
 
 
  # Example usage
