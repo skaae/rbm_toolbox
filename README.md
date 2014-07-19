@@ -20,13 +20,13 @@ RBM toolbox support among others:
 
 # Settings
 |Setting   			| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	|
-|---				|---	|---	|---				|---	|---
-|traintype   		|   	|   	|   				|   	|
-|cdn   				|   	|   	|   				|   	|
-|numepochs   		|   	|   	|   				|   	|
-]classRBM   				|   	|   	|   				|   	|
-|err_func   				|   	|   	|   				|   	|
-|test_interval
+|---				|---			|---				|---		 	|---					|---
+|traintype   		|   			|	   				|   			|   					|
+|cdn   				|   			|   				|   			|   					|
+|numepochs   		|  x 			|   x				|   	x		|  x 					| x
+]classRBM   		|  x 			|   x				|   	x		|  x 					| x
+|err_func^1   		|  x 			|   x				|   	x		|  x 					|
+|test_interval^1	|  x 			|   x				|   	x		|  x 					|				
 |learningrate   				|   	|   	|   				|   	|
 |momentum   				|   	|   	|   				|   	|
 |L1			|   	|   	|   				|   	|
@@ -43,6 +43,7 @@ RBM toolbox support among others:
 |semisup_type   				|   	|   	|   				|   	|
 |semisup_beta   				|   	|   	|   				|   	|
 
+1) Applies if classRBM is 1
 
 # Examples
 
