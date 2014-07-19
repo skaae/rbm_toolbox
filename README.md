@@ -18,7 +18,7 @@ RBM toolbox support among others:
 
  # Usage
  
-```
+```MATLAB
 rng('default');rng(0);
 sizes = [500];
 
