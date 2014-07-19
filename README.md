@@ -44,11 +44,12 @@ RBM toolbox support among others:
 |semisup_beta   			|   			|   				|   			|  x 					|
 
 1) Applies if classRBM is 1 and x_val and y_val are set
-1) Applies if classRBM is 1 
+
+2) Applies if classRBM is 1 
 
 # Examples
 
-## Example 1 - generative training $$p(x)$$
+## Example 1 - generative learning **p(x)**
 
 Training RBM's in RBM_toolbox is controlled through three functions:
   * `dbncreateopts` creates an opts struct. The opts struct control learningrate, number of epochs, reqularization, training type etc. The help for `dbncreateopts` descripes all valid fields in the opts struct.
@@ -101,38 +102,6 @@ Finally the weights can be visualized:
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
 
 
-For the 
-
- # Example usage
-
-
-		%load Data
-		rand('state',0);
-		load mnist_uint8;
-
-		train_x = double(train_x) / 255;
-		test_x  = double(test_x)  / 255;
-		train_y = double(train_y);
-		test_y  = double(test_y);
-
-
-		% for sampling from RBM
-		class_vec = zeros(100,size(train_y,2));
-		for i = 1:size(train_y,2)
-		    class_vec((i-1)*10+1:i*10,i) = 1;
-		end
-
-		% SETUP and train
-		dbn.sizes = [500];
-		opts = dbncreateopts();
-		dbn = dbntrain(dbn, train_x, opts);
-		digits = dbnsample(dbn,100,5000,class_vec);
-		dbnsamplemovie(dbn,100,3000,'test',1,@visualize,class_vec);
-		probs = dbnclassprobs(dbn,train_x);
-		preds = dbnpredict(dbn,train_x);
-
-
-This toolbox builds on the DeepLearnToolbox by Rasmus Berg Palm.
 
 ## References
 
