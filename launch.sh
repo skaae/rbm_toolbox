@@ -1,7 +1,7 @@
 #!/bin/bash
-folder="mnist_cRBM"
+folder="mnist_cRBM_dropout"
 mkdir -p "$folder"
-for count in {1..144}
+for count in {1..72}
 do
     echo "#!/bin/sh
 #

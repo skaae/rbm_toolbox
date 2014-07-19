@@ -19,6 +19,24 @@ RBM toolbox support among others:
 
 
 # Settings
+
+## training objectives
+
+The RBM toolbox supports four different TBM training objectives. For a detailed description refer to [2].
+
+
+* `rbmgenerative`:  **-log(p(x))** or **-log(p(x,y))** if `classRBM` is 1
+* `rbmdiscriminative`  **-log(p(x I y))**   [2]
+* `rbmhybrid` Models   **-(1-alpha)log(y I x) - alpha log(p (x) ) [2]
+* `rbmsemisuplearn`    **TYPE** + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [2]
+
+
+The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
+
+
+## Settings table
+
+The table shows which fields in the opts struct that applies to the different training objectives.
 |Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	
 |---						|---			|---				|---		 	|---					|
 |traintype   				|  x 			|	   				|   	x		|  x 					|
@@ -101,7 +119,7 @@ Finally the weights can be visualized:
 <html>
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
 
-
+## Example 2 - Generative RBM with labels **p(x,y)**
 
 ## References
 
