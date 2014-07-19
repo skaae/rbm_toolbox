@@ -25,14 +25,20 @@ RBM toolbox support among others:
 The RBM toolbox supports four different TBM training objectives. For a detailed description refer to [2].
 
 
-* `rbmgenerative`:  `-log(p(x))` or `-log(p(x,y))` if `classRBM` is 1
-* `rbmdiscriminative`  -log(p(x I y))*   [2]
-* `rbmhybrid` Models   -(1-alpha)log(y I x) - alpha log(p (x) )* [2]
-* `rbmsemisuplearn`    TYPE + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [2]
+* `rbmgenerative`:  `-log(p(x))` or `-log(p(x,y)) if `classRBM` is 1
+* `rbmdiscriminative`  `-log(p(x I y))`   [2]
+* `rbmhybrid` Models   `-(1-alpha)log(y I x) - alpha log(p (x) )` [2]
+* `rbmsemisuplearn`    `TYPE + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [2]
 
 
 The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
 
+## Regularization
+
+RBM toolbox supports L1 and L2 regularization and regularization through a maximum L2 norm fo the incoming weights to each neuron [4].
+Sparsity is implemented as described in [2]. Dropout of hidden units is implemented as described in [1].
+
+When training a classification RBM ('opts.classRBM = 1') and a validation set is given through `opts.x_val` and `opts.y_val`, then early stopping can be used. The patience for early stopping can be specified with `opts.patience`. 
 
 ## Settings table
 
@@ -80,7 +86,7 @@ The following example trains a generative RBM with 500 hidden units and visulize
 ```MATLAB
 rng('default');rng(0);
 load mnist_uint8;
- train_x = double(train_x(1:30000,:)) / 255;
+train_x = double(train_x) / 255;
 
 sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
@@ -121,11 +127,53 @@ Finally the weights can be visualized:
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
 
 ## Example 2 - Generative RBM with labels **p(x,y)**
+A classification RBM can be trained by setting `opts.classRBM` to 1 and and setting `opts.y_train` to the training labels. The training labels must be *one-of-K* encoded.
+
+When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validaiton error will also be reported.
+
+
+```MATLAB
+rng('default');rng(0);
+load mnist_uint8;
+train_x = double(train_x) / 255;
+
+
+sizes = [500];   % hidden layer size
+[opts, valid_fields] = dbncreateopts();
+opts.numepochs = 50;
+opts.traintype = 'CD';
+opts.classRBM = 1;
+opts.y_train = train_y
+opts.train_func = @rbmgenerative;
+
+
+%% Set learningrate
+eps       		  = 0.05;    % initial learning rate
+f                 = 0.97;      % learning rate decay
+opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
+
+% Set momentum
+T             = 25;       % momentum ramp up
+p_f 		  = 0.9;    % final momentum
+p_i           = 0.5;    % initial momentum
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+
+
+dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbntrain(dbn, train_x, opts);
+figure;
+figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
+```
+
 
 ## References
 
 [1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.
 [3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.
+[4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.
+
  Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
 All rights reserved.
