@@ -129,13 +129,17 @@ Finally the weights can be visualized:
 ## Example 2 - Generative RBM with labels **p(x,y)**
 A classification RBM can be trained by setting `opts.classRBM` to 1 and and setting `opts.y_train` to the training labels. The training labels must be *one-of-K* encoded.
 
-When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validaiton error will also be reported.
+When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validation error will also be reported.
 
 
 ```MATLAB
 rng('default');rng(0);
 load mnist_uint8;
-train_x = double(train_x) / 255;
+train_x = double(train_x)/255;
+vx   = double(train_x(1:10000,:);
+tx = train_x(10001:end,:);
+vy   = train_y(1:10000,:);
+ty = train_y(10001:end,:);
 
 
 sizes = [500];   % hidden layer size
@@ -143,7 +147,9 @@ sizes = [500];   % hidden layer size
 opts.numepochs = 50;
 opts.traintype = 'CD';
 opts.classRBM = 1;
-opts.y_train = train_y
+opts.y_train = ty;
+opts.x_val = vx;
+opts.y_val = vy;
 opts.train_func = @rbmgenerative;
 
 
@@ -160,8 +166,8 @@ opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
 
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
-dbn = dbntrain(dbn, train_x, opts);
+dbn = dbnsetup(sizes, tx, opts);  % train function 
+dbn = dbntrain(dbn, tx, opts);
 figure;
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');

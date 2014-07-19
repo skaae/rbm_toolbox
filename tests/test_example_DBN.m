@@ -48,7 +48,11 @@ set(gca,'visible','off');
 %% example 2
 rng('default');rng(0);
 load mnist_uint8;
-train_x = double(train_x) / 255;
+train_x = double(train_x)/255;
+vx   = double(train_x(1:10000,:);
+tx = train_x(10001:end,:);
+vy   = train_y(1:10000,:);
+ty = train_y(10001:end,:);
 
 
 sizes = [500];   % hidden layer size
@@ -56,7 +60,9 @@ sizes = [500];   % hidden layer size
 opts.numepochs = 50;
 opts.traintype = 'CD';
 opts.classRBM = 1;
-opts.y_train = train_y;
+opts.y_train = ty;
+opts.x_val = vx;
+opts.y_val = vy;
 opts.train_func = @rbmgenerative;
 
 
@@ -73,8 +79,8 @@ opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
 
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
-dbn = dbntrain(dbn, train_x, opts);
+dbn = dbnsetup(sizes, tx, opts);  % train function 
+dbn = dbntrain(dbn, tx, opts);
 figure;
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');
