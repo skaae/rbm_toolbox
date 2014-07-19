@@ -25,7 +25,7 @@ RBM toolbox support among others:
 |cdn   				|   			|   				|   			|   					|
 |numepochs   		|  x 			|   x				|   	x		|  x 					| x
 ]classRBM   		|  x 			|   x				|   	x		|  x 					| x
-|err_func $$_1$$   	|  x 			|   x				|   	x		|  x 					|
+|err_func <sub>_1</sub>   	|  x 			|   x				|   	x		|  x 					|
 |test_interval $$_1$$|  x 			|   x				|   	x		|  x 					|				
 |learningrate   				|   	|   	|   				|   	|
 |momentum   				|   	|   	|   				|   	|
