@@ -19,27 +19,27 @@ RBM toolbox support among others:
 
 
 # Settings
-|Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	|
-|---						|---			|---				|---		 	|---					|---
+|Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	
+|---						|---			|---				|---		 	|---					|
 |traintype   				|  x 			|	   				|   	x		|  x 					|
 |cdn   						|  x 			|   				|   	x		|  x 					|
-|numepochs   				|  x 			|   x				|   	x		|  x 					| x
-]classRBM   				|  x 			|   x				|   	x		|  x 					| x
+|numepochs   				|  x 			|   x				|   	x		|  x 					| 
+]classRBM   				|  x 			|   x				|   	x		|  x 					| 
 |err_func<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					|
 |test_interval<sub>1</sub> 	|  x 			|   x				|   	x		|  x 					|				
-|learningrate   			|  x 			|   x				|   	x		|  x 					| x
-|momentum   				|  x 			|   x				|   	x		|  x 					| x
-|L1							|  x 			|   x				|   	x		|  x 					| x
-|L2norm   					|  x 			|   x				|   	x		|  x 					| x
-|sparsity   				|  x 			|   x				|   	x		|  x 					| x
-|dropout_hidden   			|  x 			|   x				|   	x		|  x 					| x
-|early_stopping<sub>1</sub> |  x 			|   x				|   	x		|  x 					| x
-|patience<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					| x
-|y_train<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| x
-|x_val<sub>2</sub>    		|  x 			|   x				|   	x		|  x 					| x		
-|y_val<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| x
-|x_semisup   				|   			|   				|   	x		|   					|
-|hybrid_alpha   			|   			|   				|   			|  x 					|
+|learningrate   			|  x 			|   x				|   	x		|  x 					| 
+|momentum   				|  x 			|   x				|   	x		|  x 					| 
+|L1							|  x 			|   x				|   	x		|  x 					| 
+|L2norm   					|  x 			|   x				|   	x		|  x 					| 
+|sparsity   				|  x 			|   x				|   	x		|  x 					| 
+|dropout_hidden   			|  x 			|   x				|   	x		|  x 					| 
+|early_stopping<sub>1</sub> |  x 			|   x				|   	x		|  x 					| 
+|patience<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					| 
+|y_train<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| 
+|x_val<sub>2</sub>    		|  x 			|   x				|   	x		|  x 					| 		
+|y_val<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| 
+|x_semisup   				|   			|   				|   			|  x 					|
+|hybrid_alpha   			|   			|   				|   	x		|   					|
 |semisup_type   			|   			|   				|   			|  x 					|
 |semisup_beta   			|   			|   				|   			|  x 					|
 
