@@ -19,31 +19,32 @@ RBM toolbox support among others:
 
 
 # Settings
-|Setting   			| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	|
-|---				|---			|---				|---		 	|---					|---
-|traintype   		|   			|	   				|   			|   					|
-|cdn   				|   			|   				|   			|   					|
-|numepochs   		|  x 			|   x				|   	x		|  x 					| x
-]classRBM   		|  x 			|   x				|   	x		|  x 					| x
-|err_func <sub>_1</sub>   	|  x 			|   x				|   	x		|  x 					|
-|test_interval $$_1$$|  x 			|   x				|   	x		|  x 					|				
-|learningrate   				|   	|   	|   				|   	|
-|momentum   				|   	|   	|   				|   	|
-|L1			|   	|   	|   				|   	|
-|L2norm   				|   	|   	|   				|   	|
-|sparsity   				|   	|   	|   				|   	|
-|dropout_hidden   				|   	|   	|   				|   	|
-|early_stopping   				|   	|   	|   				|   	|
-|patience   				|   	|   	|   				|   	|
-|y_train   				|   	|   	|   				|   	|
-|x_val   				|   	|   	|   				|   	|
-|y_val  				|   	|   	|   				|   	|
-|x_semisup   				|   	|   	|   				|   	|
-|hybrid_alpha   				|   	|   	|   				|   	|
-|semisup_type   				|   	|   	|   				|   	|
-|semisup_beta   				|   	|   	|   				|   	|
+|Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	|
+|---						|---			|---				|---		 	|---					|---
+|traintype   				|  x 			|	   				|   	x		|  x 					|
+|cdn   						|  x 			|   				|   	x		|  x 					|
+|numepochs   				|  x 			|   x				|   	x		|  x 					| x
+]classRBM   				|  x 			|   x				|   	x		|  x 					| x
+|err_func<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					|
+|test_interval<sub>1</sub> 	|  x 			|   x				|   	x		|  x 					|				
+|learningrate   			|  x 			|   x				|   	x		|  x 					| x
+|momentum   				|  x 			|   x				|   	x		|  x 					| x
+|L1							|  x 			|   x				|   	x		|  x 					| x
+|L2norm   					|  x 			|   x				|   	x		|  x 					| x
+|sparsity   				|  x 			|   x				|   	x		|  x 					| x
+|dropout_hidden   			|  x 			|   x				|   	x		|  x 					| x
+|early_stopping<sub>1</sub> |  x 			|   x				|   	x		|  x 					| x
+|patience<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					| x
+|y_train<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| x
+|x_val<sub>2</sub>    		|  x 			|   x				|   	x		|  x 					| x		
+|y_val<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| x
+|x_semisup   				|   			|   				|   	x		|   					|
+|hybrid_alpha   			|   			|   				|   			|  x 					|
+|semisup_type   			|   			|   				|   			|  x 					|
+|semisup_beta   			|   			|   				|   			|  x 					|
 
-1) Applies if classRBM is 1
+1) Applies if classRBM is 1 and x_val and y_val are set
+1) Applies if classRBM is 1 
 
 # Examples
 
@@ -64,7 +65,7 @@ load mnist_uint8;
 sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 50;
-opts.traintype = 'PCD';
+opts.traintype = 'CD';
 opts.classRBM = 0;
 opts.train_func = @rbmgenerative;
 
