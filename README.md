@@ -23,7 +23,7 @@ The RBM toolbox uses tree functions to control training.
   * `dbnsetup` setups the DBN network, a single layer RBM is equal to a DBN. 
   * `dbntrain` trains the DBN
 
-
+The following example trains a generative RBM with 500 hidden units and visulizes the found weights.
  
 ```MATLAB
 rng('default');rng(0);
@@ -33,6 +33,7 @@ sizes = [500];   % hidden layer size
 opts.numepochs = 50;
 opts.traintype = 'CD'
 opts.sparsity = 0.1; 
+opts.train_func = @rbmgenerative;
 
 % Set momentum
 T             = 25;       % momentum ramp up
