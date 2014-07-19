@@ -18,12 +18,16 @@ RBM toolbox support among others:
 
 # Usage
 
-The RBM toolbox uses tree functions to control training. 
+Training RBM's in RBM_toolbox is controlled through three functions:
   * `dbncreateopts` creates an opts struct. The opts struct control learningrate, number of epochs, reqularization, training type etc. The help for `dbncreateopts` descripes all valid fields in the opts struct.
   * `dbnsetup` setups the DBN network, a single layer RBM is equal to a DBN. 
   * `dbntrain` trains the DBN
 
-The following example trains a generative RBM with 500 hidden units and visulizes the found weights.
+The following example trains a generative RBM with 500 hidden units and visulizes the found weights. Note that the learning rate is controlled through the `opts.learningrate` parameters. `opts.learningrate` is a function which takes the current epoch and current epoch as arguments and returns the learning rate. Similary  `opts.momentum` is a function that controls the current momentum. 
+
+In the example the learningrate starts at *0.05* and decays with each epoch. The momentum ramps up over 25 epochs, as shown in the figure. 
+
+![learningrate](/uploads/learnmom.png) 
  
 ```MATLAB
 rng('default');rng(0);
@@ -35,17 +39,17 @@ opts.traintype = 'CD'
 opts.sparsity = 0.1; 
 opts.train_func = @rbmgenerative;
 
-% Set momentum
-T             = 25;       % momentum ramp up
-p_f 		  = 0.9;    % final momentum
-p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
 %% Set learningrate
 eps       		  = 0.05;    % initial learning rate
 f                 = 0.97;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 
+% Set momentum
+T             = 25;       % momentum ramp up
+p_f 		  = 0.9;    % final momentum
+p_i           = 0.5;    % initial momentum
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
 
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
