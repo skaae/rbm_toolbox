@@ -133,11 +133,11 @@ Finally the weights can be visualized:
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
 
 ## Example 2 - Generative RBM with labels **p(x,y)**
+
 A classification RBM can be trained by setting `opts.classRBM` to 1 and and setting `opts.y_train` to the training labels. The training labels must be *one-of-K* encoded.
 
 When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validation error will also be reported.
-In the example the validation error is calculated after each epoch, i.e `opts.test_interval` is set 1.
-
+In the example the validation error is calculated after each epoch, i.e `opts.test_interval` is set 1. In the example we also enable early stopping, we use a early_stopping patience of 5, i.e if no progress have been made in 5 epochs stop training.
 
 ```MATLAB
 rng('default');rng(0);
@@ -205,7 +205,8 @@ The training erorror and validation error can be visualized as well:
 <html>
 <img src="/uploads/example2_error.png" height="350" width="350"> 
 
-Note that in this example the validation error is lower than the training error, this is not typical. 
+Note that in this example the validation error is lower than the training error, this is not typical. In the plot the 
+red x indicate the lowest validation error. 
 
 ## Example 3 - PCD sampling and movies
 
