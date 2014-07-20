@@ -40,6 +40,12 @@ Sparsity is implemented as described in [2]. Dropout of hidden units is implemen
 
 When training a classification RBM ('opts.classRBM = 1') and a validation set is given through `opts.x_val` and `opts.y_val`, then early stopping can be used. The patience for early stopping can be specified with `opts.patience`. 
 
+## Training DBN's
+DBN can be trained by given multiple hidden sizes to `dbnsetup` e.g. `sizes=[500 500]` for a two layer DBN with 500 hidden units in 
+each layer. 
+
+**TODO** add wake sleep algorithm?
+
 ## Settings table
 
 The table shows which fields in the opts struct that applies to the different training objectives.
@@ -130,28 +136,30 @@ Finally the weights can be visualized:
 A classification RBM can be trained by setting `opts.classRBM` to 1 and and setting `opts.y_train` to the training labels. The training labels must be *one-of-K* encoded.
 
 When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validation error will also be reported.
+In the example the validation error is calculated after each epoch, i.e `opts.test_interval` is set 1.
 
 
 ```MATLAB
 rng('default');rng(0);
 load mnist_uint8;
 train_x = double(train_x)/255;
-vx   = double(train_x(1:10000,:);
-tx = train_x(10001:end,:);
-vy   = train_y(1:10000,:);
-ty = train_y(10001:end,:);
-
+test_x  = double(test_x)/255;
+train_y = double(train_y);
+test_y = double(test_y);
 
 sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
+opts.early_stopping = 1;
+opts.patience = 5;
+
 opts.numepochs = 50;
 opts.traintype = 'CD';
 opts.classRBM = 1;
-opts.y_train = ty;
-opts.x_val = vx;
-opts.y_val = vy;
+opts.y_train = train_y;
+opts.x_val = test_x;
+opts.y_val = test_y;
+opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
-
 
 %% Set learningrate
 eps       		  = 0.05;    % initial learning rate
@@ -164,22 +172,54 @@ p_f 		  = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
 opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 
-
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, tx, opts);  % train function 
-dbn = dbntrain(dbn, tx, opts);
-figure;
+dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbntrain(dbn, train_x, opts);
+
+%% Do predictions
+pred_val = dbnpredict(dbn,test_x);
+[~, labels_val] = max(test_y,[],2);
+acc_val = mean(pred_val == labels_val);
+
+%% plot weights 
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');
-```
 
+%% plot errors
+plot([dbn.rbm{1}.val_error',dbn.rbm{1}.train_error'])
+legend({'Validation error','Train error'})
+[min_val,min_idx] =  min(dbn.rbm{1}.val_error);
+hold on; plot(min_idx,min_val,'xr'); hold off;
+xlabel('Epoch'); ylabel('Error'); grid on;
+```
+For classification RBM's predictions can be calculated by `dbnpredict` wich returns a label or with 
+`dbnclassprobs` wich returns the predicted class probabilities. 
+
+The learned weights can be visualized with the `visualize` function. 
+
+<html>
+<img src="/uploads/example1_weights.png" height="500" width="500"> 
+
+The training erorror and validation error can be visualized as well:
+
+<html>
+<img src="/uploads/learnmom.png" height="350" width="350"> 
+
+Note that in this example the validation error is lower than the training error, this is not typical. 
+
+## Example 3 - PCD sampling and movies
+
+## Example 4 - Discriminative training
+
+## Example 5 - Hybrid training
+
+## Example 6 - Semi-supervised learning 
 
 ## References
 
-[1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.
-[2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.
-[3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.
-[4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.
+[1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.  
+[2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.  
+[3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.  
+[4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.  
 
- Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com)
-All rights reserved.
+Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.

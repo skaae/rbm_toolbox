@@ -7,7 +7,8 @@ function [ perf,rbm ] = rbmmonitor(rbm,x,opts,val_samples,epoch)
 %   val_samples is a vector of the same length as the number of  validation
 %   samples. Used when free energies are compared.
 %
-%   Returns a string for dispaly
+%   Returns a string for display
+%
 % Copyright Søren Sønderby July 2014
 if mod(epoch,opts.test_interval) == 0
     % a) lassRBM calculate validation and training error
@@ -15,17 +16,17 @@ if mod(epoch,opts.test_interval) == 0
     %    much lower than 1 we are overfitting
     if rbm.classRBM
         train_probs = rbmclassprobs( rbm,x,opts.batchsize);
-        train_confusion = confusionmatrix(train_probs,opts.y_train);
-        [train_acc_err, train_om] = rbm.err_func(train_confusion);
+        %train_confusion = confusionmatrix(train_probs,opts.y_train);
+        [train_err, train_om] = rbm.err_func(train_probs,opts.y_train);
         
-        rbm.train_error(end+1) = train_acc_err;
+        rbm.train_error(end+1) = train_err;
         rbm.train_error_measures{end+1} = train_om;
         if ~isempty(opts.x_val)
             val_probs = rbmclassprobs( rbm,opts.x_val,opts.batchsize);
-            val_confusion = confusionmatrix(val_probs,opts.y_val);
-            [val_acc_err, val_om] = rbm.err_func(val_confusion);
+            %val_confusion = confusionmatrix(val_probs,opts.y_val);
+            [val_err, val_om] = rbm.err_func(val_probs,opts.y_val);
             
-            rbm.val_error(end+1) = val_acc_err;
+            rbm.val_error(end+1) = val_err;
             rbm.val_error_measures{end+1} = val_om;
             val_err = num2str(rbm.val_error(end));
         else

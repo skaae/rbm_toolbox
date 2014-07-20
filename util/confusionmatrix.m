@@ -19,9 +19,9 @@ for curr_class = 1:n_output % testing: set to four
     %create binary vectors for each class. For each class (target_class)
     % match the predition with target class and the expected class with the
     % target class
-    pred_class = ~(pred == curr_class);
-    true_class = ~(expected == curr_class);
-    confusionmat(:,:,curr_class) = confusion(pred_class,true_class);
+    predicted_class = (pred == curr_class);
+    correct_class = (expected == curr_class);
+    confusionmat(:,:,curr_class) = confusion(predicted_class,correct_class);
     
 
 end

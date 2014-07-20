@@ -1,12 +1,12 @@
 #!/bin/bash
-folder="mnist_cRBM_dropout"
+folder="mnist_cRBM_CD"
 mkdir -p "$folder"
 for count in {1..72}
 do
     echo "#!/bin/sh
 #
 # stdout/stderr redirection
-#PBS -N rbm_eval_$count
+#PBS -N $folder.$count
 #PBS -o $folder/\$PBS_JOBNAME.$PBS_JOBID.out
 #PBS -e $folder/\$PBS_JOBNAME.$PBS_JOBID.err
 #PBS -l nodes=1:ppn=1

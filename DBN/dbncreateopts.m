@@ -57,10 +57,9 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     
 %          err_func : A function which return a error measure. This applies only
 %                     to a classRBM. The error function 
-%                     takes a [2X2Xnclasses] confusion matrix as input and
-%                     returs a erroror measure and a struct of other measure
-%                     that are stored, these may be []. See util/accuracy.m and
-%                     util/matthew.m for sample implementations.
+%                     takes the predicted probabilites as first argument and the
+%                     one-of-K encoded true labels as second arguments. see
+%                     accuracy.m in utils folder.
 %                   
 %      hybrid_alpha : weigthing of generative and hybrid training objective see 
 %                     [1]
@@ -69,6 +68,7 @@ function [ opts,valid_fields ] = dbncreateopts()
 %      semisup_type : either @rbmhybrid, @rbmgenerative or @rbmdiscriminative
 %                     see train_func for description.
 %    dropout_hidden : dropout fraction of hidden units.
+%
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
 %         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
@@ -108,7 +108,7 @@ opts.y_train = [];
 opts.x_val = [];
 opts.y_val = [];
 opts.x_semisup = [];
-opts.early_stopping = 1;
+opts.early_stopping = 0;
 opts.patience = 5;
 opts.train_func = @rbmgenerative;
 opts.hybrid_alpha = 0.5;
