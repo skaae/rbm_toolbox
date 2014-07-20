@@ -198,12 +198,12 @@ For classification RBM's predictions can be calculated by `dbnpredict` wich retu
 The learned weights can be visualized with the `visualize` function. 
 
 <html>
-<img src="/uploads/example1_weights.png" height="500" width="500"> 
+<img src="/uploads/example2_weights.png" height="500" width="500"> 
 
 The training erorror and validation error can be visualized as well:
 
 <html>
-<img src="/uploads/learnmom.png" height="350" width="350"> 
+<img src="/uploads/example2_error.png" height="350" width="350"> 
 
 Note that in this example the validation error is lower than the training error, this is not typical. 
 
