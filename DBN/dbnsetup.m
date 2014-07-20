@@ -82,6 +82,8 @@ for u = 1 : n_rbm
     dbn.rbm{u}.val_error_measures = {};
     dbn.rbm{u}.energy_ratio = [];
     
+
+    
     % i havent implemented early stopping for non top layers because
     % they are not classRBMS
     if n_rbm == u
@@ -100,6 +102,8 @@ for u = 1 : n_rbm
     if opts.classRBM == 1 && u == n_rbm
         % init bias and weights for class vectors
         dbn.rbm{u}.classRBM = 1;
+        
+        dbn.rbm{u}.train_func = opts.train_func;
         n_classes = size(opts.y_train,2);
         dbn.rbm{u}.U  = normrnd(0,0.01,hid_size, n_classes);
         dbn.rbm{u}.vU  = normrnd(0,0.01,hid_size, n_classes);
@@ -108,11 +112,16 @@ for u = 1 : n_rbm
         dbn.rbm{u}.vd  = normrnd(0,0.01,n_classes, 1);
         
     else
+        % for non toplayers use generative training
         dbn.rbm{u}.classRBM = 0;
+        dbn.rbm{u}.train_func = @rbmgenerative;
+        
         dbn.rbm{u}.U  = [];
         dbn.rbm{u}.vU  = [];
         dbn.rbm{u}.d  = [];
-        dbn.rbm{u}.vd  = [];
+        dbn.rbm{u}.vd  = [];    
+        
+
     end
     
     

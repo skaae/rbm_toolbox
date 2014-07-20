@@ -42,7 +42,7 @@ chainsy = [];
 best = '';
 
 
-if isequal(opts.train_func,@rbmsemisuplearn)
+if isequal(rbm.train_func,@rbmsemisuplearn)
     semisup = 1;
     l_semisup = 0;
     n_samples_semisup = size(opts.x_semisup,1);
@@ -102,7 +102,7 @@ for epoch = 1 : opts.numepochs
         end
         
         % calculate rbm gradients
-        [grads,c_err,chains,chainsy]= opts.train_func(rbm,v0,ey,opts,chains,chainsy);
+        [grads,c_err,chains,chainsy]= rbm.train_func(rbm,v0,ey,opts,chains,chainsy);
         
         err = err + c_err;
         %fprintf('%d\n',c_err)

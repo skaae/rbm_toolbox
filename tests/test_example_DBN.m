@@ -60,8 +60,6 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-
-
 sizes = [500];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
