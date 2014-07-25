@@ -9,12 +9,6 @@ n_rbm = numel(dbn.rbm);
 line = repmat('-',1,80);
 fprintf('%s\n                  TRAINING RBM 1\n %s\n',line,line);
 
-if dbn.rbm{1}.classRBM == 1 && n_rbm == 1
-    ye = opts.y_train;
-else
-    ye = [];
-end
-
 dbn.rbm{1} = rbmtrain(dbn.rbm{1},x_train,opts);
 
 
