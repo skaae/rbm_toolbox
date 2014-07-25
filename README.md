@@ -208,11 +208,68 @@ The training erorror and validation error can be visualized as well:
 Note that in this example the validation error is lower than the training error, this is not typical. In the plot the 
 red x indicate the lowest validation error. 
 
-## Example 3 - PCD sampling and movies
+## Example 3 - PCD, layers and sampling
+
+In example 3 we use PCD to train a classification DBN using the generative training objective. In the other examples `opts.traintype` has ben `CD` wich mean contrastive divergence [5]. In this example we will use `PCD`, persistent contrastive divergence [6].
+In CD the gibbs chains are initiated at the data points, PCD differs from this by having a number of persistent chains wich are used to initiate the gibbs sampling. Because the gibbs chains are persistent they can wander further away from the data then in CD, this typically means that PCD training requires a lower learningrate then CD training.
+
+In the example we use a DBN with two layers, each with 500 hidden neurons. In RBM toolbox non-top layer RBM's are always trained with the generative training objective. 
+
+```
+rng('default');rng(0);
+load mnist_uint8;
+train_x = double(train_x)/255;
+test_x  = double(test_x)/255;
+train_y = double(train_y);
+test_y = double(test_y);
+
+sizes = [500 500];   % hidden layer size
+[opts, valid_fields] = dbncreateopts();
+opts.numepochs = 100;
+opts.traintype = 'PCD';
+opts.classRBM = 1;
+opts.y_train = train_y;
+opts.x_val = test_x;
+opts.y_val = test_y;
+opts.test_interval = 1;
+opts.train_func = @rbmgenerative;
+
+%% Set learningrate
+eps       		  = 0.001;    % initial learning rate
+f                 = 0.97;      % learning rate decay
+opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
+
+% Set momentum
+T             = 25;       % momentum ramp up
+p_f 		  = 0.9;    % final momentum
+p_i           = 0.5;    % initial momentum
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+
+
+dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbntrain(dbn, train_x, opts);
+
+class_vec = zeros(100,size(train_y,2));
+for i = 1:size(train_y,2)
+    class_vec((i-1)*10+1:i*10,i) = 1;
+end
+
+digits = dbnsample(dbn,100,10000,class_vec); 
+
+```
 
 ## Example 4 - Discriminative training
 
+Look in folder  mnist_cRBM_discriminative 
+
 ## Example 5 - Hybrid training
+
+Look in folders
+
+mnist_cRBM_PCD    
+mnist_cRBM_CD 
+mnist_cRBM_CD_nomomentum
 
 ## Example 6 - Semi-supervised learning 
 
@@ -222,5 +279,8 @@ red x indicate the lowest validation error.
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.  
 [3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.  
 [4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.  
+[5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., 2002.  
+[6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
+
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
