@@ -34,10 +34,9 @@ if opts.early_stopping
         if  reqboth('y_val','x_val')
             error('Eearly stopping with classRBM requires x and y val sets')
         end
-    end
-elseif opts.classRBM == 0
-    error('Early stopping is not implemented for generativeRBM')
-    
+    elseif opts.classRBM == 0
+         error('Early stopping is not implemented for generativeRBM')
+    end   
 end
 
 % if discriminitive training require labels
