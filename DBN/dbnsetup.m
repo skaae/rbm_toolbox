@@ -49,7 +49,9 @@ end
 % create weight initialization function 
 switch lower(opts.init_type)
     case 'gauss'
+        initfunc = @(m,n) normrnd(0,0.01,m,n);
     case 'crbm'
+        initfunc = @(m,n) (rand(m,n)-0.5) ./ max([m n]);
     otherwise
         error('init_type should be either gauss or cRBM');
 end
@@ -111,12 +113,12 @@ for u = 1 : n_rbm
         
         dbn.rbm{u}.train_func = opts.train_func;
         n_classes = size(opts.y_train,2);
-        dbn.rbm{u}.U  = normrnd(0,0.01,hid_size, n_classes);
-        dbn.rbm{u}.vU  = normrnd(0,0.01,hid_size, n_classes);
+        dbn.rbm{u}.U  = initfunc(0,0.01,hid_size, n_classes);
+        dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
         
         %dbn.rbm{u}.d  = normrnd(0,0.01,n_classes, 1);
         dbn.rbm{u}.d  = zeros(n_classes, 1);
-        dbn.rbm{u}.vd  = normrnd(0,0.01,n_classes, 1);
+        dbn.rbm{u}.vd  = zeros(n_classes, 1);
         
     else
         % for non toplayers use generative training
@@ -133,7 +135,7 @@ for u = 1 : n_rbm
     
     
     
-    dbn.rbm{u}.W  = normrnd(0,0.01,hid_size, vis_size);
+    dbn.rbm{u}.W  = initfunc(0,0.01,hid_size, vis_size);
     dbn.rbm{u}.vW = zeros(hid_size, vis_size);
     
     
