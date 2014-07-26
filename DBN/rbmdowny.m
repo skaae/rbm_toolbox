@@ -1,5 +1,6 @@
-function act_vis_x = rbmdownx(rbm,hid_act,act_func)
-%%RBMDOWNX calculates p(v = 1 | h) for non label units
+function act_vis_y = rbmdowny(rbm,hid_act,act_func)
+%%RBMDOWNY calculates p(v_label = 1 | h) for label units
+% This function returns [] for non rbm's
 %
 % INPUTS
 %   rbm           : A rbm struct
@@ -7,7 +8,7 @@ function act_vis_x = rbmdownx(rbm,hid_act,act_func)
 %   act_func      : the activation function, @sigm | @sigmrnd
 %
 % OUTPUTS
-%   act_vis_x     : The activation of the x visible units
+%   act_vis_y : The activation of the class label visible units
 %
 % see "A practical guide to training restricted Boltzmann machines" eqn 8
 % act is the activation function. currently either sigm or sigmrnd
@@ -22,10 +23,12 @@ function act_vis_x = rbmdownx(rbm,hid_act,act_func)
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
-% Modified by Søren Sønderby June 2014
+% Copyright Søren Sønderby June 2014
 
-% rep vis bias n_samples times then calculate act of vis from hid
-%vis_x_bias = repmat(rbm.b', size(hid, 1), 1);
-%act_vis_x = act_func(vis_x_bias + hid * rbm.W);  % activation of visible units
-act_vis_x = act_func( bsxfun(@plus,rbm.b',hid_act * rbm.W));
+if rbm.classRBM == 1
+%     vis_label_bias = repmat(rbm.d', size(hid, 1), 1);
+%     act_vis_label = act_func(vis_label_bias + hid * rbm.U);
+      act_vis_y = act_func(bsxfun(@plus,rbm.d',hid_act * rbm.U));
+else
+    act_vis_y = [];
 end
