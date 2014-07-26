@@ -2,7 +2,7 @@ function dbn = dbnsetup(sizes, x, opts)
 %%DBNSETUP creates a propr dbn struct
 % INPUT: sizes : A vector with hidden layer sizes
 %        x   : used to specify size of first hidden layer
-%        opts: a struct with options see below
+%        opts: a struct with options see dbncreateopts
 %
 % modified june 2014 by Søren Sønderby
 n = size(x, 2);
@@ -46,6 +46,13 @@ if isequal(opts.train_func,@rbmdiscriminative)
     end
 end
 
+% create weight initialization function 
+switch lower(opts.init_type)
+    case 'gauss'
+    case 'crbm'
+    otherwise
+        error('init_type should be either gauss or cRBM');
+end
 
 for u = 1 : n_rbm
     

@@ -68,6 +68,12 @@ function [ opts,valid_fields ] = dbncreateopts()
 %      semisup_type : either @rbmhybrid, @rbmgenerative or @rbmdiscriminative
 %                     see train_func for description.
 %    dropout_hidden : dropout fraction of hidden units.
+%         init_type : initialization of weightes. 
+%                     'gauss' init at gaussian with 0 mean and 0.01 std 
+%                     'cRBM' init as larochelle in [1] i.e  
+%                     weights = randnd(size(weights))-0.5 ./ max(size(weights)).
+%                     Bias units are always initialized at zero.
+%
 %
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
@@ -116,6 +122,7 @@ opts.semisup_beta = 0.1;
 opts.semisup_type = @rbmhybrid;
 opts.err_func = @accuracy;
 opts.dropout_hidden = 0;
+opts.init_type = 'gauss';
 
 valid_fields = fieldnames(opts);
 
