@@ -1,9 +1,9 @@
-function [act_vis_x, act_vis_label] = rbmdown(rbm,hid,act_func)
+function [act_vis_x, act_vis_label] = rbmdown(rbm,hid_act,act_func)
 %%RBMDOWN calculates p(v = 1 | h)
 %
 % INPUTS
 %   rbm           : A rbm struct
-%   hid           : the activation of the hidden layer
+%   hid_act          : the activation of the hidden layer
 %   act_func      : the activation function, @sigm | @sigmrnd
 %
 % OUTPUTS
@@ -28,12 +28,12 @@ function [act_vis_x, act_vis_label] = rbmdown(rbm,hid,act_func)
 % rep vis bias n_samples times then calculate act of vis from hid
 %vis_x_bias = repmat(rbm.b', size(hid, 1), 1);
 %act_vis_x = act_func(vis_x_bias + hid * rbm.W);  % activation of visible units
-act_vis_x = bsxfun(@plus,rbm.b',hid * rbm.W);
+act_vis_x = bsxfun(@plus,rbm.b',hid_act * rbm.W);
 % for classRBM calculate act of label visible units
 if rbm.classRBM == 1
 %     vis_label_bias = repmat(rbm.d', size(hid, 1), 1);
 %     act_vis_label = act_func(vis_label_bias + hid * rbm.U);
-      act_vis_label = act_func(bsxfun(@plus,rbm.d',hid * rbm.U));
+      act_vis_label = act_func(bsxfun(@plus,rbm.d',hid_act * rbm.U));
 else
     act_vis_label = [];
 end
