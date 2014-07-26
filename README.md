@@ -4,7 +4,7 @@ RBM toolbox is a MATLAB toolbox for training RBM's. It builds on the DeepLearnTo
 
 RBM toolbox support among others:
 
- * add support for training RBM's with class labels including, see [1,2]
+ * add support for training RBM's with class labels including, see [1,7]
     * generative training objective
     * discriminative training objective
     * hybrid training objective
@@ -26,9 +26,9 @@ The RBM toolbox supports four different TBM training objectives. For a detailed 
 
 
 * `rbmgenerative`:  `-log(p(x))` or `-log(p(x,y)) if `classRBM` is 1
-* `rbmdiscriminative`  `-log(p(x I y))`   [2]
-* `rbmhybrid` Models   `-(1-alpha)log(y I x) - alpha log(p (x) )` [2]
-* `rbmsemisuplearn`    `TYPE + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [2]
+* `rbmdiscriminative`  `-log(p(x I y))`   [7]
+* `rbmhybrid` Models   `-(1-alpha)log(y I x) - alpha log(p (x) )` [7]
+* `rbmsemisuplearn`    `TYPE + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [7]
 
 
 The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
@@ -36,7 +36,7 @@ The RBM training objective is set by supplying a function handle to one of the f
 ## Regularization
 
 RBM toolbox supports L1 and L2 regularization and regularization through a maximum L2 norm fo the incoming weights to each neuron [4].
-Sparsity is implemented as described in [2]. Dropout of hidden units is implemented as described in [1].
+Sparsity is implemented as described in [7]. Dropout of hidden units is implemented as described in [1].
 
 When training a classification RBM ('opts.classRBM = 1') and a validation set is given through `opts.x_val` and `opts.y_val`, then early stopping can be used. The patience for early stopping can be specified with `opts.patience`. 
 
@@ -267,9 +267,9 @@ Look in folder  mnist_cRBM_discriminative
 
 Look in folders
 
-mnist_cRBM_PCD    
-mnist_cRBM_CD 
-mnist_cRBM_CD_nomomentum
+mnist_cRBM_PCD   
+mnist_cRBM_CD   
+mnist_cRBM_CD_nomomentum   
 
 ## Example 6 - Semi-supervised learning 
 
@@ -281,6 +281,6 @@ mnist_cRBM_CD_nomomentum
 [4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.  
 [5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., 2002.  
 [6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
-
+[7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
