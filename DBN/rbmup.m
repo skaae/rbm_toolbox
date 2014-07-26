@@ -3,7 +3,8 @@ function act_hid = rbmup(rbm, vis,ey,act_func)
 % INPUTS
 %   rbm        : A rbm struct
 %   vis        : the activation of the visible layer
-%   ey         : if classRBM the activation of the class labels
+%   ey         : if classRBM the activation of the class labels for non cRBM
+%                use [].
 %   act_func   : the activation function, either @sigm or @sigmrnd
 %
 % OUTPUTS
