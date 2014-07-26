@@ -24,7 +24,7 @@ vis_sampled       = rbmsample(toprbm,n,k,sampleclass);
 % deterministicly pass this down the network
 for i = (n_rbm - 1):-1:1
     rbm = dbn.rbm{i};
-    [vis_sampled,~] = rbmdown(rbm,vis_sampled,@sigm);
+    vis_sampled = rbmdownx(rbm,vis_sampled,@sigm);
 end
 end
 

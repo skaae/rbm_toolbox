@@ -45,7 +45,7 @@ open(vidObj);
 
 for i = 1:k
     hid_sampled = rbmup(toprbm,vis_sampled,class_vec,@sigmrnd);
-    [vis_sampled,~] = rbmdown(toprbm,hid_sampled,@sigm);
+    vis_sampled = rbmdownx(toprbm,hid_sampled,@sigm);
     
     if mod(i-1,samplefreq) == 0
         samples = vis_sampled;
@@ -57,7 +57,7 @@ for i = 1:k
         % pass to bottom layer
         for j = (n_rbm - 1):-1:1
             rbm = dbn.rbm{j};
-            [samples,~] = rbmdown(rbm,samples,@sigm);
+            samples = rbmdownx(rbm,samples,@sigm);
         end
         
         fprintf('Gibbs steps: %i\n',i)

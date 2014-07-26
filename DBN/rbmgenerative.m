@@ -64,7 +64,6 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 type = opts.traintype;
 
 %% add dropout
-down = @rbmdown;
 if rbm.dropout_hidden > 0
     up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;
     
@@ -85,7 +84,8 @@ switch type
 end
 
 for drop_out_mask = 1:(opts.cdn - 1)
-    [visx, visy] = down(rbm,hid,@sigmrnd);
+    visx = rbmdownx(rbm,hid,@sigmrnd);
+    visy = rbmdowny(rbm,hid,@sigmrnd);
     hid = up(rbm,visx,visy,@sigmrnd);
 end
 
