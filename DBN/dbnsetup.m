@@ -113,7 +113,7 @@ for u = 1 : n_rbm
         
         dbn.rbm{u}.train_func = opts.train_func;
         n_classes = size(opts.y_train,2);
-        dbn.rbm{u}.U  = initfunc(0,0.01,hid_size, n_classes);
+        dbn.rbm{u}.U  = initfunc(hid_size, n_classes);
         dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
         
         %dbn.rbm{u}.d  = normrnd(0,0.01,n_classes, 1);
@@ -135,7 +135,7 @@ for u = 1 : n_rbm
     
     
     
-    dbn.rbm{u}.W  = initfunc(0,0.01,hid_size, vis_size);
+    dbn.rbm{u}.W  = initfunc(hid_size, vis_size);
     dbn.rbm{u}.vW = zeros(hid_size, vis_size);
     
     
