@@ -107,7 +107,8 @@ for u = 1 : n_rbm
         dbn.rbm{u}.U  = normrnd(0,0.01,hid_size, n_classes);
         dbn.rbm{u}.vU  = normrnd(0,0.01,hid_size, n_classes);
         
-        dbn.rbm{u}.d  = normrnd(0,0.01,n_classes, 1);
+        %dbn.rbm{u}.d  = normrnd(0,0.01,n_classes, 1);
+        dbn.rbm{u}.d  = zeros(n_classes, 1);
         dbn.rbm{u}.vd  = normrnd(0,0.01,n_classes, 1);
         
     else
@@ -128,10 +129,13 @@ for u = 1 : n_rbm
     dbn.rbm{u}.W  = normrnd(0,0.01,hid_size, vis_size);
     dbn.rbm{u}.vW = zeros(hid_size, vis_size);
     
-    dbn.rbm{u}.b  = normrnd(0,0.01,vis_size, 1);
+    
+    %dbn.rbm{u}.b  = normrnd(0,0.01,vis_size, 1);
+    dbn.rbm{u}.b  = zeros(vis_size,1);
     dbn.rbm{u}.vb = zeros(vis_size, 1);
     
-    dbn.rbm{u}.c  = normrnd(0,0.01,hid_size, 1);
+    %dbn.rbm{u}.c  = normrnd(0,0.01,hid_size, 1);
+    dbn.rbm{u}.c = zeros(hid_size,1);
     dbn.rbm{u}.vc = zeros(hid_size, 1);
 end
 
