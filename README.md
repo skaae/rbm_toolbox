@@ -90,11 +90,17 @@ Sparsity is implemented as described in [7]. Dropout of hidden units is implemen
 
 When training a classification RBM ('opts.classRBM = 1') and a validation set is given through `opts.x_val` and `opts.y_val`, then early stopping can be used. The patience for early stopping can be specified with `opts.patience`. 
 
-## Training DBN's
+## Setting hiddenlayer sizes
 DBN can be trained by given multiple hidden sizes to `dbnsetup` e.g. `sizes=[500 500]` for a two layer DBN with 500 hidden units in 
-each layer. 
+each layer 
 
-**TODO** add wake sleep algorithm?
+```MATLAB
+sizes = [500 500];   % hidden layer size
+[opts, valid_fields] = dbncreateopts();   % create default opts struct
+dbncheckopts(opts,valid_fields);          % simple check of validity of opts struct
+dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
+dbn = dbntrain(dbn, train_x, opts);       % train  dbn
+```
 
 ## Settings table
 
