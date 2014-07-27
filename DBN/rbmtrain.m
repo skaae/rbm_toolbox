@@ -87,7 +87,7 @@ for epoch = 1 : opts.numepochs
                 
                 % init semisup chains at mean training set values
                 % not sure if that is correct?
-                meany  = repmat(mean(opts.y_train,1),opts.batchsize,1);
+                meany  = randsample(repmat(mean(opts.y_train,1),opts.batchsize,1));
                 chains = [opts.x_semisup_batch; v0;];
                 chainsy = [meany;ey;];
             else
