@@ -1,11 +1,11 @@
-function act_vis_y = rbmdowny(rbm,hid_act,act_func)
+function act_vis_y = rbmdowny(rbm,hid_act,prob_or_sample)
 %%RBMDOWNY calculates p(v_label = 1 | h) for label units
 % This function returns [] for non rbm's
 %
 % INPUTS
 %   rbm           : A rbm struct
-%   hid_act          : the activation of the hidden layer
-%   act_func      : the activation function, @sigm | @sigmrnd
+%   hid_act       : the activation of the hidden layer
+%   prob_or_sample: prob: return probabilities, sample, sample each row
 %
 % OUTPUTS
 %   act_vis_y : The activation of the class label visible units
@@ -26,9 +26,11 @@ function act_vis_y = rbmdowny(rbm,hid_act,act_func)
 % Copyright Søren Sønderby June 2014
 
 if rbm.classRBM == 1
-%     vis_label_bias = repmat(rbm.d', size(hid, 1), 1);
-%     act_vis_label = act_func(vis_label_bias + hid * rbm.U);
-      act_vis_y = act_func(bsxfun(@plus,rbm.d',hid_act * rbm.U));
+      act_vis_y = exp(bsxfun(@plus,rbm.d',hid_act * rbm.U));
+      act_vis_y = bsxfun(@rdivide, act_vis_y, sum(act_vis_y, 2));
+      if strcmp(prob_or_sample,'sample')
+        act_vis_y = randsample(act_vis_y);
+      end
 else
     act_vis_y = [];
 end
