@@ -330,7 +330,7 @@ Samples visualization:
 
 `dbnsamplemovie` can be used to create a movie of the sampling process as the gibbs chains converge, somehow similar to http://www.cs.toronto.edu/~hinton/adi/index.htm . 
 
-[link to video](/uploads/example3.avi) 
+[link to video](https://www.youtube.com/watch?v=qqdMu09_zm4) 
 
 
 
