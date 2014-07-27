@@ -27,5 +27,5 @@ function act_vis_x = rbmdownx(rbm,hid_act,act_func)
 % rep vis bias n_samples times then calculate act of vis from hid
 %vis_x_bias = repmat(rbm.b', size(hid, 1), 1);
 %act_vis_x = act_func(vis_x_bias + hid * rbm.W);  % activation of visible units
-act_vis_x = act_func( bsxfun(@plus,rbm.b',hid_act * rbm.W) );
+act_vis_x = act_func( bsxfun(@plus,rbm.b',hid_act * rbm.W));
 end
