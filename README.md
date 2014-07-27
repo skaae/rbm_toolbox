@@ -107,32 +107,30 @@ The following example trains a generative RBM with 500 hidden units and visulize
 ```MATLAB
 rng('default');rng(0);
 load mnist_uint8;
-train_x = double(train_x) / 255;
+train_x = double(train_x)/255;
+train_y = double(train_y);
 
-sizes = [500];   % hidden layer size
+
+sizes = [200];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
-opts.numepochs = 50;
+
+opts.numepochs = 30;
 opts.traintype = 'CD';
 opts.classRBM = 0;
+opts.y_train = train_y;
+opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
+opts.init_type = 'cRBM';
 
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum     = @(t) 0;
 
-%% Set learningrate
-eps       		  = 0.05;    % initial learning rate
-f                 = 0.97;      % learning rate decay
-opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-
-% Set momentum
-T             = 25;       % momentum ramp up
-p_f 		  = 0.9;    % final momentum
-p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
-
-
-dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbncheckopts(opts,valid_fields);       
+disp(opts)
+dbn = dbnsetup(sizes, train_x, opts); 
 dbn = dbntrain(dbn, train_x, opts);
-figure;
+
+% visualize weights
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');
 ```
