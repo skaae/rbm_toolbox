@@ -112,9 +112,11 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-sizes = [200 200];   % hidden layer size
+sizes = [500 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
-opts.numepochs = 100;
+opts.early_stopping = 1;
+opts.patience = 5;
+opts.numepochs = 50;
 opts.traintype = 'PCD';
 opts.classRBM = 1;
 opts.y_train = train_y;
@@ -124,8 +126,8 @@ opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
 
 %% Set learningrate
-eps       		  = 0.001;    % initial learning rate
-f                 = 0.99;      % learning rate decay
+eps       		  = 0.05;    % initial learning rate
+f                 = 0.95;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 
 % Set momentum
@@ -139,11 +141,17 @@ dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 
+% sampledigits
 class_vec = zeros(100,size(train_y,2));
 for i = 1:size(train_y,2)
     class_vec((i-1)*10+1:i*10,i) = 1;
 end
 
 digits = dbnsample(dbn,100,10000,class_vec); 
+figure;visualize(digits'); 
+set(gca,'visible','off');
+
+% sampling movie
+dbnsamplemovie(dbn,10,3000,'example3',10,@visualize,eye(10))
 
 

@@ -3,7 +3,7 @@ function [] = dbnsamplemovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
 %   INPUTS:
 %       dbn               : a rbm struct
 %       n                 : number of samples 
-%       k                 : number of gibbs steps
+%       k                 : number of gibbs steps.
 %       fout              : location of output movie
 %       samplefreq        : samples between a picture is captured
 %       visualizer        : a function which returns a plot
