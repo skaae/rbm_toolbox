@@ -92,10 +92,10 @@ When training a classification RBM ('opts.classRBM = 1') and a validation set is
 
 ## Setting hiddenlayer sizes
 DBN can be trained by given multiple hidden sizes to `dbnsetup` e.g. `sizes=[500 500]` for a two layer DBN with 500 hidden units in 
-each layer 
+each layer. `dbnsetup` finds the size of the visible layer from `x_train` and `y_train` for classification rbm's.
 
 ```MATLAB
-sizes = [500 500];   % hidden layer size
+sizes = [500 500];                        % hidden layer size
 [opts, valid_fields] = dbncreateopts();   % create default opts struct
 dbncheckopts(opts,valid_fields);          % simple check of validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
