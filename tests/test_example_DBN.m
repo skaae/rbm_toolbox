@@ -141,17 +141,20 @@ dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 
+% plot weights 
+figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
+
 % sampledigits
 class_vec = zeros(100,size(train_y,2));
 for i = 1:size(train_y,2)
     class_vec((i-1)*10+1:i*10,i) = 1;
 end
-
 digits = dbnsample(dbn,100,10000,class_vec); 
 figure;visualize(digits'); 
 set(gca,'visible','off');
 
 % sampling movie
-dbnsamplemovie(dbn,10,3000,'example3',10,@visualize,eye(10))
+dbnsamplemovie(dbn,10,2000,'example3',9,@visualize,eye(10))
 
 

@@ -298,13 +298,17 @@ dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 
-% sampledigits
+% plot weights 
+figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
+
+% sample digits
 class_vec = zeros(100,size(train_y,2));
 for i = 1:size(train_y,2)
     class_vec((i-1)*10+1:i*10,i) = 1;
 end
 
-digits = dbnsample(dbn,100,30000,class_vec); 
+digits = dbnsample(dbn,100,10000,class_vec); 
 figure;visualize(digits'); 
 set(gca,'visible','off');
 
@@ -319,9 +323,14 @@ Weight visualization:
 
 `dbnsample` can sample from the model. The final sample is visualized below, with 
 
+Samples visualization:
+<html>
+<img src="/uploads/example3_digits.png" height="500" width="500"> 
+
+
 `dbnsamplemovie` can be used to create a movie of the sampling process as the gibbs chains converge, somehow similar to http://www.cs.toronto.edu/~hinton/adi/index.htm . 
 
-
+[link to video](/uploads/example3.avi) 
 
 
 
