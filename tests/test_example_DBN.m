@@ -22,37 +22,36 @@ train_x = double(train_x)/255;
 % test_y  = double(test_y(1:1000));
 
 
-%%  Generative RBM with 100 hidden units and contrastive divergence
+%%  Generative RBM with 200 hidden units and contrastive divergence
 % note that the learningrate and the momentum must be specified as functions.
-% This allows for decaying learningrate and momentum rampup.
-% The example uses momentum with rampup and decaying learning rate
+rng('default');rng(0);
+load mnist_uint8;
+train_x = double(train_x)/255;
+train_y = double(train_y);
 
-rng('default');rng(1);
-sizes = [500];
 
+sizes = [200];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
-opts.numepochs = 50;
-opts.traintype = 'CD'
+
+opts.numepochs = 30;
+opts.traintype = 'CD';
+opts.classRBM = 0;
+opts.y_train = train_y;
+opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
+opts.init_type = 'cRBM';
 
-T = 25;       % momentum ramp up
-p_f = 0.9;    % final momentum
-p_i = 0.5;    % initial momentum
-opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+% Set learningrate
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum     = @(t) 0;
 
-eps = 0.05;    % initial learning rate
-f = 0.97;     % learning rate decay
-opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-
-%opts.momentum = @(t) 0;
-dbncheckopts(opts,valid_fields);
-dbn = dbnsetup(sizes, train_x, opts);
- 
+dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+disp(opts)
+dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
-figure;visualize(dbn.rbm{1}.W(1:144,:)');
-set(gca,'visible','off');
 
-%% example 2
+%% example 2 classification RBM with CD training
+clear all
 rng('default');rng(0);
 load mnist_uint8;
 train_x = double(train_x)/255;
@@ -60,7 +59,7 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-sizes = [500];   % hidden layer size
+sizes = [200];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
 opts.patience = 5;
@@ -73,32 +72,29 @@ opts.x_val = test_x;
 opts.y_val = test_y;
 opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
+opts.init_type = 'cRBM';
 
-%% Set learningrate
-eps       		  = 0.05;    % initial learning rate
-f                 = 0.97;      % learning rate decay
-opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-
-% Set momentum
-T             = 25;       % momentum ramp up
-p_f 		  = 0.9;    % final momentum
-p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+% Set learningrate
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum     = @(t) 0;
 
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+disp(opts)
 dbn = dbnsetup(sizes, train_x, opts);  % train function 
 dbn = dbntrain(dbn, train_x, opts);
 
-%% Do predictions
+% Do predictions
 pred_val = dbnpredict(dbn,test_x);
 [~, labels_val] = max(test_y,[],2);
 acc_val = mean(pred_val == labels_val);
+err_val = 1-acc_val
 
-%% plot weights 
+% plot weights 
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');
 
-%% plot errors
+
+% plot errors
 plot([dbn.rbm{1}.val_error',dbn.rbm{1}.train_error'])
 legend({'Validation error','Train error'})
 [min_val,min_idx] =  min(dbn.rbm{1}.val_error);

@@ -17,7 +17,6 @@ RBM toolbox support among others:
  * Support for custom error functions
 
 
-
 # Settings
 
 ## training objectives
@@ -32,6 +31,21 @@ The RBM toolbox supports four different TBM training objectives. For a detailed 
 
 
 The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
+
+## weight initialization 
+Initial weights are either sampled from a normal distriubtion [3] or from a uniform distribution [7], the behaivior is controlled thorugh ```opts.init_type```:
+
+```MATLAB
+switch lower(opts.init_type)
+    case 'gauss'
+        initfunc = @(m,n) normrnd(0,0.01,m,n);
+    case 'crbm'
+        initfunc = @(m,n) (rand(m,n)-0.5) ./ max([m n]);
+    otherwise
+        error('init_type should be either gauss or cRBM');
+end
+```
+
 
 ## Regularization
 
@@ -52,6 +66,7 @@ The table shows which fields in the opts struct that applies to the different tr
 
 |Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	
 |---						|---			|---				|---		 	|---					|
+|init_type               	|  x 			|   x				|   	x		|  x 					|
 |traintype   				|  x 			|	   				|   	x		|  x 					|
 |cdn   						|  x 			|   				|   	x		|  x 					|
 |numepochs   				|  x 			|   x				|   	x		|  x 					| 
@@ -122,12 +137,7 @@ figure;visualize(dbn.rbm{1}.W(1:144,:)');
 set(gca,'visible','off');
 ```
 
-In the example the learningrate (blue) starts at *0.05* and decays with each epoch. The momentum (green) ramps up over 25 epochs, as shown in the figure. 
-
-<html>
-<img src="/uploads/learnmom.png" height="350" width="350"> 
-
-Finally the weights can be visualized:
+Visualization of weights:
 
 <html>
 <img src="/uploads/example1_weights.png" height="500" width="500"> 
@@ -147,7 +157,7 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-sizes = [500];   % hidden layer size
+sizes = [200];  
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
 opts.patience = 5;
@@ -160,38 +170,35 @@ opts.x_val = test_x;
 opts.y_val = test_y;
 opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
+opts.init_type = 'cRBM';
 
-%% Set learningrate
-eps       		  = 0.05;    % initial learning rate
-f                 = 0.97;      % learning rate decay
-opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum     = @(t) 0;
 
-% Set momentum
-T             = 25;       % momentum ramp up
-p_f 		  = 0.9;    % final momentum
-p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
-
-dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbncheckopts(opts,valid_fields);       
+disp(opts)
+dbn = dbnsetup(sizes, train_x, opts);  
 dbn = dbntrain(dbn, train_x, opts);
 
-%% Do predictions
+% Make predictions
 pred_val = dbnpredict(dbn,test_x);
 [~, labels_val] = max(test_y,[],2);
 acc_val = mean(pred_val == labels_val);
+err_val = 1-acc_val
 
-%% plot weights 
+% plot weights 
 figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
 set(gca,'visible','off');
 
-%% plot errors
+
+% plot errors
 plot([dbn.rbm{1}.val_error',dbn.rbm{1}.train_error'])
 legend({'Validation error','Train error'})
 [min_val,min_idx] =  min(dbn.rbm{1}.val_error);
 hold on; plot(min_idx,min_val,'xr'); hold off;
 xlabel('Epoch'); ylabel('Error'); grid on;
 ```
+
 For classification RBM's predictions can be calculated by `dbnpredict` wich returns a label or with 
 `dbnclassprobs` wich returns the predicted class probabilities. 
 
