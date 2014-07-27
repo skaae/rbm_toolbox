@@ -1,7 +1,5 @@
 rng('default');rng(1);
 
-
-
 %% init test weights 
 x = rand(100,1);
 y = 2;
