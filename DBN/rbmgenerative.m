@@ -65,13 +65,12 @@ type = opts.traintype;
 
 %% add dropout
 if rbm.dropout_hidden > 0
-    up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;
-    
+    up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;    
 else
     up = @rbmup;
 end
 
-h0 = up(rbm,v0,ey,@sigmrnd);
+h0 = up(rbm,v0,ey,@sigmrnd);   % hidden positive statistic
 
 % For contrastive divergence use the input vectors as starting point
 % for Persistent contrastive divergence we use the persistent chains as
@@ -85,13 +84,16 @@ end
 
 for drop_out_mask = 1:(opts.cdn - 1)
     visx = rbmdownx(rbm,hid,@sigmrnd);
-    visy = rbmdowny(rbm,hid,@sigmrnd);
+    visy = rbmdowny(rbm,hid);
     hid = up(rbm,visx,visy,@sigmrnd);
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
-[vk, vky] = down(rbm,hid,@sigmrnd);
-hk        = up(rbm,vk,vky,@sigm);
+% in larochelle code he samples everything. I do the same
+vk   = rbmdownx(rbm,hid,@sigmrnd);       
+vky  = rbmdowny(rbm,hid,'sample');      
+hk   = up(rbm,vk,vky,@sigmrnd);          % chg to sigm for no randomsampling
+                                         
 
 %update the state of the persistent chains if PCD othwise return empty chains
 switch type
@@ -103,14 +105,20 @@ switch type
         chainsy = [];
 end
 
+%% calculate gradients
+% h0  : postivie statistic for hidden units
+% v0  : positive statistic for the visible units
+% vk  : negative stat for visible units 
+% vky : negative stat for label visible units
+% hk  : negative stat for hidden units
 
 % calcualte the postive and negative gradient / aka positive and neg phase
 positive_phase = h0' * v0;
 negative_phase = hk' * vk;
 
 dw = positive_phase - negative_phase;
-db =  sum(v0 - vk)';
-dc =  sum(h0 - hk)';
+db =  sum(v0 - vk,1)';
+dc =  sum(h0 - hk,1)';
 
 % normalize by minibatch size
 dw = dw / opts.batchsize;
@@ -122,7 +130,7 @@ if rbm.classRBM == 1
     positive_phasey = h0' * ey;
     negative_phasey = hk' * vky;
     du = positive_phasey - negative_phasey;
-    dd = sum(ey - vky)';
+    dd = sum(ey - vky,1)';
     du = du / opts.batchsize;
     dd = dd/ opts.batchsize;
 else
