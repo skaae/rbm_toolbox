@@ -1,5 +1,5 @@
-function [class_prob,F]= rbmpyx(rbm,x,train_or_test)
-%RBMPYX calculates class probabilities, helper function
+function [class_prob,F]= rbmpygivenx(rbm,x,train_or_test)
+%RBMPYGIVENX calculates class probabilities [p(y|x)], helper function
 n_classes = size(rbm.d,1);
 n_samples = size(x,1);
 

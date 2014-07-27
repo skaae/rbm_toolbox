@@ -51,7 +51,7 @@ end
 class_prob_res = [];
 for i = 1:numel(chunks)
     minibatch = x(chunks{i}.start:chunks{i}.end,:);
-    [class_prob, ~] = rbmpyx(rbm,minibatch,'test');
+    [class_prob, ~] = rbmpygivenx(rbm,minibatch,'test');
     class_prob_res = [class_prob_res;class_prob];
 end
 

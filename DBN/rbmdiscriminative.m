@@ -75,7 +75,7 @@ n_samples = size(x,1);
 % class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
 % class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
 
-[class_prob,F]= rbmpyx(rbm,x,'train');
+[class_prob,F]= rbmpygivenx(rbm,x,'train');
 
 F_sigm = sigm(F);
 F_sigm_prob = zeros(size(F_sigm));

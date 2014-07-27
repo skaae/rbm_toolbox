@@ -65,7 +65,7 @@ end
 
 
 %sample p(y|x)
-[p_y_given_x, ~]  = rbmpyx( rbm,x,'train');
+[p_y_given_x, ~]  = rbmpygivenx( rbm,x,'train');
 
 [g_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
          opts.x_semisup_batch, p_y_given_x,opts,chains_semisup,chainsy_semisup);
