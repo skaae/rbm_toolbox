@@ -1,4 +1,4 @@
-function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy)
+function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,chainsy,debug)
 %RBMGENERATIVE calculate weight updates for generative RBM
 % SEE sections contrastive divergence(CD) and persistent contrastive
 % divergence (PCD), determined by opts.traintype
@@ -10,7 +10,8 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 %       opts      : opts struct
 %       chains    : current state of markov chains for visible units
 %       chainsy   : current state of markov chains for label visible units
-%
+%       debug     : if it exists and is 1 save intermediate values to file
+%                   currentworkdir/test_rbmgenerative.mat
 %   OUTPUTS
 %      A grads struct with the fields:
 %       grads.dw   : w weights chainge normalized by minibatch size
@@ -70,14 +71,15 @@ else
     up = @rbmup;
 end
 
-h0 = up(rbm,v0,ey,@sigmrnd);   % hidden positive statistic
+h0 = up(rbm,v0,ey,@sigm);   % hidden positive statistic larochelle does not sample postive statistics? 
+h0_rnd =  double(h0 > rand(size(h0)));
 
 % For contrastive divergence use the input vectors as starting point
 % for Persistent contrastive divergence we use the persistent chains as
 % starting point for the sampling
 switch type
     case 'CD'
-        hid = h0;
+        hid = h0_rnd;
     case 'PCD'
         hid= up(rbm,chains,chainsy,@sigmrnd);
 end
@@ -89,16 +91,24 @@ for drop_out_mask = 1:(opts.cdn - 1)
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
-% in larochelle code he samples everything. I do the same
-vk   = rbmdownx(rbm,hid,@sigmrnd);       
+vkx   = rbmdownx(rbm,hid,@sigmrnd);   
 vky  = rbmdowny(rbm,hid,'sample');      
-hk   = up(rbm,vk,vky,@sigmrnd);          % chg to sigm for no randomsampling
-                                         
+hk   = up(rbm,vkx,vky,@sigm);         
+
+% debugging
+if exist('debug','var') && debug == 1
+    warning('Debugging rbmgenerative')
+    vkx_sigm   = rbmdownx(rbm,hid,@sigm);   % debugging
+    vky_prob   = rbmdowny(rbm,hid,'prob'); 
+    hk_sample  = up(rbm,vkx,vky,@sigmrnd); 
+    save('test_rbmgenerative','h0','h0_rnd','hk_sample',...
+                 'hk','v0','vkx','vkx_sigm','vky','vky_prob');
+end
 
 %update the state of the persistent chains if PCD othwise return empty chains
 switch type
     case 'PCD'
-        chains = vk;
+        chains = vkx;
         chainsy = vky;
     case 'CD'
         chains = [];
@@ -114,10 +124,10 @@ end
 
 % calcualte the postive and negative gradient / aka positive and neg phase
 positive_phase = h0' * v0;
-negative_phase = hk' * vk;
+negative_phase = hk' * vkx;
 
 dw = positive_phase - negative_phase;
-db =  sum(v0 - vk,1)';
+db =  sum(v0 - vkx,1)';
 dc =  sum(h0 - hk,1)';
 
 % normalize by minibatch size
@@ -134,11 +144,12 @@ if rbm.classRBM == 1
     du = du / opts.batchsize;
     dd = dd/ opts.batchsize;
 else
-    du = [];
-    dd = [];
+    % return zero gradients for non cRBM's
+    du = zeros(size(rbm.U));
+    dd = zeros(size(rbm.d));
 end
 
-curr_err = sum(sum((v0 - vk) .^ 2)) / opts.batchsize;
+curr_err = sum(sum((v0 - vkx) .^ 2)) / opts.batchsize;
 
 grads.dw = dw;
 grads.db = db;

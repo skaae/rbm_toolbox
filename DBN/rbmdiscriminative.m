@@ -1,6 +1,5 @@
-function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chains,chainsy)
+function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chains,chainsy,debug)
 %RBMDISCRIMINATIVE calculate weight updates for discriminative RBM
-%
 %
 %   INPUTS:
 %       rbm       : a rbm struct
@@ -9,6 +8,8 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 %       opts      : opts struct
 %       chains    : not used, pass in anything
 %       chainsy   : not used, pass in anything
+%       debug     : if it exists and is 1 save intermediate values to file
+%                   currentworkdir/test_rbmdiscriminative.mat
 %
 %   OUTPUTS
 %      A grads struct with the fields:
@@ -47,40 +48,12 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 n_classes = size(rbm.d,1);
 n_samples = size(x,1);
 
-% wx = rbm.W*x';
-% % add dropout  (is )
-%  if rbm.dropout_hidden > 0
-%      wx = wx.*rbm.hidden_mask;
-%  end
-% 
-% 
-% % calculate probailities
-% % precalcualte activation of hidden units
-% cwx = bsxfun(@plus,wx,rbm.c);
-% 
-% % loop over all classes and caluclate energies and probabilities
-% %F = zeros(n_hidden,n_samples,n_classes);
-% 
-%  F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
-%  
-%  
-% 
-%  class_log_prob = zeros(n_samples,n_classes);
-%  for y = 1:n_classes
-%      %F(:,:,y) = bsxfun(@plus,rbm.U(:,y),cwx);
-%          class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
-%  end
-% 
-% %normalize probabilities in numerically stable way
-% class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
-% class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
-
-[class_prob,F]= rbmpygivenx(rbm,x,'train');
+[p_y_given_x, F]= rbmpygivenx(rbm,x,'train');
 
 F_sigm = sigm(F);
 F_sigm_prob = zeros(size(F_sigm));
 for i = 1:n_classes
-    F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),class_prob(:,i)');
+    F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),p_y_given_x(:,i)');
 end
 
 
@@ -111,11 +84,17 @@ for i = 1:n_classes
 end
 
 %% dd grad
-dd = sum(ey - class_prob,1)';
+dd = sum(ey - p_y_given_x,1)';
+
+% debugging
+if exist('debug','var') && debug == 1
+    warning('Debugging rbmdiscriminative')
+    save('test_rbmdiscriminative','p_y_given_x','dd');
+end
 
 %% return values
 grads.dw = dw / opts.batchsize;
-%grads.db = db / opts.batchsize;
+grads.db = zeros(size(rbm.b));
 grads.dc = dc / opts.batchsize;
 grads.dd = dd / opts.batchsize;
 grads.du = du / opts.batchsize;
@@ -123,6 +102,5 @@ grads.du = du / opts.batchsize;
 curr_err = 0;
 chains   = [];
 chainsy  = [];
-grads.db = [];
 end
 

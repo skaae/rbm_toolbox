@@ -64,34 +64,29 @@ else
 end
 
 
-%sample p(y|x)
-[p_y_given_x, ~]  = rbmpygivenx( rbm,x,'train');
+%sample p(y|x) and train semisupervised
+[ey_semisup, ~]  = randsample(rbmpygivenx( rbm,x,'train'));
 
-[g_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
-         opts.x_semisup_batch, p_y_given_x,opts,chains_semisup,chainsy_semisup);
+[grads_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
+         opts.x_semisup_batch, ey_semisup,opts,chains_semisup,chainsy_semisup);
 
 
 % combine the generative unsupervised training with either @rbmhybrid,
 % @rbmgenerative or @rbmdiscriminative
-[g_type,~,chains_type,chainsy_type]= opts.semisup_type(rbm,x,ey,opts,...
+% note here we have labels
+[grads_type,~,chains_type,chainsy_type]= opts.semisup_type(rbm,x,ey,opts,...
     chains_type,chainsy_type);
 
 chains_comb = [chains_semisup; chains_type];
 chainsy_comb = [chainsy_semisup; chainsy_type];
 
-
-weight_grads = @(type,semisup) type +  opts.semisup_beta * semisup;
-
-grads.dw = weight_grads(g_type.dw,g_semisup.dw);
-grads.db = weight_grads(g_type.db,g_semisup.db);
-grads.dc = weight_grads(g_type.dc,g_semisup.dc);
-grads.du = weight_grads(g_type.du,g_semisup.du);
-grads.dd = weight_grads(g_type.dd,g_semisup.dd);
+grads.dw = grads_type.dw + opts.semisup_beta * grads_semisup.dw;
+grads.db = grads_type.db + opts.semisup_beta * grads_semisup.db;
+grads.dc = grads_type.dc + opts.semisup_beta * grads_semisup.dc;
+grads.du = grads_type.du + opts.semisup_beta * grads_semisup.du;
+grads.dd = grads_type.dd + opts.semisup_beta * grads_semisup.dd;
 
 curr_err = 0;
-
-
-  
 
 end
 

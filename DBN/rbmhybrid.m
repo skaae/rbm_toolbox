@@ -1,4 +1,4 @@
-function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chainsy )
+function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chainsy,debug)
 %RBMDISCRIMINATIVE calcualte weight updates for hybrid RBM
 %  for discription of hybrid training objective see ref [1,2]
 %  refer to RBMGENERATIVE and RBMDISCRIMINATIVE for description of the
@@ -16,6 +16,8 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %                   generative training.
 %       chains    : not used, pass in anything
 %       chainsy   : not used, pass in anything
+%       debug     : if it exists and is 1 save intermediate values to file
+%                   currentworkdir/test_rbmhybrid.mat
 %
 %   OUTPUTS
 %      A grads struct with the fields:
@@ -50,16 +52,19 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 % Copyright Søren Sønderby June 2014
 % %   See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
-[g_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
-[g_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,chains,chainsy);
+[grads_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
+[grads_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);
 
-weight_grads = @(gen,dis) (1+opts.hybrid_alpha)*dis +  opts.hybrid_alpha * dis;
+if exist('debug','var') && debug == 1
+    warning('Debugging rbmhybrid')
+    save('test_rbmhybrid','grads_gen','grads_dis');
+end
 
-grads.dw = weight_grads(g_gen.dw,g_dis.dw);
-grads.db = weight_grads(g_gen.db,0);  %db is allways zero for dis training
-grads.dc = weight_grads(g_gen.dc,g_dis.dc);
-grads.du = weight_grads(0,g_dis.du);
-grads.dd = weight_grads(0,g_dis.dd);
+grads.dw = grads_dis.dw + opts.hybrid_alpha * grads_gen.dw;
+grads.db = grads_dis.db + opts.hybrid_alpha * grads_gen.db; 
+grads.dc = grads_dis.dc + opts.hybrid_alpha * grads_gen.dc;
+grads.du = grads_dis.du + opts.hybrid_alpha * grads_gen.du;
+grads.dd = grads_dis.dd + opts.hybrid_alpha * grads_gen.dd;
 
 end
 
