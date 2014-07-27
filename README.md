@@ -32,7 +32,43 @@ The RBM toolbox supports four different TBM training objectives. For a detailed 
 
 The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
 
+
+## Learning rate and momentum
+The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.   
+
+Decaying learning rate can be specified with:   
+
+```MATLAB
+eps       		  = 0.001;    % initial learning rate
+f                 = 0.99;      % learning rate decay
+opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
+```
+Constant learning rate can be spcified with
+
+```MATLAB
+opts.learningrate = @(t,momentum) 0.01;
+```
+
+Momentum is controlled through `opts.momentum`. `opts.momentum` should be a function taking current epoch as input.
+
+Ramp up momentum can be spcified with:
+
+```MATLAB
+T             = 50;       % momentum ramp up epoch
+p_f 		  = 0.9;    % final momentum
+p_i           = 0.5;    % initial momentum
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+```
+
+Constant momentum can be specified with:
+
+```MATLAB
+opts.momentum = @(t) 0.9;
+```
+
+
 ## weight initialization 
+
 Initial weights are either sampled from a normal distriubtion [3] or from a uniform distribution [7], the behaivior is controlled thorugh `opts.init_type`:
 
 ```MATLAB

@@ -41,16 +41,19 @@ opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
 opts.init_type = 'cRBM';
 
-% Set learningrate
 opts.learningrate = @(t,momentum) 0.05;
 opts.momentum     = @(t) 0;
 
-dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+dbncheckopts(opts,valid_fields);       
 disp(opts)
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbnsetup(sizes, train_x, opts); 
 dbn = dbntrain(dbn, train_x, opts);
 
-%% example 2 classification RBM with CD training
+% visualize weights
+figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
+set(gca,'visible','off');
+
+%% example 2 classification generative RBM with CD training
 clear all
 rng('default');rng(0);
 load mnist_uint8;
@@ -59,7 +62,7 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-sizes = [200];   % hidden layer size
+sizes = [200];  
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
 opts.patience = 5;
@@ -74,16 +77,15 @@ opts.test_interval = 1;
 opts.train_func = @rbmgenerative;
 opts.init_type = 'cRBM';
 
-% Set learningrate
 opts.learningrate = @(t,momentum) 0.05;
 opts.momentum     = @(t) 0;
 
-dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
+dbncheckopts(opts,valid_fields);       
 disp(opts)
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
+dbn = dbnsetup(sizes, train_x, opts);  
 dbn = dbntrain(dbn, train_x, opts);
 
-% Do predictions
+% Make predictions
 pred_val = dbnpredict(dbn,test_x);
 [~, labels_val] = max(test_y,[],2);
 acc_val = mean(pred_val == labels_val);
@@ -102,6 +104,7 @@ hold on; plot(min_idx,min_val,'xr'); hold off;
 xlabel('Epoch'); ylabel('Error'); grid on;
 
 %% Example 3 - PCD and sampling and movies
+clear all;
 rng('default');rng(0);
 load mnist_uint8;
 train_x = double(train_x)/255;
@@ -109,7 +112,7 @@ test_x  = double(test_x)/255;
 train_y = double(train_y);
 test_y = double(test_y);
 
-sizes = [500 500];   % hidden layer size
+sizes = [200 200];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.numepochs = 100;
 opts.traintype = 'PCD';
@@ -122,11 +125,11 @@ opts.train_func = @rbmgenerative;
 
 %% Set learningrate
 eps       		  = 0.001;    % initial learning rate
-f                 = 0.97;      % learning rate decay
+f                 = 0.99;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 
 % Set momentum
-T             = 25;       % momentum ramp up
+T             = 50;       % momentum ramp up
 p_f 		  = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
 opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
