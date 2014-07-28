@@ -9,12 +9,12 @@ switch func2str(opts.train_func)
         has_classes(opts)
     case 'rbmhybrid'
         has_classes(opts)
-    case 'rbmsemisuplearn' 
+    case 'rbmsemisuplearn'
+        if opts.classRBM == 0
+            error('Semisupervised training without labels does not make sense, use RBMGENERATIVE'
+        end
         has_classes(opts)
         assert(~isempty(opts.x_semisup));
-        if isequal(opts.semisup_type,@rbmgenerative) && opts.classRBM == 0
-            error('semisupervised training without labels does not make sense, use rbmgenerative')
-        end
     otherwise
         error('unknown training function')
 end
