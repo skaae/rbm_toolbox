@@ -29,7 +29,7 @@ if rbm.classRBM == 1
       act_vis_y = exp(bsxfun(@plus,rbm.d',hid_act * rbm.U));
       act_vis_y = bsxfun(@rdivide, act_vis_y, sum(act_vis_y, 2));
       if strcmp(prob_or_sample,'sample')
-        act_vis_y = randsample(act_vis_y);
+        act_vis_y = samplematrix(act_vis_y);
       end
 else
     act_vis_y = [];

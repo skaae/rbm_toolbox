@@ -1,5 +1,5 @@
-function sample = randsample(x)
-%RANDSAMPLE create a randomized sample from a matrix of probabilities
+function sample = samplematrix(x)
+%SAMPLEMATRIX create a randomized sample from a matrix of probabilities
 % assumes that each row of x is normalized. Samples from each of row 
 % of x using uniform distribution
 [n_samples,n_classes] = size(x);

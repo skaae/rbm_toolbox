@@ -80,9 +80,9 @@ end
 y_vec_neg = y_sample;
 
 
-%% check randsample and rbmdowny with sample
+%% check samplematrix and rbmdowny with sample
 rng('default');rng(1);
-my_y_vec_neg1 = randsample(p_y_given_h');
+my_y_vec_neg1 = samplematrix(p_y_given_h');
 rng('default');rng(1);
 my_y_vec_neg2 = rbmdowny(rbm,h_pos','sample');
 

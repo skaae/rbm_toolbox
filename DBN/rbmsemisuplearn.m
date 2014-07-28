@@ -64,9 +64,11 @@ else
 end
 
 
-%sample p(y|x) and train semisupervised
-[ey_semisup, ~]  = randsample(rbmpygivenx( rbm,x,'train'));
+%sample p(y | x) - should i use p(y|x_semisup) ???
+[ey_semisup, ~] = rbmpygivenx( rbm,x,'train'); 
+ey_semisup = samplematrix(ey_semisup);
 
+% train semisupervised
 [grads_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
          opts.x_semisup_batch, ey_semisup,opts,chains_semisup,chainsy_semisup);
 
