@@ -116,7 +116,6 @@ for u = 1 : n_rbm
         dbn.rbm{u}.U  = initfunc(hid_size, n_classes);
         dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
         
-        %dbn.rbm{u}.d  = normrnd(0,0.01,n_classes, 1);
         dbn.rbm{u}.d  = zeros(n_classes, 1);
         dbn.rbm{u}.vd  = zeros(n_classes, 1);
         
