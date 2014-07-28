@@ -18,22 +18,45 @@ RBM toolbox support among others:
 
 
 # Settings
+The following section describes som of the options. Refer to `dbncreateopts` for a description of all settings.
 
 ## training objectives
 
-The RBM toolbox supports four different TBM training objectives. For a detailed description refer to [2].
+The RBM toolbox supports four different TBM training objectives. For a detailed description refer to [7].
 
+The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func`.
+When `opts.classRBM==1` the toolbox will use both x and y as input to the visible units. You specify y training samples with `opts.y_train` and validation validation samples with `opts.x_val` and `opts.y_val`. 
+
+####Training objectives
 
 * `rbmgenerative`:  `-log(p(x))` or `-log(p(x,y))` if `classRBM` is 1
 * `rbmdiscriminative`  `-log(p(x I y))`   [7]
-* `rbmhybrid` Models   `-(1-alpha)log(y I x) - alpha log(p (x) )` [7]
-* `rbmsemisuplearn`    `TYPE + unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data  [7]
+* `rbmhybrid` Models   `-(1-alpha)log(y I x) - alpha log(p (x) )`. The importance of the generative traning objective is 
+controleld with `opts.hybrid_alpha` [7]
+* `rbmsemisuplearn`    `TYPE + beta unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data. The importance of unsupervised training is controlled with `opts.semisup_beta`. TYPE is specified with `opts.semisup_type = traintype` where `traintype is `{@rbmgenerative, @rbmdiscriminative, @rbmhybrid}`. Samples used for unsupervised training are given with `opts.x_semisup`.  See [7].
 
+#### Generative training
+Generative training and discrmininaive training are the basic training objectives in the toolbox. The hybrid and semisupervised training objectives are different combinations of generative and discriminative training. In generative training the negative log likelihood is optimized, depending on the seeting of opts.classRBM that is either `-log(p(x))` or `-log(p(x,y))`.
 
-The RBM training objective is set by supplying a function handle to one of the four training functions through `opts.train_func` 
+Generative training can be trained with contrastive divergence (`CD`) [5] or with persistent contrastive divergence (`PCD`) [6]. The traning type is specified with `opts.traintype`. Both CD and PCD samples negative statistics using gibbs sampling. The number of gibbs steps before the statistics is collected is specified with `opts.cdn`. Usually 1 works fine. 
 
+#### Discriminative training
+Discriminative training optimizes `p(y I x)`. 
+
+#### Hybrid training
+Hybrid training combines generative and discriminative training objective. The two objectives are combined with:
+
+`grads = grads_discrminative + opts.hybrid_alpha X grads_generative` 
+
+### Semisupervised training
+Semisupervised training combines unsupervised and supervised training. The following formulae is used to combine the objectives:
+
+`grads = grads_type + opts.semisup_beta * grads_generative`
+
+Here `grads_type` is either the gradients from generative, discriminative or hybrid training. `grads_generative` is the gradients from unsupervised training on the samples given in `opts.x_semisup`. The gradients are calculated with ´opts.classRBM=1`. We use samples of p(y I x_semisup) as labels. 
 
 ## Learning rate and momentum
+
 The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.
 
 Decaying learning rate can be specified with:   
@@ -81,26 +104,34 @@ switch lower(opts.init_type)
         error('init_type should be either gauss or cRBM');
 end
 ```
-
+Bias weights are always initialized to zero. 
 
 ## Regularization
 
-RBM toolbox supports L1 and L2 regularization and regularization through a maximum L2 norm fo the incoming weights to each neuron [4].
-Sparsity is implemented as described in [7]. Dropout of hidden units is implemented as described in [1].
+The following regularization options are implemented
 
-When training a classification RBM ('opts.classRBM = 1') and a validation set is given through `opts.x_val` and `opts.y_val`, then early stopping can be used. The patience for early stopping can be specified with `opts.patience`. 
+ * `opts.L1`: set the regularization weight
+ * `opts.L2`: set the regularization weight
+ * `opts.L2norm`: maximum L2 norm fo the incoming weights to each neuron [4]. Set the maximum L2norm for each neuron
+ * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted after each epoch.
+ * `opts.dropout_hidden`: dropout on hidden units. specify the probability of being dropped. see [1]
+ * `opts.early_stopping`: Early stopping is available for classification RBM's where valdiation set is specified. The patience for early stopping can be set with `opts.patience`.
+
 
 ## Setting hiddenlayer sizes
-DBN can be trained by given multiple hidden sizes to `dbnsetup` e.g. `sizes=[500 500]` for a two layer DBN with 500 hidden units in 
-each layer. `dbnsetup` finds the size of the visible layer from `x_train` and `y_train` for classification rbm's.
+In the example a RBM with 500 hidden units is created and trained. You do not need to set the size of the visible uints.
 
 ```MATLAB
-sizes = [500 500];                        % hidden layer size
+sizes = [500];                        % hidden layer size
 [opts, valid_fields] = dbncreateopts();   % create default opts struct
 dbncheckopts(opts,valid_fields);          % simple check of validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
 dbn = dbntrain(dbn, train_x, opts);       % train  dbn
 ```
+
+You can stack several RBM by specifying sizes as a vector. `sizes = [500 200]` will stack two RBM's where the first RBM has 
+#features visble units and 500 hidden units and the second RBM has 500 visble units and 200 hidden units. 
+Any number of RBM's is allowed. If several RBM's are stacked non-top layer RBM's will be trained with generative training objective and `opts.classRBM = 0`. 
 
 ## Settings table
 
