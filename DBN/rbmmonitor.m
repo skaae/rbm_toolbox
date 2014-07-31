@@ -20,14 +20,12 @@ function [ perf,rbm ] = rbmmonitor(rbm,x,opts,val_samples,epoch)
 if mod(epoch,opts.test_interval) == 0
     if rbm.classRBM
         train_probs = rbmclassprobs( rbm,x,opts.batchsize);
-        %train_confusion = confusionmatrix(train_probs,opts.y_train);
         [train_err, train_om] = rbm.err_func(train_probs,opts.y_train);
-        
         rbm.train_error(end+1) = train_err;
         rbm.train_error_measures{end+1} = train_om;
+        
         if ~isempty(opts.x_val)
             val_probs = rbmclassprobs( rbm,opts.x_val,opts.batchsize);
-            %val_confusion = confusionmatrix(val_probs,opts.y_val);
             [val_err, val_om] = rbm.err_func(val_probs,opts.y_val);
             
             rbm.val_error(end+1) = val_err;
