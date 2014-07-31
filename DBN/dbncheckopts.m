@@ -15,7 +15,7 @@ switch func2str(opts.train_func)
         has_classes(opts)
     case 'rbmsemisuplearn'
         if opts.classRBM == 0
-            error('Semisupervised training without labels does not make sense, use RBMGENERATIVE'
+            error('Semisupervised training without labels does not make sense, use RBMGENERATIVE')
         end
         has_classes(opts)
         assert(~isempty(opts.x_semisup));
