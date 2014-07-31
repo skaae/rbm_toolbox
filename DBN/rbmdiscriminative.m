@@ -41,12 +41,10 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
+% See also RBMGENERATIVE RBMHYBRID RBMSEMISUPLEARN
+%
 % Copyright Søren Sønderby June 2014
-
-
-[n_hidden,n_visible]  = size(rbm.W);
 n_classes = size(rbm.d,1);
-n_samples = size(x,1);
 
 [p_y_given_x, F]= rbmpygivenx(rbm,x,'train');
 
@@ -56,34 +54,26 @@ for i = 1:n_classes
     F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),p_y_given_x(:,i)');
 end
 
-
 % init grads
 dw = zeros(size(rbm.W));
 du = zeros(size(rbm.U));
 dc = zeros(size(rbm.c));
-dd = zeros(size(rbm.d));
 
-
-[~,class_labels] = max(ey,[],2);
-temp = zeros(500,10);
+class_labels = predict(ey);
 for i = 1:n_classes
-    
-    %%  dw grad
+    %  dw grad
     idx = find(i == class_labels);
     dw = dw +  F_sigm(:,idx,i)*x(idx,:) - F_sigm_prob(:,:,i)*x;
     
-    
-    %%  du grad
+    %  du grad
     du(:,i) = sum(F_sigm(:,class_labels == i,i),2) - sum(F_sigm_prob(:,:,i),2);
     
-    
-    
-    %% dc grad
+    % dc grad
     dc = dc + sum(F_sigm(:,class_labels == i,i),2) - sum(F_sigm_prob(:,:,i),2);
     
 end
 
-%% dd grad
+% dd grad
 dd = sum(ey - p_y_given_x,1)';
 
 % debugging
@@ -92,7 +82,7 @@ if exist('debug','var') && debug == 1
     save('test_rbmdiscriminative','p_y_given_x','dd');
 end
 
-%% return values
+% create grads struct and scale grad by minibatch size.
 grads.dw = dw / opts.batchsize;
 grads.db = zeros(size(rbm.b));
 grads.dc = dc / opts.batchsize;

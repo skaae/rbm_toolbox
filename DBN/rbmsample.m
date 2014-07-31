@@ -11,9 +11,8 @@ function [vis_sampled] = rbmsample(rbm,n,k,sampleclass)
 %   OUTPUTS
 %       vis_samples       : samples as a samples-by-n matrix
 %
-%  NOTES
-%   k should quite high. 1000 seems to work for mnist PCD model
-%
+% See also DBNSAMPLE DBNSAMPLEMOVIE
+% 
 % Copyright Søren Sønderby June 2014
 
 if nargin == 4   % sample class is given, assume that classRBM = 1

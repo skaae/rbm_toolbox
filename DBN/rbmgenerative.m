@@ -26,7 +26,7 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 %CONTRASTIVE DIVERGENCE (TYPE = 'CD')
 % Normal contrastive divergence with k CD updates
 %
-% See also
+% See
 %   Hinton, G. (2002). Training Products of Experts by Minimizing Contrastive
 %   Divergence. Neural Compu- tation, 14, 1771?1800.
 %
@@ -58,13 +58,13 @@ function [grads,curr_err,chains,chainsy] = rbmgenerative(rbm,v0,ey,opts,chains,c
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
+% See also RBMDISCRMINATIVE RBMHYBRID RBMSEMISUPLEARN 
+%
 % Copyright Søren Sønderby June 2014
 
-% Collect postivite phase (we already have v0 as imput)
-% the positive phase is the same for CD and PCD
 type = opts.traintype;
 
-%% add dropout
+% add dropout
 if rbm.dropout_hidden > 0
     up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;    
 else

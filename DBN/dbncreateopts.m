@@ -88,7 +88,11 @@ function [ opts,valid_fields ] = dbncreateopts()
 %         divergence,? Neural Comput., 2002.
 %     [5] N. Srivastava and G. Hinton, ?Dropout: A Simple Way to Prevent Neural
 %         Networks from Overfitting,? J. Mach.  ?, 2014.
-% copyright Søren Sønderby july 2014
+%
+% see also, DBNSETUP, DBNCHECKOPTS DBNTRAIN
+%
+% Copyright Søren Sønderby july 2014
+
 
 % DEFAULT SETTINGS
 opts.traintype = 'PCD';

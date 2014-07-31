@@ -10,7 +10,7 @@ function [ W ] = l2normconstraint( W,L2norm )
 %   OUTPUT
 %           W :  rescaled weights below threshold
 %
-% copyright Søren Sønderby july 2014
+% Copyright (c) Søren Sønderby july 2014
 input = sum(W.^2,2);
 norm_const = sqrt(input/L2norm);    % normalization constant
 norm_const(norm_const < 1) = 1;     % find units below threshold

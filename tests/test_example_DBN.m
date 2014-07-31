@@ -87,7 +87,7 @@ dbn = dbntrain(dbn, train_x, opts);
 
 % Make predictions
 pred_val = dbnpredict(dbn,test_x);
-[~, labels_val] = max(test_y,[],2);
+labels_val = predict(test_y);
 acc_val = mean(pred_val == labels_val);
 err_val = 1-acc_val
 

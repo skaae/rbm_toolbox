@@ -49,8 +49,9 @@ function [ grads,curr_err,chains_comb,chainsy_comb ] = rbmsemisuplearn(rbm,x,ey,
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
+% See also RBMGENERATIVE, RBMDISCRIMINATIVE RBMHYBRID
+%
 % Copyright Søren Sønderby June 2014
-%    See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
 %split chains don't if it matters that i use the correct chains??
 if strcmp(opts.traintype,'PCD')
@@ -63,9 +64,17 @@ else
     chainsy_semisup = []; chainsy_type = [];
 end
 
-
 %sample p(y | x) - should i use p(y|x_semisup) ???
-[ey_semisup, ~] = rbmpygivenx( rbm,x,'train'); 
+n_semisup_samples = size(opts.x_semisup,1);
+n_samples = size(x,1);
+if n_semisup_samples <= n_samples
+    s = randsample(n_semisup_samples,n_samples,0); % sample without replacement
+else
+    s = randsample(n_semisup_samples,n_samples,1); % sample with replacement
+end
+
+% use s to pick the correct number of samples from x 
+[ey_semisup, ~] = rbmpygivenx( rbm,x(s,:),'train'); 
 ey_semisup = samplematrix(ey_semisup);
 
 % train semisupervised

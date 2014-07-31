@@ -1,20 +1,19 @@
 # RBM Toolbox
 
-RBM toolbox is a MATLAB toolbox for training RBM's. It builds on the DeepLearnToolbox by Rasmus Berg.
+RBM toolbox is a MATLAB toolbox for training RBM's.
 
-RBM toolbox support among others:
-
- * add support for training RBM's with class labels including, see [1,7]
-    * generative training objective
-    * discriminative training objective
-    * hybrid training objective
-    * semi-supervised learning
- * CD - k (contrastive divergence k)
- * PCD (persistent contrastive divergence)
+ * Support for training RBM's with class labels including:
+    * generative training objective [2,7]
+    * discriminative training objective [2,7]
+    * hybrid training objective [2,7]
+    * semi-supervised learning [2,7]
+ * CD - k (contrastive divergence k) [5]
+ * PCD (persistent contrastive divergence) [6]
  * Various rbm sampling functions (pictures / movies)
- * Classiciation support
- * Regularization: L1, L2, maxL2norm, sparsity, early-stopping
- * Support for custom error functions
+ * Classiciation support [2,7]
+ * Regularization: L1, L2, maxL2norm, sparsity, early-stopping, dropout [3], momentum [1] 
+
+Some code in the toolbox is based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
 
 # Settings
@@ -53,7 +52,7 @@ Semisupervised training combines unsupervised and supervised training. The follo
 
 `grads = grads_type + opts.semisup_beta * grads_generative`
 
-Here `grads_type` is either the gradients from generative, discriminative or hybrid training. `grads_generative` is the gradients from unsupervised training on the samples given in `opts.x_semisup`. The gradients are calculated with ´opts.classRBM=1`. We use samples of p(y I x_semisup) as labels. 
+Here `grads_type` is either the gradients from generative, discriminative or hybrid training. `grads_generative` is the gradients from unsupervised training on the samples given in `opts.x_semisup`. The gradients are calculated with ´opts.classRBM=1`. We use samples of p(y I x) as labels, where x is 
 
 ## Learning rate and momentum
 
@@ -253,7 +252,7 @@ dbn = dbntrain(dbn, train_x, opts);
 
 % Make predictions
 pred_val = dbnpredict(dbn,test_x);
-[~, labels_val] = max(test_y,[],2);
+labels_val = predict(test_y);
 acc_val = mean(pred_val == labels_val);
 err_val = 1-acc_val
 

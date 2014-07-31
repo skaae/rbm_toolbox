@@ -4,10 +4,9 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %  refer to RBMGENERATIVE and RBMDISCRIMINATIVE for description of the
 %  training objectives.
 %
-%
 %   INPUTS:
 %       rbm       : a rbm struct
-%       x        : the initial state of the hidden units
+%       x         : the initial state of the hidden units
 %       ey        : one hot encoded labels if classRBM otherwise empty
 %       opts      : opts struct. opts.train_type determines if CD or PCD should
 %                   be used for generative training. otps.cdn determines the
@@ -31,9 +30,7 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %       chains     : updated value of chains for visible units
 %       chainsy    : updated value of chains for label visible units.
 %
-%
-%
-% References
+% REFERENCES
 %    [1] H. Larochelle and Y. Bengio, ?Classification using discriminative
 %        restricted Boltzmann machines,? ? 25th Int. Conf. Mach. ?, 2008.
 %    [2] H. Larochelle and M. Mandel, ?Learning algorithms for the
@@ -49,8 +46,9 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
+%  See also RBMGENERATIVE, RBMDISCRIMINATIVE RBMSEMISUPLEARN
+%
 % Copyright Søren Sønderby June 2014
-% %   See also RBMGENERATIVE, RBMDISCRIMINATIVE.
 
 [grads_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
 [grads_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);

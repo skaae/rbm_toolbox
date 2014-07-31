@@ -1,7 +1,17 @@
 function dbn = dbntrain(dbn, x_train, opts)
 %%DBNTRAIN train a DBN by stacking RBM's
-% see dbncreateopts for a descriptionof the opts struct. Use dbnsetup
-% to create the dbn struct
+% see dbncreateopts for a description of the opts struct. Use dbnsetup
+% to create the dbn struct.
+%
+% EXAMPLE
+%  sizes = [200];   % hidden layer size
+%  [opts, valid_fields] = dbncreateopts();
+%  dbncheckopts(opts,valid_fields);       
+%  disp(opts)
+%  dbn = dbnsetup(sizes, train_x, opts); 
+%  dbn = dbntrain(dbn, train_x, opts);
+%
+% See also DBNCREATEOPTS DBNCHECKOPTS DBNSETUP DBNTRAIN
 %
 % modified june 2014 by Søren Sønderby
 n_rbm = numel(dbn.rbm);

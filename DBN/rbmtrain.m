@@ -1,13 +1,17 @@
 function rbm = rbmtrain(rbm, x_train,opts)
-%%RBMTRAIN trains a single RBM
-% notation:
+%RBMTRAIN trains a single RBM
+%
+% NOTATION:
 % data  : all data given as      [n_samples   x #vis]
 %    W  : vis - hid weights      [ #hid       x #vis ]
 %    U  : label - hid weights    [ #hid       x #n_classes ]
 %    b  : bias of visible layer  [ #vis       x 1]
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
-%  Modified by Søren Sønderby June 2014
+%
+% See also DBNTRAIN
+%
+% Copyright Søren Sønderby June 2014
 
 % SETUP and checking
 assert(isfloat(x_train), 'x must be a float');

@@ -1,5 +1,9 @@
 function  dbncheckopts( opts,valid_fields )
 %DBNCHECKOPTS checks the validity of the opts struct
+%
+% see also, DBNSETUP, DBNTRAIN, DBNCREATEOPTS
+%
+% Copyright Søren Sønderby july 2014
 fields = fieldnames(opts);
 assert(  isequal(sort(fields),sort(valid_fields))  ) 
 

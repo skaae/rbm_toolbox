@@ -1,5 +1,6 @@
 function [] = dbnsamplemovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
-%%DBNSAMPLEMOVIE generates movie of sampling from DBN
+%%DBNSAMPLEMOVIE generates movie of sampling process from DBN
+%
 %   INPUTS:
 %       dbn               : a rbm struct
 %       n                 : number of samples 
@@ -7,13 +8,17 @@ function [] = dbnsamplemovie(dbn,n,k,fout,samplefreq,visualizer,sampleclass)
 %       fout              : location of output movie
 %       samplefreq        : samples between a picture is captured
 %       visualizer        : a function which returns a plot
-%       sampleclass       : class to sample if classRBM, an integer
+%       sampleclass       : Class to sample. This is either a scalar giving the
+%                           class or a vector of size [n x n_classes] with each
+%                           row corresponding to the one hot encoding of the desired
+%                           class to be sampled.
+%
+% See also DBNSAMPLE
+%
 % Copyright Søren Sønderby June 2014
-
 n_rbm = numel(dbn.rbm);
 
-if nargin == 7   % sample class is given, assume that classRBM = 1
-    
+if nargin == 7   % sample class is given, assume that classRBM = 1 
     % check wether a scalar or a matrix is given
     if isscalar(sampleclass)
         class_vec     = dbnmakeonehot( dbn,n,sampleclass);
@@ -22,20 +27,17 @@ if nargin == 7   % sample class is given, assume that classRBM = 1
             error('Given class matrix does not match n');
         end
         class_vec = sampleclass;
-    end
-    
+    end 
 else
     class_vec = [];
 end
-
 
 % create starting state from bias
 toprbm = dbn.rbm{end};
 bx = repmat(toprbm.b',n,1);
 vis_sampled = double(bx > rand(size(bx)));
 
-
-%% create movie
+% create movie
 close all
 figure;
 vidObj = VideoWriter(fout);
@@ -65,8 +67,7 @@ for i = 1:k
         axis equal
         writeVideo(vidObj, getframe(gca));
     end
-    vis_sampled = double(vis_sampled > rand(size(vis_sampled)));
-    
+    vis_sampled = double(vis_sampled > rand(size(vis_sampled))); 
 end
 
 

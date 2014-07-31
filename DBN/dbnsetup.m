@@ -1,10 +1,14 @@
 function dbn = dbnsetup(sizes, x, opts)
 %%DBNSETUP creates a propr dbn struct
-% INPUT: sizes : A vector with hidden layer sizes
-%        x   : used to specify size of first hidden layer
-%        opts: a struct with options see dbncreateopts
+%     INPUT 
+%        sizes : A vector with hidden layer sizes
+%            x : used to specify size of first hidden layer
+%         opts : a struct with options see dbncreateopts
 %
-% modified june 2014 by Søren Sønderby
+% See also DBNCREATEOPTS DBNTRAIN DBNCHECKOPTS
+%
+% Copyright Søren Sønderby july 2014
+
 n = size(x, 2);
 dbn.sizes = [n, sizes];
 n_rbm = numel(dbn.sizes) - 1;

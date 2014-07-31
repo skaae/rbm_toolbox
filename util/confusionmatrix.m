@@ -8,9 +8,9 @@ assert(n_output~=1,'Behavior of matthew correlation not tested with single outpu
 
 
 % find predictions and correct labels
-[~, pred] = max(pred,[],2);
-[~, expected] = max(ey,[],2);
-    confusionmat = zeros(2,2,n_output);
+pred = predict(pred);
+expected = predict(ey);
+confusionmat = zeros(2,2,n_output);
 
 
 

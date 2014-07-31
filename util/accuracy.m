@@ -15,8 +15,8 @@ function [err, other_measures] = accuracy(pred_probs,ey)
 %  Copyright (c) Søren Sønderby july 2014
 
 % find predictions and correct labels
-[~, pred] = max(pred_probs,[],2);
-[~, expected] = max(ey,[],2);
+pred = predict(pred_probs);
+expected = predict(ey);
 
 other_measures = {};
 err = 1-mean(pred==expected);
