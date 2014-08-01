@@ -1,4 +1,4 @@
-function [ perf,rbm ] = rbmmonitor(rbm,x,opts,val_samples,epoch)
+function [ perf,rbm ] = rbmmonitor(rbm,x,opts,x_samples,val_samples,epoch)
 %RBMMONITOR monitor rbm performance
 % Internal function used by RBMTRAIN
 % If the RBM is a classRBM the function augments rbm.train_perf and
@@ -37,14 +37,11 @@ if mod(epoch,opts.test_interval) == 0
         
         perf = sprintf('  | Tr: %5f - Val: %s' ,...
             rbm.train_error(end),val_err);
-    else
-        %         warning('Remimpelent rbmfreeenergy');
-        %         e_val = rbmfreeenergy(rbm,opts.x_val,opts.y_val);
-        %         e_train = rbmfreeenergy(rbm,x(val_samples,:),...
-        %             opts.y_train(val_samples,:));
-        %         rbm.energy_ratio(end+1) = e_val / e_train;
-        %         perf = sprintf(' | Energy ratio %f5', e_val / e_train);
-        perf = '';
+    else  % non class RBM calculate free energy ratio
+        x_s = x(x_samples,:);
+        x_val_s = opts.x_val(val_samples,:);
+        rbm.energy_ratio(end+1) = rbmfreeenergyratio(rbm,x_s,x_val_s);
+        perf = sprintf(' | Energy ratio %f5', rbm.energy_ratio(end));
     end
 else  % not a sampling epoch 
     perf = '.';

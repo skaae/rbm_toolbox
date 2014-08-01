@@ -360,23 +360,28 @@ Weight visualization:
 <img src="/uploads/example3_digits.png" height="500" width="500"> 
 
 
-`dbnsamplemovie` can be used to create a movie of the sampling process as the gibbs chains converge, somehow similar to http://www.cs.toronto.edu/~hinton/adi/index.htm . 
+`dbnsamplemovie` can be used to create a movie of the sampling process as the Gibbs chains converge, somehow similar to http://www.cs.toronto.edu/~hinton/adi/index.htm . 
 
 [link to video](https://www.youtube.com/watch?v=qqdMu09_zm4) 
 
+## Reproducing results from [7]
+In example 4 to 8 the results from [7] are reproduced. 
 
-
-## Example 4 - Discriminative training
+# Example 4 - Discriminative training from table 1 in [7]
 
 Look in folder  mnist_cRBM_discriminative 
 
-## Example 5 - Hybrid training
+# Example 5 - Generative training from table 1 in [7]
 
-## Example 6 - Semi-supervised learning 
+# Example 6 - Hybrid training from table 1 in [7]
 
-## Example 7 - reproduce results from [7]
+# Example 7 - Hybrid training with sparsity from table 1 in [7]
 
-## References
+# Example 8 - Semi-supervised learning 
+
+# Example 9 - reproduce results from [7]
+
+# References
 
 [1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.  
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.  
