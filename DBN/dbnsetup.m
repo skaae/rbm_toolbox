@@ -33,14 +33,10 @@ if valid('classRBM') && opts.classRBM == 1
 end
 
 % if early stopping a validation set must be specified
-if opts.early_stopping
-    if opts.classRBM == 1
+if opts.early_stopping 
         if  reqboth('y_val','x_val')
-            error('Eearly stopping with classRBM requires x and y val sets')
-        end
-    elseif opts.classRBM == 0
-         error('Early stopping is not implemented for generativeRBM')
-    end   
+            error('Eearly stopping  requires x and y val sets')
+        end  
 end
 
 % if discriminitive training require labels

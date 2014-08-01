@@ -35,10 +35,9 @@ else
     val_samples = [];
 end
 
-if rbm.early_stopping
-    best_err = Inf;
-    patience  = rbm.patience;
-end
+earlystop.best_err = Inf;
+earlystop.patience  = rbm.patience;
+
 
 % RUN epochs
 init_chains = 1;
@@ -119,27 +118,28 @@ for epoch = 1 : opts.numepochs
     
     % calc train/val performance.
     [perf,rbm] = rbmmonitor(rbm,x_train,opts,x_samples,val_samples,epoch);
-    [best_err,patience,best_str,best_rbm] = rbmearlystopping(rbm,opts,best_err,patience)
-   
-        % stop training
-        if patience < 0
-            disp('No more Patience. Return best RBM')
-            best_rbm.val_error = rbm.val_error;
-            best_rbm.train_error = rbm.train_error;
-            best_rbm.error = rbm.error;
-            rbm = best_rbm;
-            
-            break;
-        end
+    earlystop  = rbmearlystopping(rbm,opts,earlystop,epoch);
+    
+    % stop training?
+    if rbm.early_stopping && earlystop.patience < 0
+        disp('No more Patience. Return best RBM')
+        earlystop.best_rbm.val_error = rbm.val_error;
+        earlystop.best_rbm.train_error = rbm.train_error;
+        earlystop.best_rbm.error = rbm.error;
+        rbm = earlystop.best_rbm;
+        
+        break;
     end
-    
-    % display output
-    epochnr = ['Epoch ' num2str(epoch) '/' num2str(opts.numepochs) '.'];
-    avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
-    lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
-    disp([epochnr avg_err lr_mom perf best_str]);
-    
-    
+% display output
+epochnr = ['Epoch ' num2str(epoch) '/' num2str(opts.numepochs) '.'];
+avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
+lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
+disp([epochnr avg_err lr_mom perf earlystop.best_str]);    
+end
+
+
+
+
 end
 
 
