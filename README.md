@@ -131,7 +131,7 @@ dbn = dbntrain(dbn, train_x, opts);       % train  dbn
 ```
 
 You can stack several RBM by specifying sizes as a vector. `sizes = [500 200]` will stack two RBM's where the first RBM has 
-#features visible units and 500 hidden units and the second RBM has 500 visible units and 200 hidden units. 
+n_features visible units and 500 hidden units and the second RBM has 500 visible units and 200 hidden units. 
 Any number of RBM's is allowed. If several RBM's are stacked non-top layer RBM's will be trained with generative training objective and `opts.classRBM = 0`.
  
 ## Settings table
