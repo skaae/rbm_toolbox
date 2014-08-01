@@ -36,7 +36,7 @@ else
 end
 
 if rbm.early_stopping
-    best_error = Inf;
+    best_err = Inf;
     patience  = rbm.patience;
 end
 
