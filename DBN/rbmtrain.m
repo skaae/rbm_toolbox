@@ -44,7 +44,7 @@ end
 init_chains = 1;
 chains = [];
 chainsy = [];
-best = '';
+best_str = '';
 
 
 if isequal(rbm.train_func,@rbmsemisuplearn)
@@ -119,17 +119,8 @@ for epoch = 1 : opts.numepochs
     
     % calc train/val performance.
     [perf,rbm] = rbmmonitor(rbm,x_train,opts,x_samples,val_samples,epoch);
-    
-    if rbm.early_stopping && ~isempty(rbm.val_error)
-        if best_error > rbm.val_error(end)
-            best = ' ***';
-            best_error = rbm.val_error(end);
-            best_rbm = rbm;
-            patience = rbm.patience;
-        else
-            best = '';
-            patience = patience-1;
-        end
+    [best_err,patience,best_str,best_rbm] = rbmearlystopping(rbm,opts,best_err,patience)
+   
         % stop training
         if patience < 0
             disp('No more Patience. Return best RBM')
@@ -146,7 +137,7 @@ for epoch = 1 : opts.numepochs
     epochnr = ['Epoch ' num2str(epoch) '/' num2str(opts.numepochs) '.'];
     avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
     lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
-    disp([epochnr avg_err lr_mom perf best]);
+    disp([epochnr avg_err lr_mom perf best_str]);
     
     
 end
