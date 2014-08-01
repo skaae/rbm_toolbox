@@ -22,14 +22,15 @@ n_samples = size(x_train, 1);
 numbatches = n_samples / opts.batchsize;
 assert(rem(numbatches, 1) == 0, 'numbatches not integer');
 
-% use validation set or not
+% use validation set or not in calculation of free energy
 if ~isempty(opts.x_val)
     n_val_samples   = size(opts.x_val,1);
     samples         = randperm(size(x_train,1));
     % if size of val set is larger than train set use trainset size otherwise
     % use size of validation set
     size_val_sample = ifelse(n_samples>=n_val_samples, n_val_samples, n_samples);
-    val_samples     = samples(1:size_val_sample);
+    x_samples     = samples(1:size_val_sample);
+    val_samples       = 1:size_val_sample;
 else
     val_samples = [];
 end
@@ -117,7 +118,7 @@ for epoch = 1 : opts.numepochs
     rbm.error(end+1) = err / numbatches;
     
     % calc train/val performance.
-    [perf,rbm] = rbmmonitor(rbm,x_train,opts,val_samples,epoch);
+    [perf,rbm] = rbmmonitor(rbm,x_train,opts,x_samples,val_samples,epoch);
     
     if rbm.early_stopping && ~isempty(rbm.val_error)
         if best_error > rbm.val_error(end)
