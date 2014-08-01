@@ -13,13 +13,21 @@ function dbn = dbntrain(dbn, x_train, opts)
 %
 % See also DBNCREATEOPTS DBNCHECKOPTS DBNSETUP DBNTRAIN
 %
-% modified june 2014 by Søren Sønderby
+% Copyright june 2014 by Søren Sønderby
+if opts.gpu 
+    warning('GPU implementation not working')
+    training = @rbmtraingpu;
+else
+    training = @rbmtrain;
+end
+
+
 n_rbm = numel(dbn.rbm);
 
 line = repmat('-',1,80);
 fprintf('%s\n                  TRAINING RBM 1\n %s\n',line,line);
 
-dbn.rbm{1} = rbmtrain(dbn.rbm{1},x_train,opts);
+dbn.rbm{1} = training(dbn.rbm{1},x_train,opts);
 
 
 for i = 2 : n_rbm
@@ -32,13 +40,13 @@ for i = 2 : n_rbm
     
     
     fprintf('%s\n                  TRAINING RBM %i\n %s\n',line,i,line);
-    x_train = rbmup(dbn.rbm{i - 1},x_train,ye,@sigm);
+    x_train = rbm.rbmup(dbn.rbm{i - 1},x_train,ye,@sigm);
     
     if ~isempty(opts.x_val)
-        opts.x_val = rbmup(dbn.rbm{i - 1}, opts.x_val,ye,@sigm);
+        opts.x_val = rbm.rbmup(dbn.rbm{i - 1}, opts.x_val,ye,@sigm);
     end
     
-    dbn.rbm{i} = rbmtrain(dbn.rbm{i},x_train,opts);
+    dbn.rbm{i} = training(dbn.rbm{i},x_train,opts);
     
     
     

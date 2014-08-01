@@ -66,13 +66,13 @@ type = opts.traintype;
 
 % add dropout
 if rbm.dropout_hidden > 0
-    up = @(rbm, vis,ey,act_func) rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;    
+    up = @(rbm, vis,ey,act_func) rbm.rbmup(rbm, vis,ey,act_func).*rbm.hidden_mask;    
 else
-    up = @rbmup;
+    up = @rbm.rbmup;
 end
 
 h0 = up(rbm,v0,ey,@sigm);   % hidden positive statistic larochelle does not sample postive statistics? 
-h0_rnd =  double(h0 > rand(size(h0)));
+h0_rnd =  double(h0 > rbm.rand(size(h0)));
 
 % For contrastive divergence use the input vectors as starting point
 % for Persistent contrastive divergence we use the persistent chains as
@@ -86,20 +86,22 @@ end
 
 for drop_out_mask = 1:(opts.cdn - 1)
     visx = rbmdownx(rbm,hid,@sigmrnd);
-    visy = rbmdowny(rbm,hid);
+    visy = rbm.rbmdowny(rbm,hid);
     hid = up(rbm,visx,visy,@sigmrnd);
 end
 
 % in last up/down dont sample hidden because it introduces sampling noise
 vkx   = rbmdownx(rbm,hid,@sigmrnd);   
-vky  = rbmdowny(rbm,hid,'sample');      
+vky   = rbm.rbmdowny(rbm,hid);
+vky   = samplematrix(vky); % sample visible state
+
 hk   = up(rbm,vkx,vky,@sigm);         
 
 % debugging
 if exist('debug','var') && debug == 1
     warning('Debugging rbmgenerative')
     vkx_sigm   = rbmdownx(rbm,hid,@sigm);   % debugging
-    vky_prob   = rbmdowny(rbm,hid,'prob'); 
+    vky_prob   = rbm.rbmdowny(rbm,hid); 
     hk_sample  = up(rbm,vkx,vky,@sigmrnd); 
     save('test_rbmgenerative','h0','h0_rnd','hk_sample',...
                  'hk','v0','vkx','vkx_sigm','vky','vky_prob');
@@ -145,8 +147,8 @@ if rbm.classRBM == 1
     dd = dd/ opts.batchsize;
 else
     % return zero gradients for non cRBM's
-    du = zeros(size(rbm.U));
-    dd = zeros(size(rbm.d));
+    du = rbm.zeros(size(rbm.U));
+    dd = rbm.zeros(size(rbm.d));
 end
 
 curr_err = sum(sum((v0 - vkx) .^ 2)) / opts.batchsize;

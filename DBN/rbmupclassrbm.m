@@ -1,10 +1,9 @@
-function act_hid = rbmup(rbm, vis,ey,act_func)
-%%RBMUP calculate p(h=1|v)
+function act_hid = rbmupclassrbm(rbm, vis,ey,act_func)
+%%RBMUPCLASSRBM calculate p(h=1|v) for for class rbm
 % INPUTS
 %   rbm        : A rbm struct
 %   vis        : the activation of the visible layer
-%   ey         : if classRBM the activation of the class labels for non cRBM
-%                use [].
+%   ey         : activation of the class labels
 %   act_func   : the activation function, either @sigm or @sigmrnd
 %
 % OUTPUTS
@@ -27,15 +26,7 @@ function act_hid = rbmup(rbm, vis,ey,act_func)
 %
 % Copyright Søren Sønderby June 2014
 
-act_hid = bsxfun(@plus,rbm.c',vis * rbm.W');
-
-% for the hinton DBN add the activation coming from the label visible units
-if rbm.classRBM == 1
-    act_hid  = act_hid +  ey * rbm.U';
-end
-
-
-
+act_hid = bsxfun(@plus,rbm.c',vis * rbm.W') +  ey * rbm.U';
 act_hid = act_func(act_hid); %apply activation function
 
 

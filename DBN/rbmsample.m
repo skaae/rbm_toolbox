@@ -40,7 +40,7 @@ vis_sampled = double(bx > rand(size(bx)));
 
 % do updown passes k-1 times
 for i = 1:k-1
-    hid_sampled = rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
+    hid_sampled = rbm.rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
     vis_sampled = rbmdownx(rbm,hid_sampled,@sigmrnd);
     if mod(i,500) == 1
         fprintf('.')
@@ -49,7 +49,7 @@ for i = 1:k-1
 end
 fprintf('.OK\n')
 % in last down pass dont sample binary.
-hid_sampled = rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
+hid_sampled = rbm.rbmup(rbm,vis_sampled,class_vec,@sigmrnd);
 vis_sampled = rbmdownx(rbm,hid_sampled,@sigm);
 
 end

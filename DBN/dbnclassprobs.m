@@ -27,7 +27,7 @@ if ~dbn.rbm{n_rbm}.classRBM
 end
 % pass data deterministicly from input to top RBM
 for i = 1 : n_rbm-1
-    x = rbmup(dbn.rbm{i},x,[],@sigm);
+    x = rbm.rbmup(dbn.rbm{i},x,[],@sigm);
 end
 
 % at top RBM calculate class probabilities

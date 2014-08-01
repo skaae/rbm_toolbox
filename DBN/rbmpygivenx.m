@@ -14,7 +14,7 @@ if isequal(lower(train_or_test),'train') && rbm.dropout_hidden > 0
 end
 
 F = bsxfun(@plus, permute(rbm.U, [1 3 2]), cwx);
-class_log_prob = zeros(n_samples,n_classes);
+class_log_prob = rbm.zeros(n_samples,n_classes);
 for y = 1:n_classes
     class_log_prob(:,y) =  sum( softplus(F(:,:,y)), 1)+ rbm.d(y);
 end

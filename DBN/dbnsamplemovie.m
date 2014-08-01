@@ -46,7 +46,7 @@ vidObj.FrameRate = 30;
 open(vidObj);
 
 for i = 1:k
-    hid_sampled = rbmup(toprbm,vis_sampled,class_vec,@sigmrnd);
+    hid_sampled = rbm.rbmup(toprbm,vis_sampled,class_vec,@sigmrnd);
     vis_sampled = rbmdownx(toprbm,hid_sampled,@sigm);
     
     if mod(i-1,samplefreq) == 0

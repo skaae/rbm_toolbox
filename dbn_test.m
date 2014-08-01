@@ -37,10 +37,10 @@ semisup_x = [];
 
 %%% for testing
 % semisup_x = train_x(3001:end,:);
- train_x = train_x(1:500,:);
- test_x =  test_x(1:100,:);
- train_y = train_y(1:500,:);
- test_y =  test_y(1:100,:);
+ %train_x = train_x(1:500,:);
+ %test_x =  test_x(1:100,:);
+ %train_y = train_y(1:500,:);
+ %test_y =  test_y(1:100,:);
 
 
 
@@ -68,7 +68,7 @@ opts.L1 = 0;
 opts.L2 = 0;
 opts.L2norm = 0;
 
-opts.classRBM = 0;
+opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = test_x;
 opts.y_val = test_y;

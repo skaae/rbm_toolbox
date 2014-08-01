@@ -49,15 +49,15 @@ n_classes = size(rbm.d,1);
 [p_y_given_x, F]= rbmpygivenx(rbm,x,'train');
 
 F_sigm = sigm(F);
-F_sigm_prob = zeros(size(F_sigm));
+F_sigm_prob = rbm.zeros(size(F_sigm));
 for i = 1:n_classes
     F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),p_y_given_x(:,i)');
 end
 
 % init grads
-dw = zeros(size(rbm.W));
-du = zeros(size(rbm.U));
-dc = zeros(size(rbm.c));
+dw = rbm.zeros(size(rbm.W));
+du = rbm.zeros(size(rbm.U));
+dc = rbm.zeros(size(rbm.c));
 
 class_labels = predict(ey);
 for i = 1:n_classes
@@ -84,7 +84,7 @@ end
 
 % create grads struct and scale grad by minibatch size.
 grads.dw = dw / opts.batchsize;
-grads.db = zeros(size(rbm.b));
+grads.db = rbm.zeros(size(rbm.b));
 grads.dc = dc / opts.batchsize;
 grads.dd = dd / opts.batchsize;
 grads.du = du / opts.batchsize;

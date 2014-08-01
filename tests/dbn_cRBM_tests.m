@@ -22,6 +22,9 @@ rbm.d = d;
 rbm.c = c;
 rbm.b = b;
 x_rbm = x';
+rbm.rbmdowny = @rbmdowny;
+rbm.zeros = @zeros;
+rbm.rand = @rand;
 opts.y_train = y_vec';
 opts.traintype = 'CD';
 opts.cdn = 1;
@@ -56,7 +59,7 @@ p_y_given_h = p_y_given_h_non_norm / sum(p_y_given_h_non_norm);
 my_p_h_given_y_x = rbmup(rbm, x_rbm,opts.y_train,@sigm);
 rng('default');rng(2);
 my_h_pos = rbmup(rbm, x_rbm,opts.y_train,@sigmrnd);
-my_p_y_given_h = rbmdowny(rbm,h_pos','prob');
+my_p_y_given_h = rbm.rbmdowny(rbm,h_pos');
 
 assert(all(p_h_given_y_x == my_p_h_given_y_x'));
 assert(all(p_y_given_h == my_p_y_given_h'));
@@ -84,7 +87,9 @@ y_vec_neg = y_sample;
 rng('default');rng(1);
 my_y_vec_neg1 = samplematrix(p_y_given_h');
 rng('default');rng(1);
-my_y_vec_neg2 = rbmdowny(rbm,h_pos','sample');
+my_y_vec_neg2 = rbm.rbmdowny(rbm,h_pos');
+my_y_vec_neg2 = samplematrix(my_y_vec_neg2);
+
 
 assert(all(y_vec_neg == my_y_vec_neg1'));
 assert(all(y_vec_neg == my_y_vec_neg2'))

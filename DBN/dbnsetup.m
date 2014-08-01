@@ -58,6 +58,8 @@ end
 
 for u = 1 : n_rbm
     
+
+        
     % if one learningrate/momentum function use this for all
     % otherwise use individual learningrate/momentum for each rbm
     if numel(opts.learningrate) == n_rbm && n_rbm ~=1
@@ -145,6 +147,34 @@ for u = 1 : n_rbm
     %dbn.rbm{u}.c  = normrnd(0,0.01,hid_size, 1);
     dbn.rbm{u}.c = zeros(hid_size,1);
     dbn.rbm{u}.vc = zeros(hid_size, 1);
+    
+    
+    %%% prepare for GPU
+        %set gpu info
+    dbn.rbm{u}.gpu = opts.gpu;
+    
+        % for non class RBM's rbmy should return empty. To avoid if statement 
+    % create a functio returning empty otherwise use rbmdowny
+    
+    if dbn.rbm{u}.gpu
+        dbn.rbm{u}.rand =  @gpuArray.rand;  
+        dbn.rbm{u}.zeros = @gpuArray.zeros;
+    else
+         dbn.rbm{u}.rand    = @rand;
+         dbn.rbm{u}.zeros    = @zeros;
+       
+    end
+    
+    
+    if dbn.rbm{u}.classRBM
+        dbn.rbm{u}.rbmdowny = @rbmdowny;
+        dbn.rbm{u}.rbmup    = @rbmupclassrbm;
+    else
+                dbn.rbm{u}.rbmdowny =  @(rbm,hid_act) [];
+        dbn.rbm{u}.rbmup    = @rbmupnotclassrbm;
+  
+    end
+    
 end
 
 end
