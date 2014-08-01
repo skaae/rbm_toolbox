@@ -364,22 +364,22 @@ Weight visualization:
 
 [link to video](https://www.youtube.com/watch?v=qqdMu09_zm4) 
 
-## Reproducing results from [7]
+# Reproducing results from [7]
 In example 4 to 8 the results from [7] are reproduced. 
 
-# Example 4 - Discriminative training from table 1 in [7]
+## Example 4 - Discriminative training from table 1 in [7]
 
 Look in folder  mnist_cRBM_discriminative 
 
-# Example 5 - Generative training from table 1 in [7]
+## Example 5 - Generative training from table 1 in [7]
 
-# Example 6 - Hybrid training from table 1 in [7]
+## Example 6 - Hybrid training from table 1 in [7]
 
-# Example 7 - Hybrid training with sparsity from table 1 in [7]
+## Example 7 - Hybrid training with sparsity from table 1 in [7]
 
-# Example 8 - Semi-supervised learning 
+## Example 8 - Semi-supervised learning 
 
-# Example 9 - reproduce results from [7]
+## Example 9 - reproduce results from [7]
 
 # References
 
