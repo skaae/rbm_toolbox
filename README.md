@@ -114,7 +114,7 @@ The following regularization options are implemented
  * `opts.L2norm`: Maximum L2 norm for the incoming weights to each neuron [4]. Specify the maximum L2norm for each neuron
  * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted after each epoch.
  * `opts.dropout_hidden`: dropout on hidden units. Specify the probability of being dropped. see [1]
- * `opts.early_stopping`: Early stopping is available for classification RBM's where validation set is specified. The patience for early stopping can be set with `opts.patience`.
+ * `opts.early_stopping`: Early stopping is available for classification RBM's where validation set is specified. The patience for early stopping can be set with `opts.patience`. For non classification RBM's or lower layers of DBN with early stopping enables the error measure is the ratio of free energies between  free_energy_validation / free_energy_train, as described in [3]. The best ratio is lowest values which is not below 0.99. 
 
 Setting a regularization value to 0 it.
 
