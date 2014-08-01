@@ -1,7 +1,7 @@
 #!/bin/bash
-folder="mnist_cRBM_CD"
+folder="mnist_cRBM_CD_nomomentum"
 mkdir -p "$folder"
-for count in {1..72}
+for count in {1..24}
 do
     echo "#!/bin/sh
 #

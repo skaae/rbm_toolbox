@@ -34,23 +34,24 @@ train_y = double(train_y);
 test_y  = double(test_y);
 semisup_x = [];
 
+
 %%% for testing
-semisup_x = train_x(3001:end,:);
-train_x = train_x(1:5000,:);
-test_x =  test_x(1:5000,:);
-train_y = train_y(1:5000,:);
-test_y =  test_y(1:5000,:);
+% semisup_x = train_x(3001:end,:);
+ train_x = train_x(1:500,:);
+ test_x =  test_x(1:100,:);
+ train_y = train_y(1:500,:);
+ test_y =  test_y(1:100,:);
 
 
 
-sizes = [110];
+sizes = [200];
 [opts, valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmsemisuplearn;
-opts.dropout_hidden = 0.5;
+opts.train_func = @rbmgenerative;
+opts.dropout_hidden = 0;
 
-opts.traintype = 'PCD';
-opts.numepochs =   100;
+opts.traintype = 'CD';
+opts.numepochs =   1000;
 opts.batchsize = 100;
 opts.cdn = 1; % contrastive divergence
 
@@ -60,14 +61,14 @@ p_i = 0.5;    % initial momentum
 eps = 0.01;    % initial learning rate
 f = 0.9;     % learning rate decay
 
-opts.learningrate = @(t,momentum) 0.05;
+opts.learningrate = @(t,momentum) 0.01;
 opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f, p_f);
-%opts.momentum     = @(t) 0;
+opts.momentum     = @(t) 0;
 opts.L1 = 0;
 opts.L2 = 0;
 opts.L2norm = 0;
 
-opts.classRBM = 1;
+opts.classRBM = 0;
 opts.y_train = train_y;
 opts.x_val = test_x;
 opts.y_val = test_y;
