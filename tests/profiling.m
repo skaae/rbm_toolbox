@@ -4,6 +4,7 @@ sizes = [200];
 
 opts.y_train = train_y;
 opts.numepochs = 5;
+opts.test_interval = 1;
 dbncheckopts(opts,valid_fields);
 
 
