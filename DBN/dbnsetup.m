@@ -167,10 +167,10 @@ for u = 1 : n_rbm
     
     
     if dbn.rbm{u}.classRBM
-        dbn.rbm{u}.rbmdowny = @rbmdowny;
+        dbn.rbm{u}.rbmdowny = @rbmdownyclassrbm;
         dbn.rbm{u}.rbmup    = @rbmupclassrbm;
     else
-                dbn.rbm{u}.rbmdowny =  @(rbm,hid_act) [];
+        dbn.rbm{u}.rbmdowny = @rbmdownynotclass;
         dbn.rbm{u}.rbmup    = @rbmupnotclassrbm;
   
     end

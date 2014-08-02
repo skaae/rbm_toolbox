@@ -22,7 +22,6 @@ function act_hid = rbmupnotclassrbm(rbm, vis,ey,act_func)
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 %
-% See also RBMDOWNX RBMDOWNY
 %
 % Copyright Søren Sønderby June 2014
 

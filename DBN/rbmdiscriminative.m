@@ -50,8 +50,8 @@ n_classes = size(rbm.d,1);
 
 F_sigm = sigm(F);
 F_sigm_prob = rbm.zeros(size(F_sigm));
-for i = 1:n_classes
-    F_sigm_prob(:,:,i)  = bsxfun(@times, F_sigm(:,:,i),p_y_given_x(:,i)');
+for c = 1:n_classes
+    F_sigm_prob(:,:,c)  = bsxfun(@times, F_sigm(:,:,c),p_y_given_x(:,c)');
 end
 
 % init grads
@@ -60,16 +60,25 @@ du = rbm.zeros(size(rbm.U));
 dc = rbm.zeros(size(rbm.c));
 
 class_labels = predict(ey);
-for i = 1:n_classes
+%b = bs,F_sigm_prob,permute(repmat(x,1,1,n_classes),[3,1,2]));
+
+
+for c = 1:n_classes
     %  dw grad
-    idx = find(i == class_labels);
-    dw = dw +  F_sigm(:,idx,i)*x(idx,:) - F_sigm_prob(:,:,i)*x;
+    
+    % find idx for current class
+    lin_idx = find(c == class_labels);
+    bin_idx =  class_labels == c;
+    
+    a = F_sigm(:,lin_idx,c)*x(lin_idx,:);
+    b = F_sigm_prob(:,:,c)*x;
+    dw = dw + a  - b;
     
     %  du grad
-    du(:,i) = sum(F_sigm(:,class_labels == i,i),2) - sum(F_sigm_prob(:,:,i),2);
+    du(:,c) = sum(F_sigm(:,bin_idx,c),2) - sum(F_sigm_prob(:,:,c),2);
     
     % dc grad
-    dc = dc + sum(F_sigm(:,class_labels == i,i),2) - sum(F_sigm_prob(:,:,i),2);
+    dc = dc + sum(F_sigm(:,bin_idx,c),2) - sum(F_sigm_prob(:,:,c),2);
     
 end
 
@@ -84,7 +93,7 @@ end
 
 % create grads struct and scale grad by minibatch size.
 grads.dw = dw / opts.batchsize;
-grads.db = rbm.zeros(size(rbm.b));
+grads.db = zeros(size(rbm.b));
 grads.dc = dc / opts.batchsize;
 grads.dd = dd / opts.batchsize;
 grads.du = du / opts.batchsize;

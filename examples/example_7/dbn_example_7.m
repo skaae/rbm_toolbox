@@ -1,35 +1,25 @@
 %% Example 7 - hybrid training with sparsity
 % Tries to reproduce hybrid sparsity result from table 1 in 
 % "Learning algorithms for the classification Restricted boltzmann machine"
-
 if ~ismac
-    cd('/zhome/ba/d/51602/rbm_toolbox')
-    addpath(genpath('/zhome/ba/d/51602/rbm_toolbox'))
-
+    current_dir = pwd();
+    cd('../..');
+    addpath(genpath(pwd()));
+    cd(current_dir)
 end
 
 %% setup training
-rng('default');rng(0);
-load mnist_uint8;
+rng('default');rng(101);
 
-% Test set
-test_x  = double(test_x)/255;
-test_y = double(test_y);
 
-%Training and validation set
-train_x = double(train_x)/255;
-train_y = double(train_y);
-
-val_x   = train_x(1:10000,:);
-train_x = train_x(10001:end,:);
-val_y   = train_y(1:10000,:);
-train_y = train_y(10001:end,:);
+[train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
+f = fullfile(pwd,'example7.mat')
 
 % Setup DBN
 sizes = [3000 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
-opts.patience = 15;
+opts.patience = 50;
 opts.numepochs = 10000;
 opts.traintype = 'CD';
 opts.init_type = 'cRBM';
@@ -60,4 +50,5 @@ end
 digits = dbnsample(dbn,100,10000,class_vec);
 
 
-save('example.mat','dbn','opts','digits');
+
+save(f,'dbn','opts','digits');

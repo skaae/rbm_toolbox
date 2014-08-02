@@ -23,7 +23,7 @@ parsave = @(fname,dbn,opts,digits) save(fname,'dbn','opts','digits');
 
 
 %set up a deepbelief network
-rand('state',0);
+
 
 
 load mnist_uint8;
@@ -36,11 +36,11 @@ semisup_x = [];
 
 
 %%% for testing
-% semisup_x = train_x(3001:end,:);
- %train_x = train_x(1:500,:);
- %test_x =  test_x(1:100,:);
- %train_y = train_y(1:500,:);
- %test_y =  test_y(1:100,:);
+semisup_x = train_x(3001:end,:);
+ train_x = train_x(1:500,:);
+ test_x =  test_x(1:100,:);
+ train_y = train_y(1:500,:);
+ test_y =  test_y(1:100,:);
 
 
 
@@ -81,10 +81,15 @@ opts.hybrid_alpha = 0.5;
 opts.err_func = @accuracy;
 
 dbncheckopts(opts,valid_fields);
+
+rng('default');rng(101);
 dbn = dbnsetup(sizes, train_x, opts);
 
+profile on
 dbn = dbntrain(dbn, train_x, opts);
-figure; visualize(dbn.rbm{1}.W(1:100,:)')
+profile off
+profile viewer
+%figure; visualize(dbn.rbm{1}.W(1:100,:)')
 
 
 

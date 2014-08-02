@@ -377,9 +377,27 @@ Look in folder  mnist_cRBM_discriminative
 
 ## Example 7 - Hybrid training with sparsity from table 1 in [7]
 
-## Example 8 - Semi-supervised learning 
+## Example 8 
+  Test of dropout
 
-## Example 9 - reproduce results from [7]
+
+## example 9
+  like example 4 but with momentum
+
+## example 10 
+  like example 5 but with momentum  
+
+## example 11
+  like example 6 but with momentum
+
+## example 12 
+like example 7 but with momentum
+
+
+
+# Example 8 - Semi-supervised learning 
+
+# Example 9 - reproduce results from [7]
 
 # References
 

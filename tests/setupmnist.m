@@ -1,13 +1,6 @@
 function [train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist()
-
-if ~ismac
-    cd('../..');
-    addpath(genpath(pwd()));
-end
-
-%% setup training
-rng('default');rng(0);
 load mnist_uint8;
+
 
 % Test set
 test_x  = double(test_x)/255;

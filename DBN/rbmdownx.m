@@ -22,7 +22,6 @@ function act_vis_x = rbmdownx(rbm,hid_act,act_func)
 %    c  : bias of hidden layer   [ #hid       x 1]
 %    d  : bias of label layer    [ #n_classes x 1]
 % 
-% See also RBMDOWNY RBMUP
 %
 % Modified by Søren Sønderby June 2014
 

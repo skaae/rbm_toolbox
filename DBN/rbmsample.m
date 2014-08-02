@@ -19,7 +19,7 @@ if nargin == 4   % sample class is given, assume that classRBM = 1
     
     % check wether a scalar or a matrix is given
     if isscalar(sampleclass)
-        class_vec     = dbnmakeonehot( dbn,n,sampleclass);
+        class_vec     = rbmmakeonehot( rbm,n,sampleclass);
     else
         if size(sampleclass,1) ~= n
             error('Given class matrix does not match n');

@@ -1,14 +1,25 @@
 %% Example 6 - hybrid training
 % Tries to reproduce hybrid result from table 1 in 
 % "Learning algorithms for the classification Restricted boltzmann machine"
+if ~ismac
+    current_dir = pwd();
+    cd('../..');
+    addpath(genpath(pwd()));
+    cd(current_dir)
+end
+
+%% setup training
+rng('default');rng(101);
+
 
 [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
+f = fullfile(pwd,'example6.mat')
 
 % Setup DBN
 sizes = [1500 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
-opts.patience = 15;
+opts.patience = 50;
 opts.numepochs = 10000;
 opts.traintype = 'CD';
 opts.init_type = 'cRBM';
@@ -38,4 +49,5 @@ end
 digits = dbnsample(dbn,100,10000,class_vec);
 
 
-save('example.mat','dbn','opts','digits');
+
+save(f,'dbn','opts','digits');
