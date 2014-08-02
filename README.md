@@ -393,6 +393,10 @@ Look in folder  mnist_cRBM_discriminative
 ## example 12 
 like example 7 but with momentum
 
+## example 13
+same as 5 but no sampling in rbmgenerative
+rbmgenerative l 96 commented out
+
 
 
 # Example 8 - Semi-supervised learning 

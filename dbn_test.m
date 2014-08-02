@@ -1,3 +1,5 @@
+close all
+clear all
 
 if ~ismac
     cd('/zhome/f9/4/69552/DeepLearnToolbox_noGPU')
@@ -37,9 +39,9 @@ semisup_x = [];
 
 %%% for testing
 semisup_x = train_x(3001:end,:);
- train_x = train_x(1:500,:);
+ train_x = train_x(1:1000,:);
  test_x =  test_x(1:100,:);
- train_y = train_y(1:500,:);
+ train_y = train_y(1:1000,:);
  test_y =  test_y(1:100,:);
 
 
@@ -47,7 +49,7 @@ semisup_x = train_x(3001:end,:);
 sizes = [200];
 [opts, valid_fields] = dbncreateopts();
 
-opts.train_func = @rbmgenerative;
+opts.train_func = @rbmdiscriminative;
 opts.dropout_hidden = 0;
 
 opts.traintype = 'CD';

@@ -23,6 +23,7 @@ rbm.c = c;
 rbm.b = b;
 x_rbm = x';
 rbm.rbmdowny = @rbmdownyclassrbm;
+rbm.rbmup    = @rbmupclassrbm;
 rbm.zeros = @zeros;
 rbm.rand = @rand;
 opts.y_train = y_vec';
@@ -56,9 +57,9 @@ p_y_given_h_non_norm= exp( U'*h_pos + d );
 p_y_given_h = p_y_given_h_non_norm / sum(p_y_given_h_non_norm);
 
 %% Test RBMUP and RBMDOWNY
-my_p_h_given_y_x = rbmup(rbm, x_rbm,opts.y_train,@sigm);
+my_p_h_given_y_x = rbmupclassrbm(rbm, x_rbm,opts.y_train,@sigm);
 rng('default');rng(2);
-my_h_pos = rbmup(rbm, x_rbm,opts.y_train,@sigmrnd);
+my_h_pos = rbmupclassrbm(rbm, x_rbm,opts.y_train,@sigmrnd);
 my_p_y_given_h = rbm.rbmdowny(rbm,h_pos');
 
 assert(all(p_h_given_y_x == my_p_h_given_y_x'));
@@ -112,9 +113,9 @@ rng('default');rng(1);
 h_neg = rand(20,1) < p_h_given_y_x_neg;
 
 %% check RBMUP
-my_p_h_given_y_x_neg = rbmup(rbm,x_neg',y_vec_neg',@sigm);
+my_p_h_given_y_x_neg = rbmupclassrbm(rbm,x_neg',y_vec_neg',@sigm);
 rng('default');rng(1);
-my_h_neg =  rbmup(rbm,x_neg',y_vec_neg',@sigmrnd);
+my_h_neg =  rbmupclassrbm(rbm,x_neg',y_vec_neg',@sigmrnd);
 assert(all(p_h_given_y_x_neg == my_p_h_given_y_x_neg'));
 assert(all(h_neg == my_h_neg'))
 
