@@ -33,10 +33,12 @@ if ~isempty(opts.x_val)
     val_samples       = 1:size_val_sample;
 else
     val_samples = [];
+    x_samples    = [];
 end
 
 earlystop.best_err = Inf;
 earlystop.patience  = rbm.patience;
+earlystop.best_str = '';
 
 
 % RUN epochs
