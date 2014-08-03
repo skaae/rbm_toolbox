@@ -26,11 +26,11 @@ function [grads,curr_err,chains,chainsy] = rbmdiscriminative(rbm,x,ey,opts,chain
 %
 %
 % References
-%    [1] H. Larochelle and Y. Bengio, ?Classification using discriminative 
+%    [1] H. Larochelle and Y. Bengio, ?Classification using discriminative
 %        restricted Boltzmann machines,? ? 25th Int. Conf. Mach. ?, 2008.
-%    [2] H. Larochelle and M. Mandel, ?Learning algorithms for the 
-%        classification restricted boltzmann machine,? J. Mach.  ?, 2012.     
-%  
+%    [2] H. Larochelle and M. Mandel, ?Learning algorithms for the
+%        classification restricted boltzmann machine,? J. Mach.  ?, 2012.
+%
 % NOTATION
 % data  : all data given as      [n_samples   x #vis]
 %    v  : all data given as      [n_samples   x #vis]
@@ -63,12 +63,37 @@ class_labels = predict(ey);
 %b = bs,F_sigm_prob,permute(repmat(x,1,1,n_classes),[3,1,2]));
 
 
+%       a=arrayfun(@(c) test(c,F_sigm,class_labels,x),...
+%                      1:n_classes,'uni',false);
+%       b = arrayfun(@(c) F_sigm_prob(:,:,c)*x,...
+%           1:n_classes,'uni',false);
+%
+%
+%     for c = 1:n_classes
+%         dw = dw + a{c} - b{c};
+%     end
+%
+%     function a = test(c,F_sigm,class_labels,x)
+%         % find idx for current class
+%      l_idx = find(c == class_labels);
+%      a = F_sigm(:,l_idx,c)*x(l_idx,:);
+%
+%     end
+%
+
+
+% f1 = size(F_sigm);
+% x1 = size(x);
+% a = reshape(sum(bsxfun(@times,reshape(F_sigm,[f1(1),1,f1(2:3)]),...
+%                       reshape(x',1,x1(2),[])),3),f1(1),x1(2),[]);
+
 for c = 1:n_classes
     %  dw grad
     
     % find idx for current class
-    lin_idx = find(c == class_labels);
     bin_idx =  class_labels == c;
+    
+    lin_idx = find(c == class_labels);
     
     a = F_sigm(:,lin_idx,c)*x(lin_idx,:);
     b = F_sigm_prob(:,:,c)*x;

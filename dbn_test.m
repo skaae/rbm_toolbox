@@ -87,7 +87,7 @@ dbncheckopts(opts,valid_fields);
 rng('default');rng(101);
 dbn = dbnsetup(sizes, train_x, opts);
 
-profile on
+profile on; profile clear
 dbn = dbntrain(dbn, train_x, opts);
 profile off
 profile viewer

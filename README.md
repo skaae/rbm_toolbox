@@ -397,6 +397,8 @@ like example 7 but with momentum
 same as 5 but no sampling in rbmgenerative
 rbmgenerative l 96 commented out
 
+example 14 as 4 but online learning
+
 
 
 # Example 8 - Semi-supervised learning 

@@ -5,13 +5,15 @@ function  dbncheckopts( opts,valid_fields )
 %
 % Copyright Søren Sønderby july 2014
 fields = fieldnames(opts);
-assert(  isequal(sort(fields),sort(valid_fields))  ) 
+assert(  isequal(sort(fields),sort(valid_fields))  )
 
 switch func2str(opts.train_func)
     case 'rbmgenerative'
     case 'rbmdiscriminative'
+        isclassRBM(opts)
         has_classes(opts)
     case 'rbmhybrid'
+        isclassRBM(opts)
         has_classes(opts)
     case 'rbmsemisuplearn'
         if opts.classRBM == 0
@@ -28,8 +30,13 @@ end
     function has_classes(opts)
         % require classRBM and train labels
         assert(all([opts.classRBM == 1,...
-                    ~isempty(opts.y_train) ]));
+            ~isempty(opts.y_train) ]));
     end
 
+    function isclassRBM(opts)
+        if opts.classRBM == 0
+            error([func2str(opts.train_func) ' must be a class RBM'])
+        end
+    end
 end
 
