@@ -31,13 +31,14 @@ else
     error('opts.init_type must be function handle or the strings gaus/cRBM');
 end
 
-% check cdn if its a function handle use it otherwise create a function from the
-% scalar given
-opts.cdn = create_func(opts.cdn);
+
+
 
 for u = 1 : n_rbm
     
-    
+    % check cdn if its a function handle use it otherwise create a function from the
+% scalar given
+    dbn.rbm{u}.cdn = create_func(opts.cdn);
     
     % if one learningrate/momentum function use this for all
     % otherwise use individual learningrate/momentum for each rbm

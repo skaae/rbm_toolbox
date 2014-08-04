@@ -1,10 +1,12 @@
-[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0,0.1);
+[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0,0.01);
 sizes = [200];
 [opts, valid_fields] = dbncreateopts();
 
 opts.y_train = train_y;
+opts.x_val = val_x;
+opts.y_val = val_y;
 opts.init_type = 'cRBM';
-opts.numepochs = 1;
+opts.numepochs = 5;
 opts.test_interval = 1;
 opts.train_func = @rbmdiscriminative;
 opts.classRBM = 1;

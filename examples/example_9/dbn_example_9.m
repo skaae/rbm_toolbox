@@ -18,7 +18,7 @@ f = fullfile(pwd,'example9.mat')
 sizes = [500 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
-opts.patience = 50;
+opts.patience = 15;
 opts.numepochs = 10000;
 opts.traintype = 'CD';
 opts.init_type = 'cRBM';
@@ -33,7 +33,7 @@ opts.train_func = @rbmdiscriminative;
 %% Set learningrate and momentum
 opts.learningrate = @(t,momentum) 0.05;
 
-T = 50;       % momentum ramp up
+T = 5;       % momentum ramp up
 p_f = 0.9;    % final momentum
 p_i = 0.5;    % initial momentum
 opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f, p_f);

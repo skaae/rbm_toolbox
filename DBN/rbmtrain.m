@@ -70,7 +70,7 @@ for epoch = 1 : opts.numepochs
     % in each epoch update rbm parameters
     rbm.curMomentum     = rbm.momentum(epoch);
     rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
-    rbm.curCDn          = opts.cdn(epoch);
+    rbm.curCDn          = rbm.cdn(epoch);
     
     
     for l = 1 : numbatches
