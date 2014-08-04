@@ -397,7 +397,7 @@ To reproduce the results the following settings where used:
  * Early stopping with patience of 15.
  * MNIST training set was randomly split into a training set of 50000 samples and a validation 10000 samples. The original test set was used. 
 
-A few notes
+A few notes on training, a) the final result is highly dependent on the mini-batch size, for MNIST mini-batch sizes of 100 gives results that are 0.5% worse, b) weight initalization is equally important, try experiment by supplying your own initalization functions. 
 
 
 ## Example 4 - Discriminative 
@@ -437,6 +437,11 @@ example 14 as 4 but online learning    (RUNNING)
 
 # Example 9 - reproduce results from [7]
 
+# TODO
+
+ * Add AIS? [8]
+# 
+
 # References
 
 [1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.  
@@ -446,5 +451,7 @@ example 14 as 4 but online learning    (RUNNING)
 [5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., 2002.  
 [6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
 [7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
+[8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
+
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
