@@ -66,6 +66,13 @@ for epoch = 1 : opts.numepochs
     end
     
     err = 0;
+    
+    % in each epoch update rbm parameters
+    rbm.curMomentum     = rbm.momentum(epoch);
+    rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
+    rbm.curCDn          = opts.cdn(epoch);
+    
+    
     for l = 1 : numbatches
         v0 = extractminibatch(kk,l,opts.batchsize,x_train,opts);
         if rbm.classRBM == 1

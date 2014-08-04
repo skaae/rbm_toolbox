@@ -31,6 +31,10 @@ else
     error('opts.init_type must be function handle or the strings gaus/cRBM');
 end
 
+% check cdn if its a function handle use it otherwise create a function from the
+% scalar given
+opts.cdn = create_func(opts.cdn);
+
 for u = 1 : n_rbm
     
     
@@ -163,6 +167,14 @@ end
         
         assert(max(weights(:)) <= interval_max)
         assert(min(weights(:)) >= interval_min)
+    end
+
+    function ret = create_func(val)
+        if isa(val, 'function_handle')
+            ret = val;
+        else  % assume its a scalar
+            ret = @(epoch) val;
+        end
     end
 
 end

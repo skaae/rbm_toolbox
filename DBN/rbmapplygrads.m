@@ -24,10 +24,6 @@ dc = grads.dc;
 dd = grads.dd;
 du = grads.du;
 
-% update learning rate and momentum
-rbm.curMomentum     = rbm.momentum(epoch);
-rbm.curLR           = rbm.learningrate(epoch,rbm.curMomentum);
-
 %% l2 regularization
 if rbm.L2 >0
     dw = dw -  rbm.L2 * rbm.W;

@@ -84,7 +84,7 @@ switch type
         hid= up(rbm,chains,chainsy,@sigmrnd);
 end
 
-for n = 1:(opts.cdn - 1)
+for n = 1:(rbm.curCDn - 1)
     visx = rbmdownx(rbm,hid,@sigmrnd);
     visy = rbm.rbmdowny(rbm,hid);
     hid = up(rbm,visx,visy,@sigmrnd);
