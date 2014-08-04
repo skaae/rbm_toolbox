@@ -1,6 +1,6 @@
 function dbn = dbnsetup(sizes, x, opts)
 %%DBNSETUP creates a propr dbn struct
-%     INPUT 
+%     INPUT
 %        sizes : A vector with hidden layer sizes
 %            x : used to specify size of first hidden layer
 %         opts : a struct with options see dbncreateopts
@@ -14,52 +14,25 @@ dbn.sizes = [n, sizes];
 n_rbm = numel(dbn.sizes) - 1;
 
 
-valid = @(f) isfield(opts,'x_val') == 1 && ~isempty(opts.(f));
-reqboth =@(a,b) valid(a) && ~valid(b);
 
-% require that they are on togheter
-if  reqboth('y_val','x_val')
-    error('For validation specify both y_val and x_val')
-end
-
-
-% check if y is given if class rbm
-if valid('classRBM') && opts.classRBM == 1
-    if ~valid('y_train')
-        error('classRBM  requires y_train to be specified in opts')
-    elseif reqboth('y_val','x_val')
-        error('classRBM with x_val must also specify y_val in opts')
+% create weight initialization function
+if isa(opts.init_type, 'function_handle')
+    initfunc = opts.init_type;
+else
+    switch lower(opts.init_type)
+        case 'gauss'
+            initfunc = @(m,n) normrnd(0,0.01,m,n);
+        case 'crbm'
+            initfunc = @init_crbm;
+        otherwise
+            error('init_type should be either gauss or cRBM');
     end
-end
-
-% if early stopping a validation set must be specified
-if opts.early_stopping 
-        if  reqboth('y_val','x_val')
-            error('Eearly stopping  requires x and y val sets')
-        end  
-end
-
-% if discriminitive training require labels
-if isequal(opts.train_func,@rbmdiscriminative)
-    if ~valid('y_train')
-        error('Discriminative training requires labels')
-    end
-end
-
-% create weight initialization function 
-switch lower(opts.init_type)
-    case 'gauss'
-        initfunc = @(m,n) normrnd(0,0.01,m,n);
-    case 'crbm'
-        initfunc = @init_crbm;
-    otherwise
-        error('init_type should be either gauss or cRBM');
 end
 
 for u = 1 : n_rbm
     
-
-        
+    
+    
     % if one learningrate/momentum function use this for all
     % otherwise use individual learningrate/momentum for each rbm
     if numel(opts.learningrate) == n_rbm && n_rbm ~=1
@@ -92,7 +65,7 @@ for u = 1 : n_rbm
     dbn.rbm{u}.val_error_measures = {};
     dbn.rbm{u}.energy_ratio = [];
     
-
+    
     
     % i havent implemented early stopping for non top layers because
     % they are not classRBMS
@@ -129,9 +102,9 @@ for u = 1 : n_rbm
         dbn.rbm{u}.U  = [];
         dbn.rbm{u}.vU  = [];
         dbn.rbm{u}.d  = [];
-        dbn.rbm{u}.vd  = [];    
+        dbn.rbm{u}.vd  = [];
         
-
+        
     end
     
     
@@ -150,19 +123,19 @@ for u = 1 : n_rbm
     
     
     %%% prepare for GPU
-        %set gpu info
+    %set gpu info
     dbn.rbm{u}.gpu = opts.gpu;
     
-        % for non class RBM's rbmy should return empty. To avoid if statement 
+    % for non class RBM's rbmy should return empty. To avoid if statement
     % create a functio returning empty otherwise use rbmdowny
     
     if dbn.rbm{u}.gpu
-        dbn.rbm{u}.rand =  @gpuArray.rand;  
+        dbn.rbm{u}.rand =  @gpuArray.rand;
         dbn.rbm{u}.zeros = @gpuArray.zeros;
     else
-         dbn.rbm{u}.rand    = @rand;
-         dbn.rbm{u}.zeros    = @zeros;
-       
+        dbn.rbm{u}.rand    = @rand;
+        dbn.rbm{u}.zeros    = @zeros;
+        
     end
     
     
@@ -172,27 +145,22 @@ for u = 1 : n_rbm
     else
         dbn.rbm{u}.rbmdowny = @rbmdownynotclass;
         dbn.rbm{u}.rbmup    = @rbmupnotclassrbm;
-  
+        
     end
     
 end
 
     function weights = init_crbm(m,n)
-        % initilize weigts from uniform distribution. As described in 
+        % initilize weigts from uniform distribution. As described in
         % Learning Algorithms for the Classification Restricted Boltzmann
         % machine
         M = max([m,n]);
-        
         interval_max = M^(-0.5);
         interval_min = -interval_max;
-        
-        
-        
-        
         weights = interval_min + (interval_max-interval_min).*rand(m,n);
+        
         assert(max(weights(:)) <= interval_max)
         assert(min(weights(:)) >= interval_min)
-        
     end
 
 end
