@@ -364,14 +364,31 @@ Weight visualization:
 
 [link to video](https://www.youtube.com/watch?v=qqdMu09_zm4) 
 
-# Reproducing results from [7]
-In example 4 to 8 the results from [7] are reproduced. 
+# Reproducing results from [7], specifically the results from the table reproduced below:
 
-## Example 4 - Discriminative training from table 1 in [7]
+| Model  |Objective   										| Errror (%) 	| Example  |
+|---	 |---		  										|---			|---	   |
+|   	 | Generative(lr = 0.005, H = 6000)    		  		|	3.39		|    4     |
+|ClassRBM| Discriminative(lr = 0.05, H = 500)   		  	|	1.81		|    5     |
+|   	 | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)  		|	1.28		|    6     |
+|   	 | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |	1.16		|    7     |
+
+
+The networks were trained on the MNIST data set.
+To reproduce the results the following settings where used:
+ * online learning, i.e a batchsize of 1. 
+ * Initial weights are taken from uniform samples in the interval [-m^(-0.5), m^(-0.5)] where m is max([n_rows, n_columns)] of the matrix being initilaized. 
+ * Early stopping with patience of 15.
+ * MNIST training set was randomly split into a training set of 50000 samples and a validation 10000 samples. The original test set was used. 
+
+The 
+
+
+## Example 4 - Discriminative training from table 1 in [7] (RUNNING)
 
 Look in folder  mnist_cRBM_discriminative 
 
-## Example 5 - Generative training from table 1 in [7]
+## Example 5 - Generative training from table 1 in [7]   (RUNNING)
 
 ## Example 6 - Hybrid training from table 1 in [7]
 
@@ -397,7 +414,7 @@ like example 7 but with momentum
 same as 5 but no sampling in rbmgenerative
 rbmgenerative l 96 commented out
 
-example 14 as 4 but online learning
+example 14 as 4 but online learning    (RUNNING)
 
 
 
