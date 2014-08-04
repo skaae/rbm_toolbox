@@ -440,6 +440,7 @@ example 14 as 4 but online learning    (RUNNING)
 # TODO
 
  * Add Annealed Importance Sampling (AIS) [8]
+ * add Normalization to RBM [9]
 # 
 
 # References
@@ -452,6 +453,6 @@ example 14 as 4 but online learning    (RUNNING)
 [6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
 [7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
 [8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
-
+[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.   
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
