@@ -1,4 +1,4 @@
-function  dbncheckopts( opts,valid_fields )
+function  dbncheckopts( opts,valid_fields,x )
 %DBNCHECKOPTS checks the validity of the opts struct
 %
 % see also, DBNSETUP, DBNTRAIN, DBNCREATEOPTS
@@ -6,6 +6,32 @@ function  dbncheckopts( opts,valid_fields )
 % Copyright Søren Sønderby july 2014
 fields = fieldnames(opts);
 assert(  isequal(sort(fields),sort(valid_fields))  )
+
+
+
+
+valid = @(f) isfield(opts,f) == 1 && ~isempty(opts.(f));
+reqboth =@(a,b) valid(a) && ~valid(b);
+
+% check that if validation sets are given they have both x and y
+if  reqboth('y_val','x_val')
+    error('For validation specify both y_val and x_val')
+else
+    assert(size(opts.y_val,1) == size(x_val,1))
+end
+
+
+% check if y is given if class rbm + check y size if x is given
+if opts.classRBM == 1
+    if ~valid('y_train')
+        error('classRBM  requires y_train to be specified in opts')
+    elseif exist('x','var')
+        assert(size(opts.y_train,1) == size(x,1))
+    end
+    
+end
+
+
 
 switch func2str(opts.train_func)
     case 'rbmgenerative'
