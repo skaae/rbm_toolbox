@@ -51,7 +51,7 @@ switch lower(opts.init_type)
     case 'gauss'
         initfunc = @(m,n) normrnd(0,0.01,m,n);
     case 'crbm'
-        initfunc = @(m,n) (rand(m,n)-0.5) ./ max([m n]);
+        initfunc = @init_crbm;
     otherwise
         error('init_type should be either gauss or cRBM');
 end
@@ -176,5 +176,23 @@ for u = 1 : n_rbm
     end
     
 end
+
+    function weights = init_crbm(m,n)
+        % initilize weigts from uniform distribution. As described in 
+        % Learning Algorithms for the Classification Restricted Boltzmann
+        % machine
+        M = max([m,n]);
+        
+        interval_max = M^(-0.5);
+        interval_min = -interval_max;
+        
+        
+        
+        
+        weights = interval_min + (interval_max-interval_min).*rand(m,n);
+        assert(max(weights(:)) <= interval_max)
+        assert(min(weights(:)) >= interval_min)
+        
+    end
 
 end
