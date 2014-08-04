@@ -18,7 +18,7 @@ n_rbm = numel(dbn.sizes) - 1;
 % create weight initialization function
 if isa(opts.init_type, 'function_handle')
     initfunc = opts.init_type;
-else
+elseif ischar(opts.init_type)
     switch lower(opts.init_type)
         case 'gauss'
             initfunc = @(m,n) normrnd(0,0.01,m,n);
@@ -27,6 +27,8 @@ else
         otherwise
             error('init_type should be either gauss or cRBM');
     end
+else
+    error('opts.init_type must be function hanlde or the strings gaus/cRBM');
 end
 
 for u = 1 : n_rbm
