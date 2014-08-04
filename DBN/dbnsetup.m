@@ -28,7 +28,7 @@ elseif ischar(opts.init_type)
             error('init_type should be either gauss or cRBM');
     end
 else
-    error('opts.init_type must be function hanlde or the strings gaus/cRBM');
+    error('opts.init_type must be function handle or the strings gaus/cRBM');
 end
 
 for u = 1 : n_rbm
