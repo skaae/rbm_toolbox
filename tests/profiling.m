@@ -1,12 +1,14 @@
-[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist();
+[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0,0.1);
 sizes = [200];
 [opts, valid_fields] = dbncreateopts();
 
-opts.y_train = test_y;
-opts.numepochs = 5;
+opts.y_train = train_y;
+opts.init_type = 'cRBM';
+opts.numepochs = 1;
 opts.test_interval = 1;
 opts.train_func = @rbmdiscriminative;
 opts.classRBM = 1;
+opts.batchsize = 1;
 dbncheckopts(opts,valid_fields);
 
 
@@ -18,7 +20,7 @@ rng('default');rng(101);
 
 close all; profile on; profile clear
 tic
-dbn = dbntrain(dbn, test_x, opts);
+dbn = dbntrain(dbn, train_x, opts);
 toc
 profile off
 profile viewer
