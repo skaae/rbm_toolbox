@@ -110,6 +110,14 @@ end
         weights = interval_min + (interval_max-interval_min).*rand(m,n);
     end
 ```
+Lastly you can supply your own function as a handle to `opts.init_type`. The signature must be `f(n_rows,n_columns)`. The output should be a dobule m-by-n matrix. e.g:
+
+```MATLAB
+opts.init_type = @(m,n)  normrnd(0,100,m,n);
+```
+
+
+
 ## Regularization
 
 The following regularization options are implemented
@@ -389,7 +397,7 @@ To reproduce the results the following settings where used:
  * Early stopping with patience of 15.
  * MNIST training set was randomly split into a training set of 50000 samples and a validation 10000 samples. The original test set was used. 
 
-The 
+A few notes
 
 
 ## Example 4 - Discriminative 
