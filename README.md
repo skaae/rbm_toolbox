@@ -98,13 +98,18 @@ switch lower(opts.init_type)
     case 'gauss'
         initfunc = @(m,n) normrnd(0,0.01,m,n);
     case 'crbm'
-        initfunc = @(m,n) (rand(m,n)-0.5) ./ max([m n]);
+        initfunc = @(m,n) init_crbm;
     otherwise
         error('init_type should be either gauss or cRBM');
 end
-```
-Bias weights are always initialized to zero. 
 
+    function weights = init_crbm(m,n)
+        M = max([m,n]);
+        interval_max = M^(-0.5);
+        interval_min = -interval_max;
+        weights = interval_min + (interval_max-interval_min).*rand(m,n);
+    end
+```
 ## Regularization
 
 The following regularization options are implemented
@@ -372,6 +377,9 @@ Weight visualization:
 |ClassRBM| Discriminative(lr = 0.05, H = 500)   		  	|	1.81		|    5     |
 |   	 | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)  		|	1.28		|    6     |
 |   	 | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |	1.16		|    7     |
+lr = learning rate
+H = hidden layer size
+
 
 
 The networks were trained on the MNIST data set.
@@ -384,15 +392,14 @@ To reproduce the results the following settings where used:
 The 
 
 
-## Example 4 - Discriminative training from table 1 in [7] (RUNNING)
+## Example 4 - Discriminative 
 
-Look in folder  mnist_cRBM_discriminative 
 
-## Example 5 - Generative training from table 1 in [7]   (RUNNING)
+## Example 5 - Generative
 
-## Example 6 - Hybrid training from table 1 in [7]
+## Example 6 - Hybrid training 
 
-## Example 7 - Hybrid training with sparsity from table 1 in [7]
+## Example 7 - Hybrid training with sparsity
 
 ## Example 8 
   Test of dropout
