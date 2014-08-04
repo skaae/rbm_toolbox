@@ -97,7 +97,7 @@ for c = 1:n_classes
     
     a = F_sigm(:,lin_idx,c)*x(lin_idx,:);
     b = F_sigm_prob(:,:,c)*x;
-    dw = dw + a  - b;
+    dw = dw + a-b;
     
     %  du grad
     du(:,c) = sum(F_sigm(:,bin_idx,c),2) - sum(F_sigm_prob(:,:,c),2);
