@@ -17,7 +17,7 @@ reqboth =@(a,b) valid(a) && ~valid(b);
 if  reqboth('y_val','x_val')
     error('For validation specify both y_val and x_val')
 else
-    assert(size(opts.y_val,1) == size(x_val,1))
+    assert(size(opts.y_val,1) == size(opts.x_val,1))
 end
 
 
