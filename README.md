@@ -417,7 +417,7 @@ A few notes on training, a) the final result is highly dependent on the mini-bat
   like example 4 but with momentum
 
 ## example 10 
-  like example 5 but with momentum  
+  like example 4 ...
 
 ## example 11
   like example 6 but with momentum
@@ -439,7 +439,7 @@ example 14 as 4 but online learning    (RUNNING)
 
 # TODO
 
- * Add AIS? [8]
+ * Add Annealed Importance Sampling (AIS) [8]
 # 
 
 # References
