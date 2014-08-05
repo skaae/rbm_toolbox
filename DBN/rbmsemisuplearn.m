@@ -64,30 +64,12 @@ else
     chainsy_semisup = []; chainsy_type = [];
 end
 
-%sample p(y | x) - should i use p(y|x_semisup) ???
-n_semisup_samples = size(opts.x_semisup,1);
-n_samples = size(x,1);
-if n_semisup_samples <= n_samples
-    s = randsample(n_semisup_samples,n_samples,0); % sample without replacement
-else
-    s = randsample(n_semisup_samples,n_samples,1); % sample with replacement
-end
-
-% use s to pick the correct number of samples from x 
-[ey_semisup, ~] = rbmpygivenx( rbm,x(s,:),'train'); 
+%sample p(y | x) 
+[ey_semisup, ~] = rbmpygivenx( rbm,x,'train'); 
 ey_semisup = samplematrix(ey_semisup);
-
-
-% ey_semisup = bsxfun(@minus,ey_semisup,rbm.yt_MU);
-% 
-% % train semisupervised
-% %warning('probably replace rbm.xt_MU with rbm.xs_MU')
-% xt_MU = rbm.xt_MU;
-% rbm.xt_MU = rbm.xs_MU;
 
 [grads_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
          opts.x_semisup_batch, ey_semisup,opts,chains_semisup,chainsy_semisup);
-% rbm.xt_MU = xt_MU;
 
 
 % combine the generative unsupervised training with either @rbmhybrid,
