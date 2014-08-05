@@ -42,9 +42,10 @@ if rbm.L1 > 0
 end
 
 if rbm.sparsity > 0
-    dw = dw - rbm.sparsity;
+    db = db - rbm.sparsity;
+    dc = dc - rbm.sparsity;
     if rbm.classRBM == 1
-        du = du - rbm.sparsity;
+        dd = dd - rbm.sparsity;
     end
 end
 
