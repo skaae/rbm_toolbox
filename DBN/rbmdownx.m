@@ -26,4 +26,9 @@ function act_vis_x = rbmdownx(rbm,hid_act,act_func)
 % Modified by Søren Sønderby June 2014
 
 act_vis_x = act_func( bsxfun(@plus,rbm.b',hid_act * rbm.W));
+
+%%% added for ZM algorithm
+%act_vis_x = bsxfun(@minus,act_vis_x,rbm.xt_MU);
+
+
 end

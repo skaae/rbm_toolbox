@@ -26,3 +26,6 @@ function act_vis_y = rbmdownyclassrbm(rbm,hid_act)
 % Copyright Søren Sønderby June 2014
 act_vis_y = exp(bsxfun(@plus,rbm.d',hid_act * rbm.U));
 act_vis_y = bsxfun(@rdivide, act_vis_y, sum(act_vis_y, 2));
+
+%%% added for ZM algorithm
+%act_vis_y = bsxfun(@minus,act_vis_y,rbm.yt_MU);

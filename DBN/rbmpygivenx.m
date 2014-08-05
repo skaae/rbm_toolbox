@@ -21,6 +21,10 @@ end
 
 %normalize probabilities
 class_prob = exp(bsxfun(@minus, class_log_prob, max(class_log_prob, [], 2)));
+
+%zm algo
+%class_prob = bsxfun(@minus,class_prob,rbm.yt_MU);
+
 class_prob = bsxfun(@rdivide, class_prob, sum(class_prob, 2));
 
 end

@@ -37,7 +37,7 @@ end
 for u = 1 : n_rbm
     
     % check cdn if its a function handle use it otherwise create a function from the
-% scalar given
+    % scalar given
     dbn.rbm{u}.cdn = create_func(opts.cdn);
     
     % if one learningrate/momentum function use this for all
@@ -171,6 +171,8 @@ end
     end
 
     function ret = create_func(val)
+        % takes a scalar val or function handle and returns a function returning 
+        % val if val is not a function.
         if isa(val, 'function_handle')
             ret = val;
         else  % assume its a scalar

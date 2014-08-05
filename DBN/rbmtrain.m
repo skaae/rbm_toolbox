@@ -47,6 +47,26 @@ chains = [];
 chainsy = [];
 best_str = '';
 
+% %% calculate normalization and normalize for x train, x val and x semisup
+% rbm.xt_MU = mean(x_train,1);
+% x_train = bsxfun(@minus,x_train,rbm.xt_MU);
+% 
+% if rbm.classRBM
+%     rbm.yt_MU = mean(opts.y_train,1);
+%     opts.y_train = bsxfun(@minus,opts.y_train,rbm.yt_MU);
+% end
+% if ~isempty(opts.x_val)
+%     rbm.xv_MU = mean(opts.x_val);
+%     rbm.yv_MU = mean(opts.y_val);
+%     opts.y_val =  bsxfun(@minus,opts.y_val,rbm.yv_MU);
+%     opts.x_val =  bsxfun(@minus,opts.x_val,rbm.xv_MU);
+% 
+% end
+% if ~isempty(opts.x_semisup)
+%     rbm.xs_MU = mean(opts.x_semisup);
+%     opts.x_semisup =  bsxfun(@minus,opts.x_semisup,opts.xs_MU);
+% end
+
 
 if isequal(rbm.train_func,@rbmsemisuplearn)
     semisup = 1;
@@ -145,7 +165,7 @@ avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
 lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
 disp([epochnr avg_err lr_mom perf earlystop.best_str]);    
 end
-
+rbm.c = rbm.c - rbm.W*rbm.xt_MU';   %ZM algorithm
 
 
 

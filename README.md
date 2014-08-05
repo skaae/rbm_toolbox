@@ -414,10 +414,10 @@ A few notes on training, a) the final result is highly dependent on the mini-bat
 
 
 ## example 9
-  like example 4 but with momentum
+  like example 5 + ZM
 
 ## example 10 
-  like example 4 ...
+  like example 4 ZM + increasing CD
 
 ## example 11
   like example 6 but with momentum
@@ -441,6 +441,7 @@ example 14 as 4 but online learning    (RUNNING)
 
  * Add Annealed Importance Sampling (AIS) [8]
  * add Normalization to RBM [9]
+ *  Parallel tempering for training of restricted Boltzmann machines.
 # 
 
 # References

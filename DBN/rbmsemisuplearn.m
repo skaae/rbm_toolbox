@@ -77,9 +77,17 @@ end
 [ey_semisup, ~] = rbmpygivenx( rbm,x(s,:),'train'); 
 ey_semisup = samplematrix(ey_semisup);
 
-% train semisupervised
+
+% ey_semisup = bsxfun(@minus,ey_semisup,rbm.yt_MU);
+% 
+% % train semisupervised
+% %warning('probably replace rbm.xt_MU with rbm.xs_MU')
+% xt_MU = rbm.xt_MU;
+% rbm.xt_MU = rbm.xs_MU;
+
 [grads_semisup,~,chains_semisup,chainsy_semisup] = rbmgenerative(rbm,...
          opts.x_semisup_batch, ey_semisup,opts,chains_semisup,chainsy_semisup);
+% rbm.xt_MU = xt_MU;
 
 
 % combine the generative unsupervised training with either @rbmhybrid,
