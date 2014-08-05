@@ -1,4 +1,4 @@
-
+function dbntest()
 % test generative and discrminative weights
 dbn_cRBM_tests()
 
@@ -102,8 +102,5 @@ opts.init_type = 'crbm';
 dbnsetup(sizes, train_x, opts);
 
 
-opts.x_val = val_x;
-opts.y_val = val_y;
-opts.init_type = 'cRBM';
-
-
+disp('ALL PASSED!')
+end
