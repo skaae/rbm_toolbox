@@ -8,6 +8,17 @@ if ~ismac
     cd(current_dir)
 end
 
+try
+    thrds  = str2num(getenv('PBS_NUM_PPN'));
+    matlabpool('open',thrds);
+catch e
+    disp(e)
+    thrds = 0;
+end
+disp(['Number of threads:' num2str(thrds)]);
+    
+
+
 %% setup training
 rng('default');rng(101);
 
@@ -38,6 +49,7 @@ opts.train_func = @rbmhybrid;
 opts.learningrate = @(t,momentum) 0.05;
 opts.momentum = @(t) 0;
 
+disp(sizes)
 disp(opts)
 dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
 dbn = dbnsetup(sizes, train_x, opts);  % train function 

@@ -50,16 +50,35 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 %
 % Copyright Søren Sønderby June 2014
 
-[grads_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
-[grads_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);
+
+parfor i = 1:2
+    if i == 1
+        [gg,ce,cs,csy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
+        grads{i} = gg;
+        curr_err{i} = ce;
+        chs{i} = cs;
+        chsy{i} = csy;
+        
+    else
+        [gg,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);
+        grads{i} = gg;
+    end
+end
+chains = chs{1};
+chainsy = chsy{1};
+grads_dis = grads{2};
+grads_gen = grads{1};
+curr_err = curr_err{1};
+
 
 if exist('debug','var') && debug == 1
     warning('Debugging rbmhybrid')
     save('test_rbmhybrid','grads_gen','grads_dis');
 end
 
+grads = struct();
 grads.dw = grads_dis.dw + opts.hybrid_alpha * grads_gen.dw;
-grads.db = grads_dis.db + opts.hybrid_alpha * grads_gen.db; 
+grads.db = grads_dis.db + opts.hybrid_alpha * grads_gen.db;
 grads.dc = grads_dis.dc + opts.hybrid_alpha * grads_gen.dc;
 grads.du = grads_dis.du + opts.hybrid_alpha * grads_gen.du;
 grads.dd = grads_dis.dd + opts.hybrid_alpha * grads_gen.dd;
