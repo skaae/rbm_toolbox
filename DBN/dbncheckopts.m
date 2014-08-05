@@ -11,14 +11,6 @@ assert(  isequal(sort(fields),sort(valid_fields))  )
 
 
 valid = @(f) isfield(opts,f) == 1 && ~isempty(opts.(f));
-reqboth =@(a,b) valid(a) && ~valid(b);
-
-% check that if validation sets are given they have both x and y
-if  reqboth('y_val','x_val')
-    error('For validation specify both y_val and x_val')
-else
-    assert(size(opts.y_val,1) == size(opts.x_val,1))
-end
 
 
 % check if y is given if class rbm + check y size if x is given
