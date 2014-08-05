@@ -28,7 +28,7 @@ if mod(epoch,opts.test_interval) == 0
         
         if ~isempty(opts.x_val)
             val_probs = rbmclassprobs( rbm,opts.x_val,opts.batchsize);
-            [val_err, val_om] = rbm.err_func(val_probs,opts.y_val);
+            [val_err, val_om] = rbm.err_func(val_probs,r.y_val);
             
             rbm.val_error(end+1) = val_err;
             rbm.val_error_measures{end+1} = val_om;

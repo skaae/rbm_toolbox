@@ -1,6 +1,9 @@
+function dbn_cRBM_tests()
 rng('default');rng(1);
 
 %% init test weights 
+lr = 0.1;
+
 x = rand(100,1);
 y = 2;
 y_vec = [0 0 1 0]';
@@ -16,11 +19,15 @@ b = zeros(100,1);
 % init RBM with same weights
 rbm.classRBM = 1;
 rbm.dropout_hidden = 0;
+rbm.curCDn = 1;
+rbm.curMomentum = 0;
+rbm.curLR = lr;
 rbm.W = W;
 rbm.U = U;
 rbm.d = d;
 rbm.c = c;
 rbm.b = b;
+
 x_rbm = x';
 rbm.rbmdowny = @rbmdownyclassrbm;
 rbm.rbmup    = @rbmupclassrbm;
@@ -28,7 +35,7 @@ rbm.zeros = @zeros;
 rbm.rand = @rand;
 opts.y_train = y_vec';
 opts.traintype = 'CD';
-opts.cdn = 1;
+opts.cdn = @(epoch) 1;
 opts.batchsize = 1;
 
 
@@ -269,7 +276,6 @@ assert(all(abs(-deriv_d-grads_dis.dd) < 10^-14))
 
 
 lambda = 0.1; % generative learning weight
-lr = 0.1;
 
 W_hybrid = -deriv_W + lambda*W_gen;
 U_hybrid = -deriv_U + lambda*U_gen;
@@ -340,7 +346,8 @@ assert(all(abs(b(:) - new_rbm.b(:))<10^-14))
 assert(all(abs(c(:) - new_rbm.c(:))<10^-14))
 assert(all(abs(d(:) - new_rbm.d(:))<10^-14))
 
-
+disp('dbn_cRB_test: All test passed')
+end
 
 
 % For semi-supervised learning (i.e. y is unknown), simply replace
@@ -361,3 +368,4 @@ assert(all(abs(d(:) - new_rbm.d(:))<10^-14))
 
 % and just use the same operations as defined above for obtaining
 % your CD statistics to do a CD parameter update.
+

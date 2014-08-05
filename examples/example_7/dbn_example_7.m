@@ -19,11 +19,12 @@ f = fullfile(pwd,'example7.mat')
 sizes = [3000 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
 opts.early_stopping = 1;
-opts.patience = 50;
+opts.patience = 15;
 opts.numepochs = 10000;
 opts.traintype = 'CD';
 opts.init_type = 'cRBM';
 opts.test_interval = 1;
+opts.batchsize = 1;
 
 opts.hybrid_alpha = 0.01;
 opts.sparsity = 10^-4;
