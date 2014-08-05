@@ -165,7 +165,7 @@ avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
 lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
 disp([epochnr avg_err lr_mom perf earlystop.best_str]);    
 end
-rbm.c = rbm.c - rbm.W*rbm.xt_MU';   %ZM algorithm
+%rbm.c = rbm.c - rbm.W*rbm.xt_MU';   %ZM algorithm
 
 
 
