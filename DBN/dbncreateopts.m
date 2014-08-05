@@ -95,7 +95,7 @@ function [ opts,valid_fields ] = dbncreateopts()
 
 
 % DEFAULT SETTINGS
-opts.traintype = 'PCD';
+opts.traintype = 'CD';
 opts.numepochs =   100;
 opts.batchsize = 100;
 opts.cdn = 1;
