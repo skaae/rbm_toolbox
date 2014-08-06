@@ -51,24 +51,10 @@ function [ grads,curr_err,chains,chainsy ] = rbmhybrid(rbm,x,ey,opts,chains,chai
 % Copyright Søren Sønderby June 2014
 
 
-parfor i = 1:2
-    if i == 1
-        [gg,ce,cs,csy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
-        grads{i} = gg;
-        curr_err{i} = ce;
-        chs{i} = cs;
-        chsy{i} = csy;
-        
-    else
-        [gg,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);
-        grads{i} = gg;
-    end
-end
-chains = chs{1};
-chainsy = chsy{1};
-grads_dis = grads{2};
-grads_gen = grads{1};
-curr_err = curr_err{1};
+
+[grads_gen,curr_err,chains,chainsy] = rbmgenerative(rbm,x,ey,opts,chains,chainsy);
+
+[grads_dis,~,~,~]= rbmdiscriminative(rbm,x,ey,opts,[],[]);
 
 
 if exist('debug','var') && debug == 1

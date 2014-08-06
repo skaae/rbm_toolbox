@@ -19,9 +19,6 @@ else
     batch = x( kk(batch_start:end),:);
 end
 
-if opts.gpu
-    batch = gpuArray(batch);
-end
 
 
 

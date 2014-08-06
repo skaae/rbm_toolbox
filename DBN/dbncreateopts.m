@@ -73,7 +73,7 @@ function [ opts,valid_fields ] = dbncreateopts()
 %                     'cRBM' init as larochelle in [1] i.e  
 %                     weights = randnd(size(weights))-0.5 ./ max(size(weights)).
 %                     Bias units are always initialized at zero.
-%              gpu  : 0|1 use gpu for calculation
+%           outfile : after each epoch the best_rbm or rbm is saved to this file
 %
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
@@ -127,7 +127,7 @@ opts.semisup_type = @rbmhybrid;
 opts.err_func = @accuracy;
 opts.dropout_hidden = 0;
 opts.init_type = 'gauss';
-opts.gpu = 0;
+opts.outfile = [];
 
 valid_fields = fieldnames(opts);
 

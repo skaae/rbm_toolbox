@@ -6,20 +6,16 @@ function dbn = dbntrain(dbn, x_train, opts)
 % EXAMPLE
 %  sizes = [200];   % hidden layer size
 %  [opts, valid_fields] = dbncreateopts();
-%  dbncheckopts(opts,valid_fields);       
+%  dbncheckopts(opts,valid_fields);
 %  disp(opts)
-%  dbn = dbnsetup(sizes, train_x, opts); 
+%  dbn = dbnsetup(sizes, train_x, opts);
 %  dbn = dbntrain(dbn, train_x, opts);
 %
 % See also DBNCREATEOPTS DBNCHECKOPTS DBNSETUP DBNTRAIN
 %
 % Copyright june 2014 by Søren Sønderby
-if opts.gpu 
-    warning('GPU implementation not working')
-    training = @rbmtraingpu;
-else
-    training = @rbmtrain;
-end
+training = @rbmtrain;
+
 
 
 n_rbm = numel(dbn.rbm);

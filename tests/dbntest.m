@@ -82,6 +82,7 @@ dbn11 = dbntrain(dbn11, train_x, opts);
 %% check early stopping
 opts.early_stopping = 1;
 opts.train_func =  @rbmgenerative;
+opts.outfile = 'test.mat';
 dbn12 = dbnsetup(sizes, train_x, opts);
 dbn12 = dbntrain(dbn12, train_x, opts);
 

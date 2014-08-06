@@ -291,19 +291,22 @@ delete('test_rbmhybrid.mat');
 
 % check intermediates of hybrid calculation
 
-% discriminiative grads
-assert(all(abs(-deriv_W(:)-hyp.grads_dis.dw(:)) < 10^-14))
-assert(all(abs(-deriv_U(:)-hyp.grads_dis.du(:)) < 10^-14))
-assert(isequal(-deriv_b,hyp.grads_dis.db))
-assert(all(abs(-deriv_c-hyp.grads_dis.dc) < 10^-14))
-assert(all(abs(-deriv_d-hyp.grads_dis.dd) < 10^-14))
+% discriminiative grads (hybrid)
+chk = @(a,b) all(abs(a(:) - b(:)) < 10^-14);
 
-% generative grads
-assert(isequal(W_gen,hyp.grads_gen.dw))
-assert(isequal(U_gen,hyp.grads_gen.du))
-assert(isequal(b_gen,hyp.grads_gen.db))
-assert(isequal(c_gen,hyp.grads_gen.dc))
-assert(isequal(d_gen,hyp.grads_gen.dd))
+assert(chk(-deriv_W,hyp.grads_dis.dw));
+assert(chk(-deriv_U,hyp.grads_dis.du));
+assert(chk(-deriv_b,hyp.grads_dis.db));
+assert(chk(-deriv_c,hyp.grads_dis.dc));
+assert(chk(-deriv_d,hyp.grads_dis.dd));
+
+% generative grads (hybrid)
+
+assert(chk(W_gen,hyp.grads_gen.dw));
+assert(chk(U_gen,hyp.grads_gen.du));
+assert(chk(b_gen,hyp.grads_gen.db));
+assert(chk(c_gen,hyp.grads_gen.dc));
+assert(chk(d_gen,hyp.grads_gen.dd));
 
 % check hybrid grads
 assert(all(abs(W_hybrid(:) - grads_hybrid.dw(:))<10^-14))

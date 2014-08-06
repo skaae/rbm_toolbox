@@ -142,7 +142,16 @@ for epoch = 1 : opts.numepochs
 epochnr = ['Epoch ' num2str(epoch) '/' num2str(opts.numepochs) '.'];
 avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
 lr_mom  = [' LR: ' num2str(rbm.curLR) '. Mom.: ' num2str(rbm.curMomentum)];
-disp([epochnr avg_err lr_mom perf earlystop.best_str]);    
+disp([epochnr avg_err lr_mom perf earlystop.best_str]);  
+if ~isempty(opts.outfile)
+    if opts.early_stopping 
+        best_rbm = earlystop.best_rbm;
+        save(opts.outfile,'best_rbm')
+        clear best_rbm;
+    else
+        save(opts.outfile,'rbm')
+    end
+end
 end
 end
 

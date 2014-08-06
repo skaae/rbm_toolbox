@@ -129,21 +129,15 @@ for u = 1 : n_rbm
     dbn.rbm{u}.vc = zeros(hid_size, 1);
     
     
-    %%% prepare for GPU
-    %set gpu info
-    dbn.rbm{u}.gpu = opts.gpu;
+    
     
     % for non class RBM's rbmy should return empty. To avoid if statement
     % create a functio returning empty otherwise use rbmdowny
     
-    if dbn.rbm{u}.gpu
-        dbn.rbm{u}.rand =  @gpuArray.rand;
-        dbn.rbm{u}.zeros = @gpuArray.zeros;
-    else
-        dbn.rbm{u}.rand    = @rand;
-        dbn.rbm{u}.zeros    = @zeros;
-        
-    end
+    dbn.rbm{u}.rand    = @rand;
+    dbn.rbm{u}.zeros    = @zeros;
+    
+    
     
     
     if dbn.rbm{u}.classRBM
@@ -171,7 +165,7 @@ end
     end
 
     function ret = create_func(val)
-        % takes a scalar val or function handle and returns a function returning 
+        % takes a scalar val or function handle and returns a function returning
         % val if val is not a function.
         if isa(val, 'function_handle')
             ret = val;

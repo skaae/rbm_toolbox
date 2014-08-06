@@ -29,6 +29,7 @@ f = fullfile(pwd,'example7.mat')
 % Setup DBN
 sizes = [3000 ];   % hidden layer size
 [opts, valid_fields] = dbncreateopts();
+opts.outfile = 'best_example7.mat';
 opts.early_stopping = 1;
 opts.patience = 15;
 opts.numepochs = 10000;
