@@ -1,3 +1,4 @@
+o
 [train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0,0.01);
 sizes = [200];
 [opts, valid_fields] = dbncreateopts();

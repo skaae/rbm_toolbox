@@ -1,8 +1,7 @@
-function [ hrbm ] = cpRBMtoHost( drbm )
+function [ hrbm ] = cpRBMtoHOST( drbm )
 fld = fields(drbm);
-drbm = struct();
+hrbm = struct();
 for i=1:numel(fld)
     fieldName = fld{i};
-    drbm.(fieldName) = gather(hrbm.(fieldName) );
+    hrbm.(fieldName) = gather(drbm.(fieldName) );
 end
-drbm.gpu = 0;

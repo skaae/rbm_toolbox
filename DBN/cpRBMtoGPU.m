@@ -3,6 +3,9 @@ fld = fields(hrbm);
 drbm = struct();
 for i=1:numel(fld)
     fieldName = fld{i};
-    drbm.(fieldName) = gpuArray(hrbm.(fieldName) );;
+    if isnumeric(hrbm.(fieldName))
+        drbm.(fieldName) = gpuArray(hrbm.(fieldName) );
+    else
+        drbm.(fieldName) = hrbm.(fieldName);
+    end
 end
-drbm.gpu = gpuArray(1);

@@ -8,6 +8,8 @@ function batch = extractminibatch(kk,minibatch_num,batchsize,x,opts)
 %             opts    ; opts struct
 %
 % Copyright Søren Sønderby August 2014
+
+
 batch_start = (minibatch_num - 1) * batchsize + 1;
 batch_end = minibatch_num * batchsize;
 n_samples = size(x,1);

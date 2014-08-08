@@ -1,4 +1,4 @@
-function dbn = dbnsetup(sizes, x, opts)
+function [dbn, opts] = dbnsetup(sizes, x, opts)
 %%DBNSETUP creates a propr dbn struct
 %     INPUT
 %        sizes : A vector with hidden layer sizes
@@ -9,17 +9,17 @@ function dbn = dbnsetup(sizes, x, opts)
 %
 % Copyright Søren Sønderby july 2014
 
-n = size(x, 2);
+[n_samples, n] = size(x);
 dbn.sizes = [n, sizes];
 n_rbm = numel(dbn.sizes) - 1;
 
 
 
 % create weight initialization function
-if isa(opts.init_type, 'function_handle')
-    initfunc = opts.init_type;
-elseif ischar(opts.init_type)
-    switch lower(opts.init_type)
+if isa(opts.inittype, 'function_handle')
+    initfunc = opts.inittype;
+elseif ischar(opts.inittype)
+    switch lower(opts.inittype)
         case 'gauss'
             initfunc = @(m,n) normrnd(0,0.01,m,n);
         case 'crbm'
@@ -32,124 +32,129 @@ else
 end
 
 
+%% use lr function etc to calculate learning rates
+opts.cdn = create_func(opts.cdn);
+mom = arrayfun(opts.momentum,1:opts.numepochs);
+lr = arrayfun(opts.learningrate,1:opts.numepochs,mom);
+cdn = arrayfun(opts.cdn,1:opts.numepochs);
 
 
 for u = 1 : n_rbm
-    
+    dbn.rbm{u}.testinterval = opts.testinterval;
     % check cdn if its a function handle use it otherwise create a function from the
     % scalar given
-    dbn.rbm{u}.cdn = create_func(opts.cdn);
-    
+    dbn.rbm{u}.cdn = cdn;
+    dbn.rbm{u}.learningrate = lr;
+    dbn.rbm{u}.momentum = mom;
+    dbn.rbm{u}.alpha = opts.alpha;
+    dbn.rbm{u}.beta = opts.beta;
     % if one learningrate/momentum function use this for all
     % otherwise use individual learningrate/momentum for each rbm
-    if numel(opts.learningrate) == n_rbm && n_rbm ~=1
-        dbn.rbm{u}.learningrate = opts.learningrate{u};
-    else
-        assert(numel(opts.learningrate)==1,'learnfunc. should be 1 or nrbm')
-        dbn.rbm{u}.learningrate = opts.learningrate;
-    end
-    
-    if numel(opts.momentum) == n_rbm && n_rbm ~= 1
-        dbn.rbm{u}.momentum = opts.momentum{u};
-    else
-        assert(numel(opts.momentum)==1,'Momen. func should be 1 or nrbm')
-        dbn.rbm{u}.momentum = opts.momentum;
-    end
     
     % regularization parameters
     dbn.rbm{u}.L2 = opts.L2;
     dbn.rbm{u}.L1 = opts.L1;
-    dbn.rbm{u}.L2norm = opts.L2norm;
     dbn.rbm{u}.sparsity = opts.sparsity;
-    dbn.rbm{u}.dropout_hidden = opts.dropout_hidden;
+    dbn.rbm{u}.dropouthidden = opts.dropouthidden;
     
     % error stuff
-    dbn.rbm{u}.err_func = opts.err_func;
-    dbn.rbm{u}.error = [];
-    dbn.rbm{u}.val_error = [];
-    dbn.rbm{u}.train_error  = [];
-    dbn.rbm{u}.train_error_measures = {};
-    dbn.rbm{u}.val_error_measures = {};
-    dbn.rbm{u}.energy_ratio = [];
-    
-    
-    
-    % i havent implemented early stopping for non top layers because
-    % they are not classRBMS
-    if n_rbm == u
-        dbn.rbm{u}.early_stopping = opts.early_stopping;
-    else
-        dbn.rbm{u}.early_stopping = 0;
-    end
+    dbn.rbm{u}.errfunc = opts.errfunc;
+    dbn.rbm{u}.reconerror = [];
+    dbn.rbm{u}.valerror = [];
+    dbn.rbm{u}.trainerror  = [];
+    dbn.rbm{u}.trainerrormeasures = {};
+    dbn.rbm{u}.valerrormeasures = {};
     dbn.rbm{u}.patience = opts.patience;
-    
-    
     
     
     vis_size =  dbn.sizes(u);
     hid_size = dbn.sizes(u + 1);
     
+    
+    n_classes = size(opts.y_train,2);
+    dbn.rbm{u}.U  = initfunc(hid_size, n_classes);
+    dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
+    
+    dbn.rbm{u}.d  = zeros(n_classes, 1);
+    dbn.rbm{u}.vd  = zeros(n_classes, 1);
     if opts.classRBM == 1 && u == n_rbm
         % init bias and weights for class vectors
         dbn.rbm{u}.classRBM = 1;
-        
-        dbn.rbm{u}.train_func = opts.train_func;
-        n_classes = size(opts.y_train,2);
-        dbn.rbm{u}.U  = initfunc(hid_size, n_classes);
-        dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
-        
-        dbn.rbm{u}.d  = zeros(n_classes, 1);
-        dbn.rbm{u}.vd  = zeros(n_classes, 1);
-        
     else
         % for non toplayers use generative training
         dbn.rbm{u}.classRBM = 0;
-        dbn.rbm{u}.train_func = @rbmgenerative;
-        
-        dbn.rbm{u}.U  = [];
-        dbn.rbm{u}.vU  = [];
-        dbn.rbm{u}.d  = [];
-        dbn.rbm{u}.vd  = [];
-        
-        
     end
     
     
     
     dbn.rbm{u}.W  = initfunc(hid_size, vis_size);
     dbn.rbm{u}.vW = zeros(hid_size, vis_size);
-    
-    
-    %dbn.rbm{u}.b  = normrnd(0,0.01,vis_size, 1);
     dbn.rbm{u}.b  = zeros(vis_size,1);
     dbn.rbm{u}.vb = zeros(vis_size, 1);
-    
-    %dbn.rbm{u}.c  = normrnd(0,0.01,hid_size, 1);
     dbn.rbm{u}.c = zeros(hid_size,1);
     dbn.rbm{u}.vc = zeros(hid_size, 1);
     
     
+
     
-    
-    % for non class RBM's rbmy should return empty. To avoid if statement
-    % create a functio returning empty otherwise use rbmdowny
-    
-    dbn.rbm{u}.rand    = @rand;
-    dbn.rbm{u}.zeros    = @zeros;
-    
-    
-    
-    
-    if dbn.rbm{u}.classRBM
-        dbn.rbm{u}.rbmdowny = @rbmdownyclassrbm;
-        dbn.rbm{u}.rbmup    = @rbmupclassrbm;
-    else
-        dbn.rbm{u}.rbmdowny = @rbmdownynotclass;
-        dbn.rbm{u}.rbmup    = @rbmupnotclassrbm;
+%% functions depending on cpu / gpu / testing
+    switch opts.gpu
+        case 0
+            dbn.rbm{u}.gpubatch= n_samples;
+            dbn.rbm{u}.rand    = @rand;
+            dbn.rbm{u}.zeros   = @zeros;
+            dbn.rbm{u}.ones    = @ones;
+            dbn.rbm{u}.cpToGPU = @(hrbm) hrbm;
+            dbn.rbm{u}.cpToHOST= @(drbm) drbh;
+            dbn.rbm{u}.cpWeightsToHOST= @(drbm) @cpWeightstoHOST;
+            dbn.rbm{u}.array   = @(x) double(x);
+            dbn.rbm{u}.gather   = @(x) x;
+            dbn.rbm{u}.colon   = @colon;
+        case 1
+            dbn.rbm{u}.gpubatch= opts.gpubatch;
+            dbn.rbm{u}.rand    = @gpuArray.rand;
+            dbn.rbm{u}.zeros   = @gpuArray.zeros;
+            dbn.rbm{u}.ones    = @gpuArray.ones;
+            dbn.rbm{u}.cpToGPU = @cpRBMtoGPU;
+            dbn.rbm{u}.cpToHOST= @cpRBMtoHost;
+            dbn.rbm{u}.cpWeightsToHOST= @(drbm) @cpWeightstoHOST;
+            dbn.rbm{u}.array   = @(x) gpuArray(x);
+            dbn.rbm{u}.gather   = @(x) gather(x);
+            dbn.rbm{u}.colon   = @gpuArray.colon;
+        case -1   % for testing
+            dbn.rbm{u}.gpubatch=opts.gpubatch;
+            dbn.rbm{u}.rand    = @(val) test(val,@rand);
+            dbn.rbm{u}.zeros   = @zeros;
+            dbn.rbm{u}.ones    = @ones;
+            dbn.rbm{u}.cpToGPU = @(hrbm) hrbm;
+            dbn.rbm{u}.cpToHOST= @(drbm) drbh;
+            dbn.rbm{u}.cpWeightsToHOST= @(drbm) @cpWeightstoHOST;
+            dbn.rbm{u}.array   = @(x) double(x);
+            dbn.rbm{u}.gather   = @(x) x;
+            dbn.rbm{u}.colon   = @colon;
+        otherwise
+            ('Unkwnown opts.gpu setting')
+    end
         
+    if isempty(opts.x_semisup)
+           opts.x_semisup = zeros(1,n);
+           if opts.gpu ==1
+               dbn.rbm{u}.semisup_samplevec = @(x)  gpuArray.zeros(size(x));
+           else
+               dbn.rbm{u}.semisup_samplevec =@(x)  zeros(size(x));
+           end
+           
+    else
+        dbn.rbm{u}.semisup_samplevec = @samplevec;
     end
     
+    
 end
+
+    function f = test(val,func)
+        rng('default');rng(101);
+        f = func(val);
+    end
 
     function weights = init_crbm(m,n)
         % initilize weigts from uniform distribution. As described in

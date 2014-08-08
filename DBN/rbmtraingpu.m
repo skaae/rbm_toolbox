@@ -1,5 +1,5 @@
-function hrbm = rbmtraingpu(hrbm, x_train,hopts)
-%RBMTRAIN trains a single RBM
+function hrbm = rbmtraingpu(hrbm, hx_train,opts)
+%RBMTRAINGPU trains a single RBM on gpu hybrid - fragile implementation
 %
 % NOTATION:
 % data  : all data given as      [n_samples   x #vis]
@@ -14,147 +14,222 @@ function hrbm = rbmtraingpu(hrbm, x_train,hopts)
 % Copyright Søren Sønderby June 2014
 
 % SETUP and checking
-assert(isfloat(x_train), 'x must be a float');
-assert(all(x_train(:)>=0) && all(x_train(:)<=1), 'all data in x must be in [0:1]');
-n_samples = size(x_train, 1);
-[n_hidden, ~] = size(hrbm.W);
+assert(isfloat(hx_train), 'x must be a float');
+assert(all(hx_train(:)>=0) && all(hx_train(:)<=1), 'all data in x must be in [0:1]');
+n_samples = size(hx_train, 1);
 
-numbatches = n_samples / hopts.batchsize;
-assert(rem(numbatches, 1) == 0, 'numbatches not integer');
-
-
-%%% show gpu info
-gpu = gpuDevice();
-reset(gpu);
-wait(gpu);
-disp(['GPU memory available (Gb): ', num2str(gpu.FreeMemory / 10^9)]);
-
-% hrbm is HOSTrbm which is not calculated on gpu.
-hrbm.gpu = 0;
+hy_train = opts.y_train;
+hx_val = opts.x_val;
+hy_val = opts.y_val;
+hx_semisup = opts.x_semisup;
 
 
-% use validation set or not in calculation of free energy
-if ~isempty(hopts.x_val)
-    n_val_samples   = size(hopts.x_val,1);
-    samples         = randperm(size(x_train,1));
-    % if size of val set is larger than train set use trainset size otherwise
-    % use size of validation set
-    size_val_sample = ifelse(n_samples>=n_val_samples, n_val_samples, n_samples);
-    x_samples     = samples(1:size_val_sample);
-    val_samples       = 1:size_val_sample;
-else
-    val_samples = [];
-end
+%% create GPU batches
+batch_idx = createminibatches(opts.gpubatch,hx_train);
+num_batches = size(batch_idx,1);
+
+% semisup batches
+% semisup batches we enforce that all batches are full size
+batch_idx_semisup = createminibatches(opts.gpubatch,hx_semisup);
+num_batches_semisup = size(batch_idx_semisup,1);
+
 
 earlystop.best_err = Inf;
-earlystop.patience  = hrbm.patience;
 
 
-% RUN epochs
-init_chains = 1;
-chains = [];
-chainsy = [];
-best_str = '';
+herrors = struct();
+herrors.train = [];
+herrors.val =[];
+herrors.reconerror = [];
 
+%% copy rbm to GPU
+drbm  = hrbm.cpToGPU( hrbm);
 
-if isequal(hrbm.train_func,@rbmsemisuplearn)
-    semisup = 1;
-    l_semisup = 0;
-    n_samples_semisup = size(hopts.x_semisup,1);
-    numbatches_semisup = n_samples_semisup / hopts.batchsize;
-    assert(rem(numbatches_semisup, 1) == 0, 'semisup numbatches not integer');
-else
-    semisup = 0;
-end
-
-
-drbm = cpRBMtoGPU(hrbm);
-
-for epoch = 1 : hopts.numepochs
-    kk = randperm(n_samples);
+cur_batch_semisup = 0;
+for epoch = 1 : opts.numepochs
+    profile on -detail builtin; profile clear;
+    profile on; profile clear;
     
-    if semisup
-        kk_semisup = randperm(n_samples_semisup);
-    end
+    epochtimer = tic;
     
-    err = 0;
-    for l = 1 : numbatches
-        v0 = extractminibatch(kk,l,hopts.batchsize,x_train,opts);
-        if drbm.classRBM == 1
-            ey = extractminibatch(kk,l,hopts.batchsize,hopts.y_train,opts);
-        else
-            ey = [];
-        end
+    %% update training
+    drbm.curcdn = drbm.cdn(epoch);
+    
+    curr_err = 0;  % reset error every epoch
+    for cur_batch = 1:num_batches
         
-        % create batches for semisupervised leanring
-        if semisup == 1
-            l_semisup = l_semisup + 1;
-            if l_semisup > numbatches_semisup
-                l_semisup = 1;
-            end
-            hopts.x_semisup_batch = extractminibatch(kk_semisup,...
-                numbatches_semisup,hopts.batchsize,hopts.x_semisup,opts);
+        %% keep track of batches for x and x_semisup
+        d_start = batch_idx(cur_batch,1);
+        d_end   = batch_idx(cur_batch,2);
+        dx_train = drbm.array( hx_train(d_start:d_end, : ) );
+        dy_train = drbm.array( hy_train(d_start:d_end, : ) );
+        
+        if drbm.beta > 0
+            cur_batch_semisup = cur_batch_semisup + 1;
+            cur_batch_semisup = mod(cur_batch_semisup-1,num_batches_semisup) +1;
+            start_semisup     = batch_idx_semisup(cur_batch_semisup,1);
+            end_semisup       = batch_idx_semisup(cur_batch_semisup,2);
+            dx_semisup   = drbm.array( hx_semisup(start_semisup:end_semisup, : ) );
         end
         
         
-        if strcmp(hopts.traintype,'PCD') && init_chains == 1
-            % init chains in first epoch if Persistent contrastive divergence
+        
+        
+        %% iter over samples in gpubatch
+        for i = 1:(d_end - d_start + 1)
             
-            % augment semisup PCD chains starting position
-            if semisup
+            % online learning, take single sample of y and y. d means device
+            dx = dx_train(i,:);
+            dy = dy_train(i,:);
+            
+            
+            %% calculate weights
+            tcwx = bsxfun(@plus,drbm.c',dx * drbm.W');
+            
+            % generative
+            if drbm.alpha > 0   
+                [dw_g,db_g,dc_g,du_g,dd_g,vkx]    = generative(drbm,dx,dy,tcwx);
+                dw_ = drbm.alpha * dw_g;
+                dc_ = drbm.alpha * dc_g;
+                du_ = drbm.alpha * du_g;
+                dd_ = drbm.alpha * dd_g;
+                db_ = drbm.alpha * db_g;
                 
-                % init semisup chains at mean training set values
-                % not sure if that is correct?
-                meany  = samplematrix(repmat(mean(hopts.y_train,1),hopts.batchsize,1));
-                chains = [hopts.x_semisup_batch; v0;];
-                chainsy = [meany;ey;];
-            else
-                chains = v0;
-                chainsy = ey;
+                curr_err = curr_err +  sum(sum((dx - vkx) .^ 2));
             end
-            init_chains = 0;
+            
+            % discriminative
+            if drbm.alpha < 1
+                [dw_d,dc_d,du_d,dd_d,p_y_given_x] = discriminative(drbm,dx,dy,tcwx');
+                dw_ =(1-drbm.alpha) * dw_d;
+                dc_ =(1-drbm.alpha) * dc_d;
+                du_ =(1-drbm.alpha) * du_d;
+                dd_ =(1-drbm.alpha) * dd_d;
+                db_ = drbm.zeros(size(drbm.b));
+            end
+            
+            % semisupervised weights
+            if drbm.beta > 0
+                i_semisup = mod(i-1,size(dx_semisup,1)) +1; % semisup sample counter
+                dx_s = dx_semisup(i_semisup,:);
+                if drbm.alpha == 1
+                    % if no discrminative we need to calculate p_y_given_x
+                    [~,~,~,~,p_y_given_x] = discriminative(drbm,dx,dy,tcwx');
+                end
+                dy_s = samplevec(drbm, p_y_given_x);  % sample from current y|x
+                tcwx_semisup = bsxfun(@plus,drbm.c',dx_s * drbm.W');
+                [dw_s,db_s,dc_s,du_s,dd_s,~]    = generative(drbm,dx_s,dy_s,tcwx_semisup);
+                dw_ =drbm.beta * dw_s;
+                dc_ =drbm.beta * dc_s;
+                du_ =drbm.beta * du_s;
+                dd_ =drbm.beta * dd_s;
+                db_ =drbm.beta * db_s;
+            end
+            
+            %% regularization
+            % apply sparsity
+            db_ = bsxfun(@minus,db_,drbm.sparsity);
+            dc_ = bsxfun(@minus,dc_,drbm.sparsity);
+            dd_ = bsxfun(@minus,dd_,drbm.sparsity);
+            
+            % L2
+            dw_ = bsxfun(@minus,dw_,drbm.L2 .* dw_);
+            du_ = bsxfun(@minus,du_,drbm.L2 .* du_);
+            
+            % L1
+            dw_ = bsxfun(@minus,dw_,drbm.L1 .* sign(dw_));
+            du_ = bsxfun(@minus,du_,drbm.L1 .* sign(du_));
+            
+            
+            %%  momentum
+            drbm.vW = drbm.momentum(epoch) * drbm.vW + drbm.learningrate(epoch) * dw_;
+            drbm.vc = drbm.momentum(epoch) * drbm.vc + drbm.learningrate(epoch) * dc_;
+            drbm.vb = drbm.momentum(epoch) * drbm.vb + drbm.learningrate(epoch) * db_;
+            drbm.vU = drbm.momentum(epoch) * drbm.vU + drbm.learningrate(epoch) * du_;
+            drbm.vd = drbm.momentum(epoch) * drbm.vd + drbm.learningrate(epoch) * dd_;
+            
+            %%  Gradients
+            drbm.W = drbm.W + drbm.vW;
+            drbm.b = drbm.b + drbm.vb;
+            drbm.c = drbm.c + drbm.vc;
+            drbm.U = drbm.U + drbm.vU;
+            drbm.d = drbm.d + drbm.vd;
+            
+            
+            drbm.reconerror  = curr_err;
+            
+            %% clear data
+            clear dx dy dx_s                            % sample data
+            clear dw_ db_ dc_ du_ dd_                        % gradients
+            clear dw_g db_g dc_g du_g dd_g vkx tcwx     % generativ
+            clear dw_d dc_d du_d dd_d p_y_given_x       % discrminative
+            clear dw_s db_s dc_s du_s dd_s tcwx_semisup % semisup
         end
         
-        if drbm.dropout_hidden > 0
-            drbm.hidden_mask = (rbm.rand(size(n_hidden,hopts.batchsize)) > drbm.dropout_hidden);
+        % clear gpu batches
+        clear dx_train dy_train dx_semisup
+    end
+    epochtime = toc(epochtimer);
+    
+    
+    if mod(epoch,drbm.testinterval) == 0
+        valtimer = tic;
+        hrbm = cpRBMtoHOST(drbm);
+        
+        % update errors on cpu
+        [herrors,errstr] =rbmcalculateerrors(hrbm,herrors,epoch,...
+            hx_train,hx_val,hy_train,hy_val,epochtime);
+        
+        %% Earlystopping
+        if  earlystop.best_err >= herrors.val(end)
+            earlystop.best_str = ' ***';
+            earlystop.best_err = herrors.val(end);
+            earlystop.best_rbm = hrbm;
+            earlystop.patience = hrbm.patience;
+            if ~isempty(opts.outfile)
+                save(['temp_' opts.outfile],'hrbm','herrors');
+            end
+        else
+            earlystop.best_str = '';
+            earlystop.patience = earlystop.patience-1;
         end
         
-        % calculate rbm gradients
-        [grads,c_err,chains,chainsy]= drbm.train_func(drbm,v0,ey,hopts,chains,chainsy);
+        %% print output
+        if opts.gpu == 1
+            gpu_mem  = ['. GPU mem free: ' num2str(opts.thisgpu.FreeMemory / 10^9)];
+        else
+            gpu_mem = '';
+        end
+        valtime = toc(valtimer);
+        valtime = ['  -   testing time: ' num2str(valtime)];
+        disp([errstr,valtime,gpu_mem,  earlystop.best_str]);
         
-        err = err + c_err;
-        %fprintf('%d\n',c_err)
-        
-        %update weights, LR,decay and momentum
-        drbm = rbmapplygrads(drbm,grads,v0,ey,epoch);
+        profsave(profile('info'),['profilernormalifs_' num2str(epoch)]);
+        % stop training?
+        if earlystop.patience < 0 || epoch == opts.numepochs
+            hrbm = earlystop.best_rbm;
+            break
+        end
+    else
+        disp(['Epoch ', num2str(epoch)]);
     end
-    drbm.error(end+1) = err / numbatches;
     
-    % calc train/val performance.
-    [perf,drbm] = rbmmonitor(drbm,x_train,hopts,x_samples,val_samples,epoch);
-    earlystop  = rbmearlystopping(drbm,hopts,earlystop,epoch);
+    %    job = batch(@rbmcalculateerrors,2,{ hrbm,herrors,epoch,...
+    %        hx_train,hx_val,hy_train,hy_val,time});
     
-    % stop training?
-    if drbm.early_stopping && earlystop.patience < 0
-        disp('No more Patience. Return best RBM')
-        earlystop.best_rbm.val_error = drbm.val_error;
-        earlystop.best_rbm.train_error = drbm.train_error;
-        earlystop.best_rbm.error = drbm.error;
-        drbm = earlystop.best_rbm;
-        
-        break;
-    end
-% display output
-epochnr = ['Epoch ' num2str(epoch) '/' num2str(hopts.numepochs) '.'];
-avg_err = [' Avg recon. err: ' num2str(err / numbatches) '|'];
-lr_mom  = [' LR: ' num2str(drbm.curLR) '. Mom.: ' num2str(drbm.curMomentum)];
-disp([epochnr avg_err lr_mom perf earlystop.best_str]);    
 end
 
-hrbm = cpRBMtoHost(drbm);
-
+disp('Training Done')
+if ~isempty(opts.outfile)
+    save(opts.outfile,'hrbm','herrors');
+end
 
 end
+
+
+
+
+
 
 
 

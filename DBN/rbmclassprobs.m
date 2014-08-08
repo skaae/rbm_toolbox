@@ -1,4 +1,4 @@
-function [ class_prob_res ] = rbmclassprobs( rbm,x,batchsize)
+function [ class_probs ] = rbmclassprobs( rbm,x)
 %RBMCLASSPROBS calculate class probabilities for a classification RBM
 % 
 %  INPUTS
@@ -28,30 +28,28 @@ function [ class_prob_res ] = rbmclassprobs( rbm,x,batchsize)
 % See also DBNCLASSPROBS
 %
 % Copyright(c) Søren Sønderby july 2014
-n_visible = size(rbm.W,2);
-if ~rbm.classRBM
-    error('Class probabilities can only be calc. for classification RBM´s');
-end
-if size(x,2) ~= n_visible
-    error('x has wrong dimensions');
-end
-
-n_samples = size(x,1);
 
 % check if result should be calculated in batches 
-if nargin == 3
-    numbatches = n_samples / batchsize;
-    assert(rem(numbatches, 1) == 0, 'numbatches not integer');
-    chunks = chunkify(batchsize,x);  
+n_samples = size(x,1);
+n_classes = size(rbm.U,2);
+if rem(n_samples,100) == 0
+    chunksize = 250;
 else
-    chunks = chunkify(n_samples,x);
+    % search for a chunks size, eventually we will hit 1
+    chunksize = 200;
+    while rem(n_samples,chunksize) ~= 0
+        chunksize = chunksize - 1;
+    end
 end
 
-class_prob_res = [];
+chunks = chunkify(chunksize,x);
+
+
+class_probs = zeros(n_samples,n_classes);
 for i = 1:numel(chunks)
-    minibatch = x(chunks{i}.start:chunks{i}.end,:);
-    [class_prob, ~] = rbmpygivenx(rbm,minibatch,'test');
-    class_prob_res = [class_prob_res;class_prob];
+    samples = chunks{i}.start:chunks{i}.end;
+    batch = x(samples,:);
+    class_probs(samples,:) = rbmpygivenx(rbm,batch);
 end
 
 
