@@ -112,7 +112,7 @@ The following regularization options are implemented
  * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted from biases after each weight update.
  * `opts.dropouthidden`: dropout on hidden units. Specify the probability of being dropped. see [1]
 
-Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`
+Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
 
 ## Hidden Layer Sizes
 
@@ -254,9 +254,9 @@ opts.cdn = 1;
 opts.thisgpu = [];              % ref to gpu,  must be set if opts.gpu =1
 opts.gpubatch = size(train_x,1); 
 opts.outfile = [name '_intermediate.mat'];
-opts.patience = 15;
+opts.patience = 4;
 opts.numepochs = 1000;
-opts.testinterval = 1;
+opts.testinterval = 5;
 opts.init_type = 'cRBM';
 opts.classRBM = 1;
 opts.y_train = train_y;
