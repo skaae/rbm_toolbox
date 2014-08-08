@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # stdout/stderr redirection
-#PBS -N dbn_example_gpu1_cdnloop
+#PBS -N dbn_example_test
 #PBS -o $PBS_JOBNAME.$PBS_JOBID.out
 #PBS -e $PBS_JOBNAME.$PBS_JOBID.err
 #PBS -l nodes=1:ppn=1,gpus=1;

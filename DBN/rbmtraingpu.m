@@ -44,8 +44,17 @@ herrors.reconerror = [];
 
 %% copy rbm to GPU
 drbm  = hrbm.cpToGPU( hrbm);
-
 cur_batch_semisup = 0;
+
+dchx = drbm.pcdchainsx;
+dchy = drbm.pcdchainsy;
+if drbm.beta > 0
+    dchx_s = drbm.pcdchainsx_semisup;
+    dchy_s = drbm.pcdchainsy_semisup;
+end
+    
+
+
 for epoch = 1 : opts.numepochs
     %profile on -detail builtin; profile clear;
     %profile on; profile clear;
@@ -88,7 +97,7 @@ for epoch = 1 : opts.numepochs
             
             % generative
             if drbm.alpha > 0
-                [dw_g,db_g,dc_g,du_g,dd_g,vkx]    = generative(drbm,dx,dy,tcwx);
+                [dw_g,db_g,dc_g,du_g,dd_g,vkx,dchx,dchy]    = generative(drbm,dx,dy,tcwx,dchx,dchy);
                 dw_ = drbm.alpha * dw_g;
                 dc_ = drbm.alpha * dc_g;
                 du_ = drbm.alpha * du_g;
@@ -118,7 +127,7 @@ for epoch = 1 : opts.numepochs
                 end
                 dy_s = samplevec(drbm, p_y_given_x);  % sample from current y|x
                 tcwx_semisup = bsxfun(@plus,drbm.c',dx_s * drbm.W');
-                [dw_s,db_s,dc_s,du_s,dd_s,~]    = generative(drbm,dx_s,dy_s,tcwx_semisup);
+                [dw_s,db_s,dc_s,du_s,dd_s,~,dchx_s,dchy_s]    = generative(drbm,dx_s,dy_s,tcwx_semisup,dchx_s,dchy_s);
                 dw_ =drbm.beta * dw_s;
                 dc_ =drbm.beta * dc_s;
                 du_ =drbm.beta * du_s;

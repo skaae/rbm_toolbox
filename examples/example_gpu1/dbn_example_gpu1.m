@@ -11,6 +11,7 @@ if ~ismac
     gpuidx = str2num(getenv('ML_GPUDEVICE')) + 1
 
     gpu = gpuDevice(gpuidx);
+    disp(gpu);
     reset(gpu);
     wait(gpu);
     
@@ -22,24 +23,24 @@ end
 
 
 
-
+name = 'example_test';
 rng('default');rng(101);
  [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
-f = fullfile(pwd,'example_gpu.mat')
+f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
 sizes = [500 ];   % hidden layer size
 opts = dbncreateopts();
-opts.gpu   = 1;
-opts.cdn = 1;
-opts.thisgpu = gpu;
-opts.gpubatch = size(train_x,1); 
-opts.outfile = 'gputest.mat';
-opts.early_stopping = 1;
-opts.patience = 15;
-opts.numepochs = 1;
 opts.alpha = 0; % 0 = discriminative, 1 = generative
 opts.beta = 0;
+opts.gpu   = 1;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.cdn = 1;   
+opts.thisgpu = gpu;              % ref to gpu,  must be set if opts.gpu =1
+opts.gpubatch = size(train_x,1); 
+opts.outfile = [name '_intermediate.mat'];
+opts.patience = 15;
+opts.numepochs = 5;
+opts.testinterval = 1;
 opts.init_type = 'cRBM';
 opts.classRBM = 1;
 opts.y_train = train_y;
@@ -56,13 +57,14 @@ opts.momentum = @(t) 0;
 
 rbm = dbn.rbm{1};
 opts.gpu
+opts.numepochs
 disp(rbm);
 
 fprintf('\n\n')
 
 rbm = rbmtraingpu(rbm,train_x,opts);
 
-
+ save(f,'rbm','opts');
 % 
 % 
 % class_vec = zeros(100,size(train_y,2));
@@ -74,4 +76,4 @@ rbm = rbmtraingpu(rbm,train_x,opts);
 % 
 % 
 % 
-% save(f,'dbn','opts','digits');
+

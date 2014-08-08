@@ -58,7 +58,8 @@ function opts  = dbncreateopts()
 %          gpubatch : load batches of this size to gpu. If you have mem probles
 %                     try with a lower value
 %            thisgpu: reference to current gpu if opts.gpu is 1. 
-%
+%          traintype: Contrastive divergence (CD) or Persistent CD (PCD)
+%         npcdchains: number of pcd chains
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
 %         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
@@ -79,6 +80,8 @@ function opts  = dbncreateopts()
 
 
 % DEFAULT SETTINGS
+opts.traintype = 'CD';
+opts.npcdchains = 100;
 opts.testinterval = 5;
 opts.numepochs =   100;
 opts.cdn = 1;

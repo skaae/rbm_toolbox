@@ -95,13 +95,14 @@ for u = 1 : n_rbm
     dbn.rbm{u}.vc = zeros(hid_size, 1);
     
     
-
     
-%% functions depending on cpu / gpu / testing
+    
+    %% functions depending on cpu / gpu / testing
     switch opts.gpu
         case 0
             dbn.rbm{u}.gpubatch= n_samples;
             dbn.rbm{u}.rand    = @rand;
+            dbn.rbm{u}.randi    = @randi;
             dbn.rbm{u}.zeros   = @zeros;
             dbn.rbm{u}.ones    = @ones;
             dbn.rbm{u}.cpToGPU = @(hrbm) hrbm;
@@ -110,9 +111,11 @@ for u = 1 : n_rbm
             dbn.rbm{u}.array   = @(x) double(x);
             dbn.rbm{u}.gather   = @(x) x;
             dbn.rbm{u}.colon   = @colon;
+            
         case 1
             dbn.rbm{u}.gpubatch= opts.gpubatch;
             dbn.rbm{u}.rand    = @gpuArray.rand;
+            dbn.rbm{u}.randi    = @gpuArray.randi;
             dbn.rbm{u}.zeros   = @gpuArray.zeros;
             dbn.rbm{u}.ones    = @gpuArray.ones;
             dbn.rbm{u}.cpToGPU = @cpRBMtoGPU;
@@ -123,7 +126,8 @@ for u = 1 : n_rbm
             dbn.rbm{u}.colon   = @gpuArray.colon;
         case -1   % for testing
             dbn.rbm{u}.gpubatch=opts.gpubatch;
-            dbn.rbm{u}.rand    = @(val) test(val,@rand);
+            dbn.rbm{u}.rand    = @(val) test1(val,@rand);
+            dbn.rbm{u}.randi   = @(val1,val2) test2(val1,val2,@randi);
             dbn.rbm{u}.zeros   = @zeros;
             dbn.rbm{u}.ones    = @ones;
             dbn.rbm{u}.cpToGPU = @(hrbm) hrbm;
@@ -132,28 +136,56 @@ for u = 1 : n_rbm
             dbn.rbm{u}.array   = @(x) double(x);
             dbn.rbm{u}.gather   = @(x) x;
             dbn.rbm{u}.colon   = @colon;
+            
+            
         otherwise
             ('Unkwnown opts.gpu setting')
     end
-        
-    if isempty(opts.x_semisup)
-           opts.x_semisup = zeros(1,n);
-           if opts.gpu ==1
-               dbn.rbm{u}.semisup_samplevec = @(x)  gpuArray.zeros(size(x));
-           else
-               dbn.rbm{u}.semisup_samplevec =@(x)  zeros(size(x));
-           end
-           
-    else
-        dbn.rbm{u}.semisup_samplevec = @samplevec;
+    
+    
+    init = dbn.rbm{u}.array;
+    switch upper(opts.traintype)
+        case 'CD'
+             dbn.rbm{u}.traintype = 0;
+             dbn.rbm{u}.pcdchainsx = 0;
+             dbn.rbm{u}.pcdchainsy = 0;
+             if opts.beta > 0
+                %init semisup chains
+                dbn.rbm{u}.pcdchainsx_semisup =0;
+                dbn.rbm{u}.pcdchainsy_semisup = 0;
+            end
+        case 'PCD'
+            % init chains
+            dbn.rbm{u}.traintype = 1;
+            kk = randperm(n_samples);
+            kk = kk(1:opts.npcdchains);
+            dbn.rbm{u}.pcdchainsx = x(kk,:);
+            dbn.rbm{u}.pcdchainsy = opts.y_train(kk,:);
+            if opts.beta > 0
+                %init semisup chains
+                kk_semisup = randperm(size(opts.x_semisup,1));
+                kk_semisup = kk_semisup(1:opts.npcdchains);
+                dbn.rbm{u}.pcdchainsx_semisup = opts.x_semisup(kk_semisup,:);
+                dbn.rbm{u}.pcdchainsy_semisup = opts.y_train(kk,:);
+            end
+        otherwise
+            error('Traintype must be CD or PCD')
     end
+    
+    
+    
     
     
 end
 
-    function f = test(val,func)
+    function f = test1(val,func)
         rng('default');rng(101);
         f = func(val);
+    end
+
+    function f = test2(val1,val2,func)
+        rng('default');rng(101);
+        f = func(val1,val2);
     end
 
     function weights = init_crbm(m,n)
