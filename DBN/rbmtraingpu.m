@@ -47,8 +47,8 @@ drbm  = hrbm.cpToGPU( hrbm);
 
 cur_batch_semisup = 0;
 for epoch = 1 : opts.numepochs
-    profile on -detail builtin; profile clear;
-    profile on; profile clear;
+    %profile on -detail builtin; profile clear;
+    %profile on; profile clear;
     
     epochtimer = tic;
     
@@ -87,7 +87,7 @@ for epoch = 1 : opts.numepochs
             tcwx = bsxfun(@plus,drbm.c',dx * drbm.W');
             
             % generative
-            if drbm.alpha > 0   
+            if drbm.alpha > 0
                 [dw_g,db_g,dc_g,du_g,dd_g,vkx]    = generative(drbm,dx,dy,tcwx);
                 dw_ = drbm.alpha * dw_g;
                 dc_ = drbm.alpha * dc_g;
@@ -127,19 +127,24 @@ for epoch = 1 : opts.numepochs
             end
             
             %% regularization
-            % apply sparsity
-            db_ = bsxfun(@minus,db_,drbm.sparsity);
-            dc_ = bsxfun(@minus,dc_,drbm.sparsity);
-            dd_ = bsxfun(@minus,dd_,drbm.sparsity);
+            % sparsity
+            if drbm.sparsity > 0
+                db_ = bsxfun(@minus,db_,drbm.sparsity);
+                dc_ = bsxfun(@minus,dc_,drbm.sparsity);
+                dd_ = bsxfun(@minus,dd_,drbm.sparsity);
+            end
             
             % L2
-            dw_ = bsxfun(@minus,dw_,drbm.L2 .* dw_);
-            du_ = bsxfun(@minus,du_,drbm.L2 .* du_);
+            if drbm.L2 > 0
+                dw_ = bsxfun(@minus,dw_,drbm.L2 .* dw_);
+                du_ = bsxfun(@minus,du_,drbm.L2 .* du_);
+            end
             
             % L1
-            dw_ = bsxfun(@minus,dw_,drbm.L1 .* sign(dw_));
-            du_ = bsxfun(@minus,du_,drbm.L1 .* sign(du_));
-            
+            if drbm.L1 > 0
+                dw_ = bsxfun(@minus,dw_,drbm.L1 .* sign(dw_));
+                du_ = bsxfun(@minus,du_,drbm.L1 .* sign(du_));
+            end
             
             %%  momentum
             drbm.vW = drbm.momentum(epoch) * drbm.vW + drbm.learningrate(epoch) * dw_;
@@ -159,15 +164,15 @@ for epoch = 1 : opts.numepochs
             drbm.reconerror  = curr_err;
             
             %% clear data
-            clear dx dy dx_s                            % sample data
-            clear dw_ db_ dc_ du_ dd_                        % gradients
-            clear dw_g db_g dc_g du_g dd_g vkx tcwx     % generativ
-            clear dw_d dc_d du_d dd_d p_y_given_x       % discrminative
-            clear dw_s db_s dc_s du_s dd_s tcwx_semisup % semisup
+            %             clear dx dy dx_s                            % sample data
+            %             clear dw_ db_ dc_ du_ dd_                        % gradients
+            %             clear dw_g db_g dc_g du_g dd_g vkx tcwx     % generativ
+            %             clear dw_d dc_d du_d dd_d p_y_given_x       % discrminative
+            %             clear dw_s db_s dc_s du_s dd_s tcwx_semisup % semisup
         end
         
         % clear gpu batches
-        clear dx_train dy_train dx_semisup
+        %         clear dx_train dy_train dx_semisup
     end
     epochtime = toc(epochtimer);
     
@@ -185,6 +190,7 @@ for epoch = 1 : opts.numepochs
             earlystop.best_str = ' ***';
             earlystop.best_err = herrors.val(end);
             earlystop.best_rbm = hrbm;
+            earlystop.best_rbm.herrors = herrors;
             earlystop.patience = hrbm.patience;
             if ~isempty(opts.outfile)
                 save(['temp_' opts.outfile],'hrbm','herrors');
@@ -204,14 +210,14 @@ for epoch = 1 : opts.numepochs
         valtime = ['  -   testing time: ' num2str(valtime)];
         disp([errstr,valtime,gpu_mem,  earlystop.best_str]);
         
-        profsave(profile('info'),['profilernormalifs_' num2str(epoch)]);
+        %profsave(profile('info'),['prof_' num2str(epoch)]);
         % stop training?
         if earlystop.patience < 0 || epoch == opts.numepochs
             hrbm = earlystop.best_rbm;
             break
         end
     else
-        disp(['Epoch ', num2str(epoch)]);
+        disp(['Epoch ', num2str(epoch) ' - TIME:' num2str(epochtime)]);
     end
     
     %    job = batch(@rbmcalculateerrors,2,{ hrbm,herrors,epoch,...

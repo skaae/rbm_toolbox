@@ -7,7 +7,7 @@ if ~ismac
     addpath(genpath(pwd()));
     cd(current_dir)
     
-    getenv('ML_GPUDEVICE')
+    getenv('ML_GPUDEVICE');
     gpuidx = str2num(getenv('ML_GPUDEVICE')) + 1
 
     gpu = gpuDevice(gpuidx);
@@ -35,7 +35,6 @@ opts.cdn = 1;
 opts.thisgpu = gpu;
 opts.gpubatch = size(train_x,1); 
 opts.outfile = 'gputest.mat';
-opts.early_stopping = 15;
 opts.patience = 15;
 opts.numepochs = 1;
 opts.testinterval = 1;

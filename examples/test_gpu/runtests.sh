@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # stdout/stderr redirection
-#PBS -N dbn_example_4_discriminative
+#PBS -N dbn_tests
 #PBS -o $PBS_JOBNAME.$PBS_JOBID.out
 #PBS -e $PBS_JOBNAME.$PBS_JOBID.err
 #PBS -l nodes=1:ppn=1,gpus=1;
@@ -12,4 +12,4 @@ export ML_GPUDEVICE
 
 echo -n gpu${ML_GPUDEVICE}@/bin/hostname
  
-matlab -nodisplay -r "dbn_example_4" 
+matlab -nodisplay -r "dbntestgpu()" 

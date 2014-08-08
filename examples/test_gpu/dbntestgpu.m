@@ -1,13 +1,31 @@
-function dbntest()
+function dbntestgpu()
 % test generative and discrminative weights
-dbn_cRBM_tests_gpu()
-
 % test that everything runs for a few epochs
+if ~ismac
+    current_dir = pwd();
+    cd('../..');
+    addpath(genpath(pwd()));
+    cd(current_dir)
+    
+    getenv('ML_GPUDEVICE')
+    gpuidx = str2num(getenv('ML_GPUDEVICE')) + 1
+
+    gpu = gpuDevice(gpuidx);
+    reset(gpu);
+    wait(gpu);
+    
+    disp(['GPU memory available (Gb): ', num2str(gpu.FreeMemory / 10^9)]);
+else 
+    gpu = [];
+end
+
+
 [train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(101,0.001);
 sizes = [11];
 [opts] = dbncreateopts();
-opts.gpu = -1;
+opts.gpu = 1;
 opts.testinterval = 1;
+opts.thisgpu = gpu;
 opts.y_train = train_y;
 
 % test single epoch
