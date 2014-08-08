@@ -131,31 +131,10 @@ To use GPU set `opts.gpu = 1`. Setting `opts.gpu = 0` uses CPU and `opts.gpu = -
 When `opts.gpu`is 1 then `opts.thisgpu` must be set to `gpuDevice()`. 
 
 
-## Settings table
-
-The table shows which fields, in the opts struct, that applies to the different training objectives.
-
-|Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	
-|---						|---			|---				|---		 	|---					|
-|inittype               	|  x 			|   x				|   	x		|  x 					|
-|cdn   						|  x 			|   				|   	x		|  x 					|
-|numepochs   				|  x 			|   x				|   	x		|  x 					| 
-|classRBM   				|  x 			|   x				|   	x		|  x 					| 
-|error_func 				|  x 			|   x				|   	x		|  x 					|
-|test_interval 			 	|  x 			|   x				|   	x		|  x 					|				
-|learningrate   			|  x 			|   x				|   	x		|  x 					| 
-|momentum   				|  x 			|   x				|   	x		|  x 					| 
-|L1							|  x 			|   x				|   	x		|  x 					| 
-|sparsity   				|  x 			|   x				|   	x		|  x 					| 
-|dropouthidden   			|  x 			|   x				|   	x		|  x 					| 
-|patience 				  	|  x 			|   x				|   	x		|  x 					| 
-|y_train 			  		|  x 			|   x				|   	x		|  x 					| 
-|x_val 				 		|  x 			|   x				|   	x		|  x 					| 		
-|y_val 				 		|  x 			|   x				|   	x		|  x 					| 
-|x_semisup   				|   			|   				|   			|  x 					|
-|alpha 			  			|   			|   				|   	x		|   					|
-|beta   					|   			|   				|   			|  x 					|
-
+## Sampling statistics
+The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
+Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
+ `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100. 
 
 # Examples
 
