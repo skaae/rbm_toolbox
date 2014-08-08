@@ -197,7 +197,7 @@ for epoch = 1 : opts.numepochs
             end
         else
             earlystop.best_str = '';
-            earlystop.patience = earlystop.patience-1;
+            earlystop.patience = earlystop.patience-opts.testinterval;
         end
         
         %% print output
