@@ -21,7 +21,7 @@ The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg P
 This README first describes a classification RBM and the notation used, then settings in the toolbox are explained and finally some usage examples are given.
 
 % Classification RBMs
-RBM's are exaplained in [3]. Classification RBM's (cRBM) differ from *regular* RBM's in that they augment the data to the visible units of the RBM. A normal RBM models `p(x)` a  cRBM models either `p(x,y)`or `p(x|y)`. The labels are passed to the RBM by augmenting them to the x values, a single input to the cRBM is then **x**<sup>n</sup><sub>input</sub> = [**x**<sup>n</sup> **y**<sup>n</sup>]    
+RBM's are exaplained in [3]. Classification RBM's (cRBM) differ from *regular* RBM's in that they augment the data to the visible units of the RBM. A normal RBM models `p(x)` a  cRBM models either `p(x,y)`or `p(x|y)`. The labels are passed to the RBM by augmenting them to the x values, a single input to the cRBM is then **x**<sup>n</sup><sub>input</sub> = {**x**<sup>n</sup>, **y**<sup>n</sup>}
 
 <html>
 <img src="/uploads/classRBM.png" height="300" width="400">    
