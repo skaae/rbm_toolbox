@@ -102,16 +102,16 @@ for epoch = 1 : opts.numepochs
             end
             
             if drbm.dropout > 0
-                do_mask = drbm.randi(2,[size(drbm.W,1),1])-1;
+                do_mask = drbm.rand([size(drbm.W,1),1]) > drbm.dropout;
                 drbm.W = bsxfun(@times,drbm.W, do_mask);
                 drbm.U = bsxfun(@times,drbm.U, do_mask);
                 drbm.c = drbm.c .* do_mask;
             end
             
             if drbm.dropconnect > 0
-                drbm.W = drbm.W .* (drbm.randi(2,size(drbm.W))-1);
-                drbm.U = drbm.U .* (drbm.randi(2,size(drbm.U))-1);
-                drbm.c = drbm.c .* (drbm.randi(2,size(drbm.c))-1);
+                drbm.W = drbm.W .* (drbm.rand(size(drbm.W)) > drbm.dropconnect);
+                drbm.U = drbm.U .* (drbm.rand(size(drbm.U)) > drbm.dropconnect);
+                drbm.c = drbm.c .* (drbm.rand(size(drbm.c)) > drbm.dropconnect);
             end
                 
             
