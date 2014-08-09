@@ -74,8 +74,6 @@ From the equation it follows that:
 
 ## Learning rate and momentum
 
-The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.
-
 Learning rate is set with:   
 
 ```MATLAB
@@ -87,8 +85,6 @@ opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 % Constant learning rate
 opts.learningrate =  0.01;
 ```
-
-Momentum is controlled through `opts.momentum`. `opts.momentum` should be a function taking current epoch as input.
 
 Momentum is set with:
 
@@ -135,7 +131,7 @@ Initial weights are either sampled from a normal distribution [3] or from a unif
  * `opts.init_type = @(m,n) func : Handle to funtion returning a M-by-N matrix.
 
 ## Regularization
-
+  
 The following regularization options are implemented:
 
  * `opts.L1`: specify the regularization weight
@@ -148,7 +144,7 @@ The following regularization options are implemented:
 #### Dropout Weights
 In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. W is the weights between visible and hiiden units. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0.
 <html>
-<img src="/uploads/dropout.png" height="200" width="500"> 
+<img src="/up dloads/dropout.png" height="200" width="500"> 
 
 
 
