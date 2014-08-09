@@ -18,7 +18,15 @@ RBM toolbox is a MATLAB toolbox for online training of RBM and stacked RBM's.
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
 
-This README first describes settings in the toolbox. Usage examples are given afterwards. Note that a single layer DBN is a RBM. 
+This README first describes a classification RBM and the notation used, then settings in the toolbox are explained and finally some usage examples are given.
+
+% Classification RBMs
+RBM's are exaplained in [3]. Classification RBM's (cRBM) differ from *regular* RBM's in that they augment the data to the visible units of the RBM. A normal RBM models `p(x)` a  cRBM models either `p(x,y)`or `p(x|y)`. The labels are passed to the RBM by augmenting them to the x values, a single input to the cRBM is then x^n_input = [x^n y^n] 
+<html>
+<img src="/uploads/classRBM.png" height="200" width="200">    
+
+
+
 
 # Settings
 Settings in the toolbox are generally controlled with the `opts` struct. An `opts` struct with default values can be created with
@@ -74,8 +82,6 @@ From the equation it follows that:
 
 ## Learning rate and momentum
 
-The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.
-
 Learning rate is set with:   
 
 ```MATLAB
@@ -87,8 +93,6 @@ opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 % Constant learning rate
 opts.learningrate =  0.01;
 ```
-
-Momentum is controlled through `opts.momentum`. `opts.momentum` should be a function taking current epoch as input.
 
 Momentum is set with:
 
@@ -135,7 +139,7 @@ Initial weights are either sampled from a normal distribution [3] or from a unif
  * `opts.init_type = @(m,n) func : Handle to funtion returning a M-by-N matrix.
 
 ## Regularization
-
+  
 The following regularization options are implemented:
 
  * `opts.L1`: specify the regularization weight
