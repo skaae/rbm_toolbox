@@ -87,10 +87,33 @@ for epoch = 1 : opts.numepochs
         %% iter over samples in gpubatch
         for i = 1:(d_end - d_start + 1)
             
+            
             % online learning, take single sample of y and y. d means device
             dx = dx_train(i,:);
             dy = dy_train(i,:);
             
+            
+            %% apply dropout and dropconnect
+            % copy original weights if dropout or dropconnect is enabled
+            if drbm.dropout > 0 || drbm.dropconnect > 0
+                W_org = drbm.W;   
+                U_org = drbm.U; 
+                c_org = drbm.c; 
+            end
+            
+            if drbm.dropout > 0
+                do_mask = drbm.randi(2,[size(drbm.W,1),1])-1;
+                drbm.W = bsxfun(@times,drbm.W, do_mask);
+                drbm.U = bsxfun(@times,drbm.U, do_mask);
+                drbm.c = drbm.c .* do_mask;
+            end
+            
+            if drbm.dropconnect > 0
+                drbm.W = drbm.W .* (drbm.randi(2,size(drbm.W))-1);
+                drbm.U = drbm.U .* (drbm.randi(2,size(drbm.U))-1);
+                drbm.c = drbm.c .* (drbm.randi(2,size(drbm.c))-1);
+            end
+                
             
             %% calculate weights
             tcwx = bsxfun(@plus,drbm.c',dx * drbm.W');
@@ -134,6 +157,14 @@ for epoch = 1 : opts.numepochs
                 dd_ =drbm.beta * dd_s;
                 db_ =drbm.beta * db_s;
             end
+            
+            %% restore original weighs if dropout or dropconnect
+            if drbm.dropout > 0 || drbm.dropconnect > 0
+                drbm.W = W_org;   
+                drbm.U = U_org; 
+                drbm.c = c_org; 
+            end
+            
             
             %% regularization
             % sparsity

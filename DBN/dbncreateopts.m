@@ -19,7 +19,9 @@ function opts  = dbncreateopts()
 %                L2 : double specifying L2 weight decay
 %          sparsity : Use a simple sparsity measure. substract sparsity from the
 %                     hidden biases after each update. see [1]
-%         classRBM  : If this field exists and is 1 then train the DBN where the
+%            dropout: dropout percentageo hidden [5]
+%        dropconnect: dropconnect percentage of hidden [6]
+%         classRBM  : [used?]If this field exists and is 1 then train the DBN where the
 %                     visible layer of the last RBM has the training labels
 %                     added. See "To recognize shapes, first learn to generate
 %                     images" Requires y_train to be spcified.
@@ -60,6 +62,13 @@ function opts  = dbncreateopts()
 %            thisgpu: reference to current gpu if opts.gpu is 1. 
 %          traintype: Contrastive divergence (CD) or Persistent CD (PCD)
 %         npcdchains: number of pcd chains
+%     traintestbatch: number of training samples used to evaluate training
+%                     performance during training. Defaults is all training
+%                     samples
+%       valtestbatch: number of validation samples used to evaluate validation
+%                     performance during training. Defaults is all validation
+%                     samples
+%
 % References
 %     [1] H. Larochelle and M. Mandel, ?Learning algorithms for the
 %         classification restricted boltzmann machine,? J. Mach.  ?, 2012.      
@@ -73,7 +82,10 @@ function opts  = dbncreateopts()
 %         divergence,? Neural Comput., 2002.
 %     [5] N. Srivastava and G. Hinton, ?Dropout: A Simple Way to Prevent Neural
 %         Networks from Overfitting,? J. Mach.  ?, 2014.
-%
+%     [6] L. Wan, M. Zeiler, S. Zhang, Y. Le Cun, and R. Fergus, 
+%         ?Regularization of Neural Networks using DropConnect,? in Proceedings 
+%         of The 30th International Conference on Machine Learning, 2013, 
+%         pp. 1058?1066.
 % see also, DBNSETUP, DBNCHECKOPTS DBNTRAIN
 %
 % Copyright Søren Sønderby july 2014
@@ -95,9 +107,12 @@ opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 opts.momentum     = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 %opts.momentum     = @(t) 0;
 opts.gpubatch = 10000;
+opts.traintestbatch = [];
 opts.L1 = 0;
 opts.L2 = 0;
 opts.sparsity = 0;
+opts.dropout = 0;
+opts.dropconnect = 0;
 opts.classRBM = 1;
 opts.y_train = [];
 opts.x_val = [];
@@ -107,7 +122,6 @@ opts.patience = 5;
 opts.alpha = 0;
 opts.beta = 0;
 opts.errfunc = @accuracy;
-opts.dropouthidden = 0;
 opts.inittype = 'gauss';
 opts.outfile = [];
 opts.gpu = 0;

@@ -40,13 +40,25 @@ cdn = arrayfun(opts.cdn,1:opts.numepochs);
 
 
 for u = 1 : n_rbm
+    if u == n_rbm
+        % init bias and weights for class vectors
+        cur_n_classes = size(opts.y_train,2);
+        cur_alpha = opts.alpha;
+    else
+        % for non toplayers use generative training
+        cur_n_classes = 1;
+        cur_alpha = 1;  %generative training for non toplayers
+    end
+    
+    
+    
     dbn.rbm{u}.testinterval = opts.testinterval;
     % check cdn if its a function handle use it otherwise create a function from the
     % scalar given
     dbn.rbm{u}.cdn = cdn;
     dbn.rbm{u}.learningrate = lr;
     dbn.rbm{u}.momentum = mom;
-    dbn.rbm{u}.alpha = opts.alpha;
+    dbn.rbm{u}.alpha = cur_alpha;
     dbn.rbm{u}.beta = opts.beta;
     % if one learningrate/momentum function use this for all
     % otherwise use individual learningrate/momentum for each rbm
@@ -55,7 +67,8 @@ for u = 1 : n_rbm
     dbn.rbm{u}.L2 = opts.L2;
     dbn.rbm{u}.L1 = opts.L1;
     dbn.rbm{u}.sparsity = opts.sparsity;
-    dbn.rbm{u}.dropouthidden = opts.dropouthidden;
+    dbn.rbm{u}.dropout = opts.dropout;
+    dbn.rbm{u}.dropconnect = opts.dropconnect;
     
     % error stuff
     dbn.rbm{u}.errfunc = opts.errfunc;
@@ -70,21 +83,12 @@ for u = 1 : n_rbm
     vis_size =  dbn.sizes(u);
     hid_size = dbn.sizes(u + 1);
     
+    dbn.rbm{u}.U  = initfunc(hid_size, cur_n_classes);
+    dbn.rbm{u}.vU  = zeros(hid_size, cur_n_classes);
     
-    n_classes = size(opts.y_train,2);
-    dbn.rbm{u}.U  = initfunc(hid_size, n_classes);
-    dbn.rbm{u}.vU  = zeros(hid_size, n_classes);
-    
-    dbn.rbm{u}.d  = zeros(n_classes, 1);
-    dbn.rbm{u}.vd  = zeros(n_classes, 1);
-    if opts.classRBM == 1 && u == n_rbm
-        % init bias and weights for class vectors
-        dbn.rbm{u}.classRBM = 1;
-    else
-        % for non toplayers use generative training
-        dbn.rbm{u}.classRBM = 0;
-    end
-    
+    dbn.rbm{u}.d  = zeros(cur_n_classes, 1);
+    dbn.rbm{u}.vd  = zeros(cur_n_classes, 1);
+
     
     
     dbn.rbm{u}.W  = initfunc(hid_size, vis_size);
