@@ -1,6 +1,6 @@
-%% Example 7 - Sparse hybrid
-% Tries to reproduce discriminative result from table 1 in 
-% "Learning algorithms for the classification Restricted boltzmann machine"
+%% Example 8 - Sparse hybrid trained on subset. Baseline for semisupervised 
+% Training set is resized to 5000 samples and validation set to 1000 samples.
+% The test set is not resized.
 if ~ismac
     current_dir = pwd();
     cd('../..');
@@ -20,19 +20,29 @@ else
     gpu = [];
 end
 
+downsize = 0.1;
 
 
-
-name = 'example_6';
+name = 'example_9_semisup100';
 rng('default');rng(0);
- [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
-f = fullfile(pwd,[name '.mat'])
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(0.1);
+ [train_x_all,~,~,~,~,~] =setupmnist(1);   % load full dataset
+ %create semisup x
+ start_idx = size(train_x) + 1;
+ semisup_x = train_x_all(start_idx:end,:);
+ disp(['Number of semisup samples: ', num2str(size(semisup_x,1))])
+ 
+ 
+ 
+ f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
 sizes = [3000 ];   % hidden layer size
+
 opts = dbncreateopts();
+opts.x_semisup = semisup_x;
 opts.alpha = 0.01; % 0 = discriminative, 1 = generative
-opts.beta = 0;
+opts.beta = 0.1;
 opts.gpu   = 1;                  % use GPU other optsion are 0: CPU, -1: CPU test
 opts.cdn = 1;   
 opts.sparsity = 10^-4;

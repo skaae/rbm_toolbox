@@ -24,8 +24,8 @@ end
 
 
 name = 'example_5';
-rng('default');rng(101);
- [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+rng('default');rng(0);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
 f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
@@ -40,12 +40,13 @@ opts.gpubatch = size(train_x,1);
 opts.outfile = [name '_intermediate.mat'];
 opts.patience = 15;
 opts.numepochs = 1000;
-opts.testinterval = 5;
+opts.testinterval = 1;
 opts.init_type = 'cRBM';
 opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = val_x;
 opts.y_val = val_y;
+opts.traintestbatch = 10000;
 
 
 %% Set learningrate and momentum

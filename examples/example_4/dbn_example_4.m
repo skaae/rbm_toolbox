@@ -24,8 +24,8 @@ end
 
 
 name = 'example_4';
-rng('default');rng(101);
- [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+rng('default');rng(0);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
 f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
@@ -47,6 +47,7 @@ opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = val_x;
 opts.y_val = val_y;
+opts.traintestbatch = 10000;
 
 
 %% Set learningrate and momentum

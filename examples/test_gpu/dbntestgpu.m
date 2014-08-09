@@ -19,8 +19,8 @@ else
     gpu = [];
 end
 
-
-[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(101,0.001);
+rng('default');rng(0);
+[train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0.001);
 sizes = [11];
 [opts] = dbncreateopts();
 opts.gpu = 1;

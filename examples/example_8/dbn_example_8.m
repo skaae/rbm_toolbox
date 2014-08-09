@@ -1,6 +1,6 @@
-%% Example 7 - Sparse hybrid
-% Tries to reproduce discriminative result from table 1 in 
-% "Learning algorithms for the classification Restricted boltzmann machine"
+%% Example 8 - Sparse hybrid trained on subset. Baseline for semisupervised 
+% Training set is resized to 5000 samples and validation set to 1000 samples.
+% The test set is not resized.
 if ~ismac
     current_dir = pwd();
     cd('../..');
@@ -23,9 +23,9 @@ end
 
 
 
-name = 'example_6';
+name = 'example_8_baseline';
 rng('default');rng(0);
- [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(0.1);
 f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
