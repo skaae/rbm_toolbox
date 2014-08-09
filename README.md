@@ -10,7 +10,7 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
  * CD - k (contrastive divergence k) [5]
  * RBM/DBN sampling functions (pictures / movies)
  * RBM/DBN Classification support [2,7]
- * Regularization: L1, L2, sparsity, early-stopping, dropout [3], momentum [1] 
+ * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [1] 
 
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
@@ -110,8 +110,20 @@ The following regularization options are implemented
  * `opts.L1`: specify the regularization weight
  * `opts.L2`: specify the regularization weight
  * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted from biases after each weight update.
- * `opts.dropouthidden`: dropout on hidden units. Specify the probability of being dropped. see [1]
+ * `opts.dropout`: dropout on hidden units. Specify the probability of being dropped. see [1]
+ * `opts.dropconnect`: dropout on connections see [10]
 
+
+**Dropout Weights**  
+<html>
+<img src="/uploads/dropout.png" height="500" width="500"> 
+
+**DropConnect Weights**
+<html>
+<img src="/uploads/dropconnect.png" height="500" width="500"> 
+
+
+** Early Stopping**  
 Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
 
 ## Hidden Layer Sizes
@@ -379,6 +391,7 @@ save(f,'rbm','opts');
 [6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
 [7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
 [8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
-[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.   
+[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.  
+[10] L. Wan, M. Zeiler, S. Zhang, Y. Le Cun, and R. Fergus, “Regularization of Neural Networks using DropConnect,” in Proceedings of The 30th International Conference on Machine Learning, 2013, pp. 1058–1066. 
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.

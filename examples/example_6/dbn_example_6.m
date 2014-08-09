@@ -55,16 +55,16 @@ opts.momentum = @(t) 0;
 
 [dbn, opts]  = dbnsetup(sizes, train_x, opts);  % train function 
 
-rbm = dbn.rbm{1};
 opts.gpu
 opts.numepochs
-disp(rbm);
-
 fprintf('\n\n')
 
-rbm = rbmtraingpu(rbm,train_x,opts);
+dbn = dbntrain(dbn,train_x,opts);
 
- save(f,'rbm','opts');
+opts.thisgpu = [];
+dbn.rbm{1}.thisgppu = [];
+
+save(f,'dbn','opts','train_x','val_x','test_x','train_y','val_y','test_y');
 % 
 % 
 % class_vec = zeros(100,size(train_y,2));
