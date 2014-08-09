@@ -23,10 +23,14 @@ This README first describes settings in the toolbox. Usage examples are given af
 ## Training Objectives
 The toolbox support three different training objectives:
 
- * Generative training: optimizes -log(p(x,y))`
- * Discrminative training: optimizes  `p(y I x)`
+ * Generative    : optimizes `-log( p(x,y) )` 
+ * Discrminative : optimizes `-log( p(y I x) )`
+ * Hybrid        : optimizes `-alpha log( p(x,y) ) + (1-alpha)-log( p(y I x) )`
 
- <html>&#9824<\html>
+Furthermore semisupervised training is available supported. Weights in the RBM is updated using the equation:
+
+`grads = alpha X generative + (1-alpha) *`
+
 
 Training objectives are controlled with:
 
