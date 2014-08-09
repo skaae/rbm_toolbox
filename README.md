@@ -1,3 +1,5 @@
+**THIS DOCUMENTATION DOES NOT CORRESPOND WITH CURRENT CODE**
+
 # RBM Toolbox
 
 RBM toolbox is a MATLAB toolbox for training RBM's.
@@ -8,10 +10,9 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
     * Hybrid training objective [2,7]
     * Semi-supervised learning [2,7]
  * CD - k (contrastive divergence k) [5]
- * PCD (persistent contrastive divergence) [6]
  * RBM/DBN sampling functions (pictures / movies)
  * RBM/DBN Classification support [2,7]
- * Regularization: L1, L2, maxL2norm, sparsity, early-stopping, dropout [3], momentum [1] 
+ * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [1] 
 
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
@@ -21,39 +22,25 @@ The following section describes different settings for training in the RBM toolb
 Refer to `dbncreateopts` for a description of all settings.
 
 ## Training Objectives
+Training objectives are controlled with:
 
-The RBM toolbox supports four different RBM training objectives: Generative, discriminative, hybrid and semi-supervised learning.
+ * opts.alpha: Controls the weight for generative training. 1 is pure generative, 0 is pure discriminative, intermediate values are hybrid training
+ * opts.beta : Controls semisupervied weight. 0 is no semisupervised, you must supply opts.x_semisup for opts.beta > 0 
 
-The RBM training objective is set by specifying a function handle in `opts.train_func`. For all training objectives, except generative with `opts.classRBM==1`, y values are required. For training samples the y values needs to be giben with `opts.y_train` and for a optional validation set the x and y values are given with `opts.x_val` and `opts.y_val` respectively. Y values need to be onehot / one-of-K encoded. 
-
-### Training objectives
-Function handles are specified with `@training_objective_name`.  
-
-* `rbmgenerative`    :  `-log(p(x))` or `-log(p(x,y))` if `classRBM` is 1
-* `rbmdiscriminative`:  `-log(p(x I y))`   [7]
-* `rbmhybrid`        :  `-(1-alpha)log(y I x) - alpha log(p (x) )`. The importance of the generative training objective is 
-controlled with `opts.hybrid_alpha` [7]
-* `rbmsemisuplearn`  :    `TYPE + beta unsupervised. Where type is {generative, discriminative,hybrid} and unsupervised is generative training on unlabeled data. The importance of unsupervised training is controlled with `opts.semisup_beta`. TYPE is specified with `opts.semisup_type = traintype` where `traintype is `{@rbmgenerative, @rbmdiscriminative, @rbmhybrid}`. Samples used for unsupervised training are given with `opts.x_semisup`.  See [7].
 
 #### Generative training
-Generative training and discriminative training are the basic training objectives in the RBM toolbox. The hybrid and semi-supervised training objectives are different combinations of generative and discriminative training. In generative training the negative log likelihood is optimized, depending on the setting of opts.classRBM that is either `-log(p(x))` or `-log(p(x,y))`.
-
-Generative training can be trained with contrastive divergence (`CD`) [5] or with persistent contrastive divergence (`PCD`) [6]. The training type is specified with `opts.traintype`. Both CD and PCD samples negative statistics using Gibbs sampling. The number of Gibbs steps before the statistics is collected is specified with `opts.cdn`, one Gibbs step usually works fine.
+Generative training and discriminative training are the basic training objectives in the RBM toolbox. The hybrid and semi-supervised training objectives are different combinations of generative and discriminative training. In generative training the objective `-log(p(x,y))` is optimized.
 
 #### Discriminative training
 Discriminative training optimizes `p(y I x)`.
 
-#### Hybrid training
-Hybrid training combines generative and discriminative training objective. The two objectives are combined with:
-
-`grads = grads_discrminative + opts.hybrid_alpha X grads_generative` 
 
 #### Semi-supervised training
 Semi-supervised training combines unsupervised and supervised training. The following formulae is used to combine the objectives:
 
-`grads = grads_type + opts.semisup_beta * grads_generative`
+`grads = grads + opts.semisup_beta * grads_generative`
 
-Here `grads_type` is either the gradients from generative, discriminative or hybrid training. `grads_generative` is the gradients from unsupervised training on the samples given in `opts.x_semisup`. The gradients are calculated with ´opts.classRBM=1`. We use samples of p(y I x) as labels for the unsupervised training.
+Here `grads` is the gradients obtained from the labeled samples. We use samples of p(y I x) as labels for the unsupervised training.
 
 ## Learning rate and momentum
 
@@ -62,7 +49,7 @@ The learning rate is controlled with `opts.learningrate`. `opts.learningrate` sh
 Decaying learning rate can be specified with:   
 
 ```MATLAB
-eps       		  = 0.001;    % initial learning rate
+eps               = 0.001;    % initial learning rate
 f                 = 0.99;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
 ```
@@ -78,7 +65,7 @@ Ramp up momentum can be specified with:
 
 ```MATLAB
 T             = 50;       % momentum ramp up epoch
-p_f 		  = 0.9;    % final momentum
+p_f           = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
 opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
 ```
@@ -124,12 +111,22 @@ The following regularization options are implemented
 
  * `opts.L1`: specify the regularization weight
  * `opts.L2`: specify the regularization weight
- * `opts.L2norm`: Maximum L2 norm for the incoming weights to each neuron [4]. Specify the maximum L2norm for each neuron
- * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted after each epoch.
- * `opts.dropout_hidden`: dropout on hidden units. Specify the probability of being dropped. see [1]
- * `opts.early_stopping`: Early stopping is available for classification RBM's where validation set is specified. The patience for early stopping can be set with `opts.patience`. For non classification RBM's or lower layers of DBN with early stopping enables the error measure is the ratio of free energies between  free_energy_validation / free_energy_train, as described in [3]. The best ratio is lowest values which is >0.99. 
+ * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted from biases after each weight update.
+ * `opts.dropout`: dropout on hidden units. Specify the probability of being dropped. see [1]
+ * `opts.dropconnect`: dropout on connections see [10]
 
-Setting a regularization value to 0 it.
+
+**Dropout Weights**  
+<html>
+<img src="/uploads/dropout.png" height="500" width="500"> 
+
+**DropConnect Weights**
+<html>
+<img src="/uploads/dropconnect.png" height="500" width="500"> 
+
+
+** Early Stopping**  
+Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
 
 ## Hidden Layer Sizes
 
@@ -137,254 +134,32 @@ In the example a RBM with 500 hidden units is created and trained. You do not ne
 
 ```MATLAB
 sizes = [500];                        % hidden layer size
-[opts, valid_fields] = dbncreateopts();   % create default opts struct
-dbncheckopts(opts,valid_fields);          % simple check of validity of opts struct
+opts = dbncreateopts();   % create default opts struct
 dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
-dbn = dbntrain(dbn, train_x, opts);       % train  dbn
+rbm = dbn.rbm{1};
+rbm = rbmtrain(rbm, train_x, opts);       % train  rbm
 ```
+## Using the GPU
 
-You can stack several RBM by specifying sizes as a vector. `sizes = [500 200]` will stack two RBM's where the first RBM has 
-n_features visible units and 500 hidden units and the second RBM has 500 visible units and 200 hidden units. 
-Any number of RBM's is allowed. If several RBM's are stacked non-top layer RBM's will be trained with generative training objective and `opts.classRBM = 0`.
- 
-## Settings table
+To use GPU set `opts.gpu = 1`. Setting `opts.gpu = 0` uses CPU and `opts.gpu = -1` is for testing. 
+When `opts.gpu`is 1 then `opts.thisgpu` must be set to `gpuDevice()`. 
 
-The table shows which fields, in the opts struct, that applies to the different training objectives.
 
-|Setting   					| @genrative  	| @discriminative  	| @rbmhybrid  	| @rbmsemisublearn  	
-|---						|---			|---				|---		 	|---					|
-|init_type               	|  x 			|   x				|   	x		|  x 					|
-|traintype   				|  x 			|	   				|   	x		|  x 					|
-|cdn   						|  x 			|   				|   	x		|  x 					|
-|numepochs   				|  x 			|   x				|   	x		|  x 					| 
-]classRBM   				|  x 			|   x				|   	x		|  x 					| 
-|err_func<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					|
-|test_interval<sub>1</sub> 	|  x 			|   x				|   	x		|  x 					|				
-|learningrate   			|  x 			|   x				|   	x		|  x 					| 
-|momentum   				|  x 			|   x				|   	x		|  x 					| 
-|L1							|  x 			|   x				|   	x		|  x 					| 
-|L2norm   					|  x 			|   x				|   	x		|  x 					| 
-|sparsity   				|  x 			|   x				|   	x		|  x 					| 
-|dropout_hidden   			|  x 			|   x				|   	x		|  x 					| 
-|early_stopping<sub>1</sub> |  x 			|   x				|   	x		|  x 					| 
-|patience<sub>1</sub>   	|  x 			|   x				|   	x		|  x 					| 
-|y_train<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| 
-|x_val<sub>2</sub>    		|  x 			|   x				|   	x		|  x 					| 		
-|y_val<sub>2</sub>   		|  x 			|   x				|   	x		|  x 					| 
-|x_semisup   				|   			|   				|   			|  x 					|
-|hybrid_alpha   			|   			|   				|   	x		|   					|
-|semisup_type   			|   			|   				|   			|  x 					|
-|semisup_beta   			|   			|   				|   			|  x 					|
-
-1) Applies if classRBM is 1 and x_val and y_val are set
-
-2) Applies if classRBM is 1 
+## Sampling statistics
+The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
+Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
+ `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100. 
 
 # Examples
 
-## Example 1 - Generative Learning **p(x)**
+Reproducing results from [7], specifically the results from the table reproduced below:
 
-Training RBM's in the RBM toolbox is controlled through three functions:
-  * `dbncreateopts`: Creates an opts struct. The opts struct control learning rate, number of epochs, regularization, training type etc. The help for `dbncreateopts` describes all valid fields in the `opts` struct.
-  * `dbnsetup`: Setups the DBN network, a single layer RBM is equal to a DBN. 
-  * `dbntrain`: Trains the DBN
-
-The following example trains a generative RBM with 500 hidden units and visualizes the found weights. Note that the learning rate is controlled through the `opts.learningrate` parameters. `opts.learningrate` is a function which takes the current epoch and current epoch as arguments and returns the learning rate. Similarly  `opts.momentum` is a function that controls the current momentum. When the `opts.train_func` is set to `@rbmgenerative` RBM outputs the reconstruction error after each epoch, the reconstruction error should not be interpreted as a measure of goodness of the model, see [3].
-
-```MATLAB
-rng('default');rng(0);
-load mnist_uint8;
-train_x = double(train_x)/255;
-train_y = double(train_y);
-
-
-sizes = [200];   % hidden layer size
-[opts, valid_fields] = dbncreateopts();
-
-opts.numepochs = 30;
-opts.traintype = 'CD';
-opts.classRBM = 0;
-opts.y_train = train_y;
-opts.test_interval = 1;
-opts.train_func = @rbmgenerative;
-opts.init_type = 'cRBM';
-
-opts.learningrate = @(t,momentum) 0.05;
-opts.momentum     = @(t) 0;
-
-dbncheckopts(opts,valid_fields);       
-disp(opts)
-dbn = dbnsetup(sizes, train_x, opts); 
-dbn = dbntrain(dbn, train_x, opts);
-
-% visualize weights
-figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
-set(gca,'visible','off');
-```
-
-Visualization of final weights:
-
-<html>
-<img src="/uploads/example1_weights.png" height="500" width="500"> 
-
-## Example 2 - Classification RBM with generative training objective, **p(x,y)**
-
-A classification RBM can be trained by setting `opts.classRBM` to 1 and setting `opts.y_train` to the training labels. The training labels must be *one-of-K* encoded.
-
-When `opts.classRBM` is 1 RBM toolbox will report the training error. The default error measure is accuracy but you may supply custom error measures through `opts.error_func`. If `opts.x_val` and `opts.y_val` are given the validation error will also be reported.
-In the example the validation error is calculated after each epoch, i.e. `opts.test_interval` is set 1. In the example we also enable early stopping, we use early stopping patience of 5, i.e. if no progress have been made in 5 epochs stop training.
-
-
-```MATLAB
-rng('default');rng(0);
-load mnist_uint8;
-train_x = double(train_x)/255;
-test_x  = double(test_x)/255;
-train_y = double(train_y);
-test_y = double(test_y);
-
-sizes = [200];  
-[opts, valid_fields] = dbncreateopts();
-opts.early_stopping = 1;
-opts.patience = 5;
-
-opts.numepochs = 50;
-opts.traintype = 'CD';
-opts.classRBM = 1;
-opts.y_train = train_y;
-opts.x_val = test_x;
-opts.y_val = test_y;
-opts.test_interval = 1;
-opts.train_func = @rbmgenerative;
-opts.init_type = 'cRBM';
-
-opts.learningrate = @(t,momentum) 0.05;
-opts.momentum     = @(t) 0;
-
-dbncheckopts(opts,valid_fields);       
-disp(opts)
-dbn = dbnsetup(sizes, train_x, opts);  
-dbn = dbntrain(dbn, train_x, opts);
-
-% Make predictions
-pred_val = dbnpredict(dbn,test_x);
-labels_val = predict(test_y);
-acc_val = mean(pred_val == labels_val);
-err_val = 1-acc_val
-
-% plot weights 
-figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
-set(gca,'visible','off');
-
-
-% plot errors
-plot([dbn.rbm{1}.val_error',dbn.rbm{1}.train_error'])
-legend({'Validation error','Train error'})
-[min_val,min_idx] =  min(dbn.rbm{1}.val_error);
-hold on; plot(min_idx,min_val,'xr'); hold off;
-xlabel('Epoch'); ylabel('Error'); grid on;
-```
-
-For classification RBM's predictions can be calculated by `dbnpredict` wich returns a label or with 
-`dbnclassprobs` wich returns the predicted class probabilities. 
-
-The learned weights can be visualized with the `visualize` function. 
-
-<html>
-<img src="/uploads/example2_weights.png" height="500" width="500"> 
-
-The training error and validation error can be visualized as well:
-
-<html>
-<img src="/uploads/example2_error.png" height="350" width="350"> 
-
-Note that in this example the validation error is lower than the training error, this is not typical. In the plot the 
-red x indicate the lowest validation error. 
-
-## Example 3 - PCD, Layers and Sampling
-
-In example 3 we use PCD to train a classification DBN using the generative training objective. In the other examples `opts.traintype` has ben `CD` which mean contrastive divergence [5]. In this example we will use `PCD`, persistent contrastive divergence [6].
-In CD the Gibbs chains are initiated at the data points, PCD differs from this by having a number of persistent chains which are used to initiate the Gibbs sampling.
-
-```
-clear all;
-rng('default');rng(0);
-load mnist_uint8;
-train_x = double(train_x)/255;
-test_x  = double(test_x)/255;
-train_y = double(train_y);
-test_y = double(test_y);
-
-sizes = [200 ];   % hidden layer size
-[opts, valid_fields] = dbncreateopts();
-opts.early_stopping = 1;
-opts.patience = 5;
-opts.numepochs = 50;
-opts.traintype = 'PCD';
-opts.classRBM = 1;
-opts.y_train = train_y;
-opts.x_val = test_x;
-opts.y_val = test_y;
-opts.test_interval = 1;
-opts.train_func = @rbmgenerative;
-
-%% Set learningrate
-eps       		  = 0.05;    % initial learning rate
-f                 = 0.95;      % learning rate decay
-opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-
-% Set momentum
-T             = 50;       % momentum ramp up
-p_f 		  = 0.9;    % final momentum
-p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
-
-
-dbncheckopts(opts,valid_fields);       %checks for validity of opts struct
-dbn = dbnsetup(sizes, train_x, opts);  % train function 
-dbn = dbntrain(dbn, train_x, opts);
-
-% plot weights 
-figure;visualize(dbn.rbm{1}.W(1:144,:)'); 
-set(gca,'visible','off');
-
-% sample digits
-class_vec = zeros(100,size(train_y,2));
-for i = 1:size(train_y,2)
-    class_vec((i-1)*10+1:i*10,i) = 1;
-end
-
-digits = dbnsample(dbn,100,10000,class_vec); 
-figure;visualize(digits'); 
-set(gca,'visible','off');
-
-% sampling movie
-dbnsamplemovie(dbn,10,3000,'example3',10,@visualize,eye(10))
-```
-
-Weight visualization:
-<html>
-<img src="/uploads/example3_weights.png" height="500" width="500"> 
-
-
-`dbnsample` can sample from the model. Samples of the digits 0-9, collected after 3000 Gibbs steps, are shown below:
-
-<html>
-<img src="/uploads/example3_digits.png" height="500" width="500"> 
-
-
-`dbnsamplemovie` can be used to create a movie of the sampling process as the Gibbs chains converge, somehow similar to http://www.cs.toronto.edu/~hinton/adi/index.htm . 
-
-[link to video](https://www.youtube.com/watch?v=qqdMu09_zm4) 
-
-# Reproducing results from [7], specifically the results from the table reproduced below:
-
-| Model  |Objective   										| Errror (%) 	| Example  |
-|---	 |---		  										|---			|---	   |
-|   	 | Generative(lr = 0.005, H = 6000)    		  		|	3.39		|    4     |
-|ClassRBM| Discriminative(lr = 0.05, H = 500)   		  	|	1.81		|    5     |
-|   	 | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)  		|	1.28		|    6     |
-|   	 | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |	1.16		|    7     |
+| Model  |Objective                                         | Errror (%)    | Example  |
+|---     |---                                               |---            |---       |
+|        | Generative(lr = 0.005, H = 6000)                 |   3.39        |    4     |
+|ClassRBM| Discriminative(lr = 0.05, H = 500)               |   1.81        |    5     |
+|        | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)        |   1.28        |    6     |
+|        | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |   1.16        |    7     |
 lr = learning rate
 H = hidden layer size
 
@@ -397,45 +172,209 @@ To reproduce the results the following settings where used:
  * Early stopping with patience of 15.
  * MNIST training set was randomly split into a training set of 50000 samples and a validation 10000 samples. The original test set was used. 
 
-A few notes on training, a) the final result is highly dependent on the mini-batch size, for MNIST mini-batch sizes of 100 gives results that are 0.5% worse, b) weight initalization is equally important, try experiment by supplying your own initalization functions. 
+Weight initalization is important, try experiment by supplying your own initalization functions. 
 
 
 ## Example 4 - Discriminative 
 
+```MATLAB
+%% Example 4 - Discriminative training
+% Tries to reproduce discriminative result from table 1 in 
+% "Learning algorithms for the classification Restricted boltzmann machine"
+name = 'example_4';
+rng('default');rng(101);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+f = fullfile(pwd,[name '.mat'])
+
+% Setup DBN
+sizes = [500 ];   % hidden layer size
+
+opts = dbncreateopts();
+opts.alpha = 0; % 0 = discriminative, 1 = generative
+opts.beta = 0;
+opts.gpu   = 0;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.cdn = 1;   
+opts.thisgpu = [];              % ref to gpu,  must be set if opts.gpu =1
+opts.gpubatch = size(train_x,1); 
+opts.outfile = [name '_intermediate.mat'];
+opts.patience = 15;
+opts.numepochs = 1000;
+opts.testinterval = 1;
+opts.init_type = 'cRBM';
+opts.classRBM = 1;
+opts.y_train = train_y;
+opts.x_val = val_x;
+opts.y_val = val_y;
+
+
+%% Set learningrate and momentum
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum = @(t) 0;
+
+
+[dbn, opts]  = dbnsetup(sizes, train_x, opts);  % train function 
+
+rbm = dbn.rbm{1};
+opts.gpu
+opts.numepochs
+disp(rbm);
+
+fprintf('\n\n')
+
+rbm = rbmtraingpu(rbm,train_x,opts);
+
+save(f,'rbm','opts');
+```
 
 ## Example 5 - Generative
 
+```MATLAB
+%% Example 5 - generative training
+% Tries to reproduce discriminative result from table 1 in 
+% "Learning algorithms for the classification Restricted boltzmann machine"
+name = 'example_5';
+rng('default');rng(101);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+f = fullfile(pwd,[name '.mat'])
+
+% Setup DBN
+sizes = [6000 ];   % hidden layer size
+opts = dbncreateopts();
+opts.alpha = 1; % 0 = discriminative, 1 = generative
+opts.beta = 0;
+opts.gpu   = 0;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.cdn = 1;   
+opts.thisgpu = [];              % ref to gpu,  must be set if opts.gpu =1
+opts.gpubatch = size(train_x,1); 
+opts.outfile = [name '_intermediate.mat'];
+opts.patience = 4;
+opts.numepochs = 1000;
+opts.testinterval = 5;
+opts.init_type = 'cRBM';
+opts.classRBM = 1;
+opts.y_train = train_y;
+opts.x_val = val_x;
+opts.y_val = val_y;
+
+
+%% Set learningrate and momentum
+opts.learningrate = @(t,momentum) 0.005;
+opts.momentum = @(t) 0;
+
+
+[dbn, opts]  = dbnsetup(sizes, train_x, opts);  % train function 
+
+rbm = dbn.rbm{1};
+opts.gpu
+opts.numepochs
+disp(rbm);
+
+fprintf('\n\n')
+
+rbm = rbmtraingpu(rbm,train_x,opts);
+save(f,'rbm','opts');
+```
+
 ## Example 6 - Hybrid training 
+
+```MATLAB
+%% Example 6 - Hybrid
+% Tries to reproduce discriminative result from table 1 in 
+% "Learning algorithms for the classification Restricted boltzmann machine"
+name = 'example_6';
+rng('default');rng(101);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+f = fullfile(pwd,[name '.mat'])
+
+% Setup DBN
+sizes = [1500 ];   % hidden layer size
+opts = dbncreateopts();
+opts.alpha = 0.01; % 0 = discriminative, 1 = generative
+opts.beta = 0;
+opts.gpu   = 0;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.cdn = 1;   
+opts.thisgpu = [];              % ref to gpu,  must be set if opts.gpu =1
+opts.gpubatch = size(train_x,1); 
+opts.outfile = [name '_intermediate.mat'];
+opts.patience = 15;
+opts.numepochs = 1000;
+opts.testinterval = 1;
+opts.init_type = 'cRBM';
+opts.classRBM = 1;
+opts.y_train = train_y;
+opts.x_val = val_x;
+opts.y_val = val_y;
+
+
+%% Set learningrate and momentum
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum = @(t) 0;
+
+
+[dbn, opts]  = dbnsetup(sizes, train_x, opts);  % train function 
+
+rbm = dbn.rbm{1};
+opts.gpu
+opts.numepochs
+disp(rbm);
+
+fprintf('\n\n')
+
+rbm = rbmtraingpu(rbm,train_x,opts);
+save(f,'rbm','opts');
+```
+
 
 ## Example 7 - Hybrid training with sparsity
 
-## Example 8 
-  Test of dropout
+```MATLAB
+%% Example 7 - Sparse hybrid
+% Tries to reproduce discriminative result from table 1 in 
+% "Learning algorithms for the classification Restricted boltzmann machine"
+name = 'example_6';
+rng('default');rng(101);
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(101,1);
+f = fullfile(pwd,[name '.mat'])
+
+% Setup DBN
+sizes = [3000 ];   % hidden layer size
+opts = dbncreateopts();
+opts.alpha = 0.01; % 0 = discriminative, 1 = generative
+opts.beta = 0;
+opts.gpu   = 0;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.cdn = 1;   
+opts.sparsity = 10^-4;
+opts.thisgpu = [];              % ref to gpu,  must be set if opts.gpu =1
+opts.gpubatch = size(train_x,1); 
+opts.outfile = [name '_intermediate.mat'];
+opts.patience = 15;
+opts.numepochs = 1000;
+opts.testinterval = 1;
+opts.init_type = 'cRBM';
+opts.classRBM = 1;
+opts.y_train = train_y;
+opts.x_val = val_x;
+opts.y_val = val_y;
 
 
-## example 9
-  like example 5 + ZM
-
-## example 10 
-  like example 4 ZM + increasing CD
-
-## example 11
-  like example 6 but with momentum
-
-## example 12 
-like example 7 but with momentum
-
-## example 13
-same as 5 but no sampling in rbmgenerative
-rbmgenerative l 96 commented out
-
-example 14 as 4 but online learning    (RUNNING)
+%% Set learningrate and momentum
+opts.learningrate = @(t,momentum) 0.05;
+opts.momentum = @(t) 0;
 
 
+[dbn, opts]  = dbnsetup(sizes, train_x, opts);  % train function 
 
-# Example 8 - Semi-supervised learning 
+rbm = dbn.rbm{1};
+opts.gpu
+opts.numepochs
+disp(rbm);
 
-# Example 9 - reproduce results from [7]
+fprintf('\n\n')
+
+rbm = rbmtraingpu(rbm,train_x,opts);
+save(f,'rbm','opts');
+```
+
 
 # TODO
 
@@ -454,6 +393,7 @@ example 14 as 4 but online learning    (RUNNING)
 [6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
 [7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
 [8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
-[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.   
+[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.  
+[10] L. Wan, M. Zeiler, S. Zhang, Y. Le Cun, and R. Fergus, “Regularization of Neural Networks using DropConnect,” in Proceedings of The 30th International Conference on Machine Learning, 2013, pp. 1058–1066. 
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
