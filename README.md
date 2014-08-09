@@ -26,7 +26,7 @@ The toolbox support three different training objectives:
  * Generative training: optimizes -log(p(x,y))`
  * Discrminative training: optimizes  `p(y I x)`
 
- &#9824
+ <html>&#9824<\html>
 
 Training objectives are controlled with:
 
