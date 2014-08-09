@@ -19,9 +19,9 @@ function opts  = dbncreateopts()
 %                L2 : double specifying L2 weight decay
 %          sparsity : Use a simple sparsity measure. substract sparsity from the
 %                     hidden biases after each update. see [1]
-%            dropout: dropout percentageo hidden [5]
-%        dropconnect: dropconnect percentage of hidden [6]
-%         classRBM  : [used?]If this field exists and is 1 then train the DBN where the
+%           dropout : dropout percentageo hidden [5]
+%       dropconnect : dropconnect percentage of hidden [6]
+%          classRBM : [used?]If this field exists and is 1 then train the DBN where the
 %                     visible layer of the last RBM has the training labels
 %                     added. See "To recognize shapes, first learn to generate
 %                     images" Requires y_train to be spcified.

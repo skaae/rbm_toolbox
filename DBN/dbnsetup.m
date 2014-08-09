@@ -32,6 +32,12 @@ else
 end
 
 
+% if traintestbatch is not given set it to the complete training set
+if isempty(opts.traintestbatch )
+    opts.traintestbatch = size(x,1);
+end
+
+
 %% use lr function etc to calculate learning rates
 opts.cdn = create_func(opts.cdn);
 mom = arrayfun(opts.momentum,1:opts.numepochs);
@@ -50,18 +56,14 @@ for u = 1 : n_rbm
         cur_alpha = 1;  %generative training for non toplayers
     end
     
-    
-    
     dbn.rbm{u}.testinterval = opts.testinterval;
-    % check cdn if its a function handle use it otherwise create a function from the
-    % scalar given
+    dbn.rbm{u}.traintestbatch =   opts.traintestbatch;
+    
     dbn.rbm{u}.cdn = cdn;
     dbn.rbm{u}.learningrate = lr;
     dbn.rbm{u}.momentum = mom;
     dbn.rbm{u}.alpha = cur_alpha;
     dbn.rbm{u}.beta = opts.beta;
-    % if one learningrate/momentum function use this for all
-    % otherwise use individual learningrate/momentum for each rbm
     
     % regularization parameters
     dbn.rbm{u}.L2 = opts.L2;
