@@ -10,6 +10,7 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
     * Hybrid training objective [2,7]
     * Semi-supervised learning [2,7]
  * CD - k (contrastive divergence k) [5]
+ * PCD (persistent contrastive divergence) [6]
  * RBM/DBN sampling functions (pictures / movies)
  * RBM/DBN Classification support [2,7]
  * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [3] 
@@ -118,11 +119,11 @@ The following regularization options are implemented
 
 **Dropout Weights**  
 <html>
-<img src="/uploads/dropout.png" height="500" width="500"> 
+<img src="/uploads/dropout.png" height="200" width="500"> 
 
 **DropConnect Weights**
 <html>
-<img src="/uploads/dropconnect.png" height="500" width="500"> 
+<img src="/uploads/dropconnect.png" height="200" width="500"> 
 
 
 ** Early Stopping**  
