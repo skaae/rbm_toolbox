@@ -35,7 +35,7 @@ dbn = dbnsetup(sizes,x_train,opts);
 dbn = dbntrain(dbn,x_train,opts);
 ```
 
-Here sizes specifies the sizes of the hidden layers in the RBM's. In the example a single RBM with 50 hidden units is created. If sizes is `sizes = [50 100]`, a RBM with 50 hidden units and a RBM with 100 hidden units are stacked. Sizes of visible layers are infeered from the data.
+Here sizes specifies the sizes of the hidden layers in the RBM's. In the example a single RBM with 50 hidden units is created. If sizes is is a vector, e.g `sizes = [50 100]`, a RBM with 50 hidden units and a RBM with 100 hidden units are stacked. Sizes of visible layers are inferred from the data.
 
 ## Training Objectives
 The toolbox support three different training objectives:
@@ -66,7 +66,7 @@ From the equation it follows that:
  * `opts.y_train`   : y training data  
  * `opts.x_val`     : x validation data (optional)
  * `opts.y_val`     : y validation data (optional)
- * `oots.x_semisup` : x semisupervised data (optional)
+ * `opts.x_semisup` : x semisupervised data (optional)
 
  During training training and validatiion performance is monitored. The number of epochs between calcualtion of training and validaiton performance is controlled with `opts.testinterval`.
 
@@ -94,7 +94,7 @@ Momentum is set with:
 
 ```MATLAB
 % Momentum with ramp-up, t = current epoch
-T             = 50;       % momentum ramp up epoch
+T             = 50;     % momentum ramp up epoch
 p_f           = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
 opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f, p_f);
@@ -164,7 +164,7 @@ Early stopping is always enabled. The early stopping patience is set with `opts.
 
 `opts.gpu` switches between CPU and GPU. GPU requires the MATLAB Parallel Computing Toolbox.
 
- * `opts.gpu = 1` : Use GPU. Requires that `opts.thisgpu` is set to a reference to the selected GPU (use `gpuDevice`).
+ * `opts.gpu = 1` : Use GPU. Requires that `opts.thisgpu` is set to a reference to the selected GPU (use `opts.thisgpu = gpuDevice()`).
  * `opts.gpu = 0` : Use CPU. 
  * `opts.gpu = -1`: For testing
 
