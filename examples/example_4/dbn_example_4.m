@@ -64,6 +64,8 @@ opts.gpu
 opts.numepochs
 fprintf('\n\n')
 
+
+disp(dbn.rbm{1})
 dbn = dbntrain(dbn,train_x,opts);
 
 opts.thisgpu = [];
