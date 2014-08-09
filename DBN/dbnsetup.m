@@ -39,7 +39,13 @@ end
 
 
 %% use lr function etc to calculate learning rates
-opts.cdn = create_func(opts.cdn);
+
+% convert scalars to functions
+opts.cdn = create_func(opts.cdn,1);
+opts.learningrate = create_func(opts.learningrate,2);
+opts.momentum = create_func(opts.momentum,1);
+
+% calculate values
 mom = arrayfun(opts.momentum,1:opts.numepochs);
 lr = arrayfun(opts.learningrate,1:opts.numepochs,mom);
 cdn = arrayfun(opts.cdn,1:opts.numepochs);
@@ -207,13 +213,18 @@ end
         assert(min(weights(:)) >= interval_min)
     end
 
-    function ret = create_func(val)
+    function ret = create_func(val,nargs)
         % takes a scalar val or function handle and returns a function returning
         % val if val is not a function.
         if isa(val, 'function_handle')
             ret = val;
         else  % assume its a scalar
-            ret = @(epoch) val;
+            switch nargs
+                case 1
+                    ret = @(v1) val;
+                case 2
+                    ret = @(v1,v2) val;
+            end
         end
     end
 
