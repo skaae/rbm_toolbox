@@ -409,17 +409,17 @@ save(f,'rbm','opts');
  *  Parallel tempering for training of restricted Boltzmann machines.
 # 
 
-# References[
+# References
 
 [1] Srivastava Nitish, G. Hinton, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach. Learn. Res., vol. 5(Jun), no. 2, p. 1929−1958, 2014.    
 [2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” in Proceedings of the 25th international conference on Machine learning. ACM,, 2008.     
 [3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, vol. 9, no. 1, p. 926, 2010.    
 [4] G. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” arXiv Prepr., vol. 1207.0580, no. Hinton, Geoffrey E., et al. "Improving neural networks by preventing co-adaptation of feature detectors." arXiv preprint arXiv:1207.0580 (2012)., Jul. 2012.    
-[5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., 2002.  
-[6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
-[7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
-[8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
-[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.  
+[5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., vol. 14, no. 8, pp. 1771–1800, 2002.     
+[6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” in Proceedings of the 25th international conference on Machine learning. ACM, 2008.    
+[7] H. Larochelle, M. Mandel, R. Pascanu, and Y. Bengio, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach. Learn. Res., vol. 13, no. 1, pp. 643–669, 2012.    
+[8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” in Proceedings of the 25th international conference on Machine learning. ACM,, 2008.    
+[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” Dep. Comput. Sci. Toronto Univ., vol. UTML-TR-11, 2011.     
 [10] L. Wan, M. Zeiler, S. Zhang, Y. Le Cun, and R. Fergus, “Regularization of Neural Networks using DropConnect,” in Proceedings of The 30th International Conference on Machine Learning, 2013, pp. 1058–1066. 
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
