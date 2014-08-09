@@ -79,7 +79,7 @@ The learning rate is controlled with `opts.learningrate`. `opts.learningrate` sh
 Learning rate is set with:   
 
 ```MATLAB
-% Decaying learning rate
+% Decaying learning rate, t = current epoch
 eps               = 0.001;    % initial learning rate
 f                 = 0.99;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
@@ -93,7 +93,7 @@ Momentum is controlled through `opts.momentum`. `opts.momentum` should be a func
 Momentum is set with:
 
 ```MATLAB
-% Momentum with ramp-up
+% Momentum with ramp-up, t = current epoch
 T             = 50;       % momentum ramp up epoch
 p_f           = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
@@ -118,7 +118,7 @@ Choose the sampling method with `opts.traintype`. For `PCD` the number of persis
  The number of Gibbs steps before the negative statistics is collected is controlled with `opts.cdn`. `opts.cdn` is specified similarly to the learning rate and momentum, i.e:
 
 ```MATLAB
-% Increasing Cdn
+% Increasing gibbs steps at fifth epoch
 T = 5;
 opts.cdn = @(epoch) ifelse(t < T,1,5);
 
@@ -130,59 +130,43 @@ opts.cdn =  1;
 
 Initial weights are either sampled from a normal distribution [3] or from a uniform distribution [7], the behavior is controlled through `opts.init_type`:
 
-```MATLAB
-switch lower(opts.init_type)
-    case 'gauss'
-        initfunc = @(m,n) normrnd(0,0.01,m,n);
-    case 'crbm'
-        initfunc = @(m,n) init_crbm;
-    otherwise
-        error('init_type should be either gauss or cRBM');
-end
-
-    function weights = init_crbm(m,n)
-        M = max([m,n]);
-        interval_max = M^(-0.5);
-        interval_min = -interval_max;
-        weights = interval_min + (interval_max-interval_min).*rand(m,n);
-    end
-```
-Lastly you can supply your own function as a handle to `opts.init_type`. The signature must be `f(n_rows,n_columns)`. The output should be a dobule m-by-n matrix. e.g:
-
-```MATLAB
-opts.init_type = @(m,n)  normrnd(0,100,m,n);
-```
-
-
+ * `opts.init_type = 'gauss'`    : N(0, 0.01)
+ * `opts.init_type = 'cRBM'`     : Unif(-M^-0.5, M^-0.5), is max(n_columns, n_rows) of weight matrix. 
+ * `opts.init_type = @(m,n) func : Handle to funtion returning a M-by-N matrix.
 
 ## Regularization
 
-The following regularization options are implemented
+The following regularization options are implemented:
 
  * `opts.L1`: specify the regularization weight
  * `opts.L2`: specify the regularization weight
  * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted from biases after each weight update.
- * `opts.dropout`: dropout on hidden units. Specify the probability of being dropped. see [1]
- * `opts.dropconnect`: dropout on connections see [10]
+ * `opts.dropout`: dropout on hidden units. Specify the 1-probability of being dropped. see [1]
+ * `opts.dropconnect`: dropout on connections, specify 1-probability of connection being zeroed, see [10]
+ * Early-stopping
 
-
-**Dropout Weights**  
+#### Dropout Weights
+In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. W is the weights between visible and hiiden units. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0.
 <html>
 <img src="/uploads/dropout.png" height="200" width="500"> 
 
-**DropConnect Weights**  
+
+
+#### DropConnect Weights
+DropConnect drops connections between visible and hidden units with probability `1-opts.dropconnect`. The picture shows W with dropconnect enabled (left) and the original weights (right)
 <html>
 <img src="/uploads/dropconnect.png" height="200" width="500"> 
 
-
-** Early Stopping**  
-Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
-
+####
+Early stopping is always enabled. The early stopping patience is set with `opts.patience`. If you want to disable early stopping set `opts.patience = Inf`. 
 
 ## Using the CPU / GPU
 
-To use GPU set `opts.gpu = 1`. Setting `opts.gpu = 0` uses CPU and `opts.gpu = -1` is for testing. 
-When `opts.gpu`is 1 then `opts.thisgpu` must be set to `gpuDevice()`. 
+`opts.gpu` switches between CPU and GPU. GPU requires the MATLAB Parallel Computing Toolbox.
+
+ * `opts.gpu = 1` : Use GPU. Requires that `opts.thisgpu` is set to a reference to the selected GPU (use `gpuDevice`).
+ * `opts.gpu = 0` : Use CPU. 
+ * `opts.gpu = -1`: For testing
 
 # Examples
 
