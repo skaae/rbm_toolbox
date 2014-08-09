@@ -1,6 +1,8 @@
+**THIS DOCUMENTATION DOES NOT CORRESPOND WITH CURRENT CODE**
+
 # RBM Toolbox
 
-RBM toolbox is a MATLAB toolbox for training RBM's.
+RBM toolbox is a MATLAB toolbox for online training of RBM and stacked RBM's.
 
  * Support for training RBM's with class labels including:
     * Generative training objective [2,7]
@@ -8,156 +10,174 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
     * Hybrid training objective [2,7]
     * Semi-supervised learning [2,7]
  * CD - k (contrastive divergence k) [5]
+ * PCD (persistent contrastive divergence) [6]
  * RBM/DBN sampling functions (pictures / movies)
  * RBM/DBN Classification support [2,7]
- * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [1] 
+ * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [3] 
 
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
-# Settings
 
-The following section describes different settings for training in the RBM toolbox. 
-Refer to `dbncreateopts` for a description of all settings.
+This README first describes settings in the toolbox. Usage examples are given afterwards. Note that a single layer DBN is a RBM. 
+
+# Settings
+Settings in the toolbox are generally controlled with the `opts` struct. An `opts` struct with default values can be created with
+
+```MATLAB
+opts = dbncreateopts();
+```
+
+The DBN network is then created and trained with:
+
+```MATLAB
+sizes = [50]
+dbn = dbnsetup(sizes,x_train,opts);
+dbn = dbntrain(dbn,x_train,opts);
+```
+
+Here sizes specifies the sizes of the hidden layers in the RBM's. In the example a single RBM with 50 hidden units is created. If sizes is is a vector, e.g `sizes = [50 100]`, a RBM with 50 hidden units and a RBM with 100 hidden units are stacked. Sizes of visible layers are inferred from the data.
 
 ## Training Objectives
-Training objectives are controlled with:
+The toolbox support three different training objectives:
 
- * opts.alpha: Controls the weight for generative training. 1 is pure generative, 0 is pure discriminative, intermediate values are hybrid training
- * opts.beta : Controls semisupervied weight. 0 is no semisupervised, you must supply opts.x_semisup for opts.beta > 0 
+ * Generative    : optimizes `-log( p(x,y) )` 
+ * Discrminative : optimizes `-log( p(y | x) )`
+ * Hybrid        : optimizes `-alpha * log( p(x,y) ) - (1-alpha) * log( p(y | x) )`
 
-
-#### Generative training
-Generative training and discriminative training are the basic training objectives in the RBM toolbox. The hybrid and semi-supervised training objectives are different combinations of generative and discriminative training. In generative training the objective `-log(p(x,y))` is optimized.
-
-#### Discriminative training
-Discriminative training optimizes `p(y I x)`.
+Furthermore semisupervised training is available. In semisupervised training unlabled data is used in conjunction with the labeled data. 
 
 
-#### Semi-supervised training
-Semi-supervised training combines unsupervised and supervised training. The following formulae is used to combine the objectives:
+RBM weights are updated using the equation:
 
-`grads = grads + opts.semisup_beta * grads_generative`
+`grads = alpha * grads_generative + (1-alpha) * grads_discriminative  + beta * grads_semisupervised`
 
-Here `grads` is the gradients obtained from the labeled samples. We use samples of p(y I x) as labels for the unsupervised training.
+From the equation it follows that:
+
+ * `opts.alpha = 0` is discriminative training
+ * `opts.alpha = 1` is generative training
+ * `opts.alpha = ]0;1[` is hybrid training
+
+ Semisupervised training is added by setting `opts.beta > 0`. In semisupervised training we partly train on unlabeled data. 
+ The toolbox uses y values sampled from `p(y|x)` as labels for the semisupervised samples.  The procedure is described in [7].
+
+## Specifying training, validation and semisupervised data
+
+ * `x_train`        : pass x training data to the toolbox with `dbntrain(dbn,x_train,opts)`
+ * `opts.y_train`   : y training data  
+ * `opts.x_val`     : x validation data (optional)
+ * `opts.y_val`     : y validation data (optional)
+ * `opts.x_semisup` : x semisupervised data (optional)
+
+ During training training and validatiion performance is monitored. The number of epochs between calcualtion of training and validaiton performance is controlled with `opts.testinterval`.
+
+ If the traning set is large it might be costly to evaluate the training performance using the whole training set. `opts.traintestbatch` controls the number of samples used for calculation of training performance. 
 
 ## Learning rate and momentum
 
 The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.
 
-Decaying learning rate can be specified with:   
+Learning rate is set with:   
 
 ```MATLAB
-eps       		  = 0.001;    % initial learning rate
+% Decaying learning rate, t = current epoch
+eps               = 0.001;    % initial learning rate
 f                 = 0.99;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-```
-Constant learning rate can be spcified with
 
-```MATLAB
-opts.learningrate = @(t,momentum) 0.01;
+% Constant learning rate
+opts.learningrate =  0.01;
 ```
 
 Momentum is controlled through `opts.momentum`. `opts.momentum` should be a function taking current epoch as input.
 
-Ramp up momentum can be specified with:
+Momentum is set with:
 
 ```MATLAB
-T             = 50;       % momentum ramp up epoch
-p_f 		  = 0.9;    % final momentum
+% Momentum with ramp-up, t = current epoch
+T             = 50;     % momentum ramp up epoch
+p_f           = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f, p_f);
+
+% Constant momentum
+opts.momentum =  0.9;
 ```
 
-Constant momentum can be specified with:
+## Sampling statistics
+
+The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
+
+ * Contrastive divergence: `opts.traintype = 'CD'`
+ * Persistent contrastive divergence:  `opts.traintype = 'PCD'`
+
+The number of Gibbs steps before the statistics is collected is controlled with `opts.cdn`. `opts.cdn` is eiether a scalar in wich case the same number of gibbs steps is used for all epochs. 
+
+Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
+ `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100.
+
+ The number of Gibbs steps before the negative statistics is collected is controlled with `opts.cdn`. `opts.cdn` is specified similarly to the learning rate and momentum, i.e:
 
 ```MATLAB
-opts.momentum = @(t) 0.9;
+% Increasing gibbs steps at fifth epoch
+T = 5;
+opts.cdn = @(epoch) ifelse(t < T,1,5);
+
+% Constant CDn
+opts.cdn =  1;
 ```
 
 ## Initial Weight Sizes
 
 Initial weights are either sampled from a normal distribution [3] or from a uniform distribution [7], the behavior is controlled through `opts.init_type`:
 
-```MATLAB
-switch lower(opts.init_type)
-    case 'gauss'
-        initfunc = @(m,n) normrnd(0,0.01,m,n);
-    case 'crbm'
-        initfunc = @(m,n) init_crbm;
-    otherwise
-        error('init_type should be either gauss or cRBM');
-end
-
-    function weights = init_crbm(m,n)
-        M = max([m,n]);
-        interval_max = M^(-0.5);
-        interval_min = -interval_max;
-        weights = interval_min + (interval_max-interval_min).*rand(m,n);
-    end
-```
-Lastly you can supply your own function as a handle to `opts.init_type`. The signature must be `f(n_rows,n_columns)`. The output should be a dobule m-by-n matrix. e.g:
-
-```MATLAB
-opts.init_type = @(m,n)  normrnd(0,100,m,n);
-```
-
-
+ * `opts.init_type = 'gauss'`    : N(0, 0.01)
+ * `opts.init_type = 'cRBM'`     : Unif(-M^-0.5, M^-0.5), is max(n_columns, n_rows) of weight matrix. 
+ * `opts.init_type = @(m,n) func : Handle to funtion returning a M-by-N matrix.
 
 ## Regularization
 
-The following regularization options are implemented
+The following regularization options are implemented:
 
  * `opts.L1`: specify the regularization weight
  * `opts.L2`: specify the regularization weight
  * `opts.sparsity`: implemented as in [7]. Specify the sparsity being subtracted from biases after each weight update.
- * `opts.dropout`: dropout on hidden units. Specify the probability of being dropped. see [1]
- * `opts.dropconnect`: dropout on connections see [10]
+ * `opts.dropout`: dropout on hidden units. Specify the 1-probability of being dropped. see [1]
+ * `opts.dropconnect`: dropout on connections, specify 1-probability of connection being zeroed, see [10]
+ * Early-stopping
 
-
-**Dropout Weights**  
+#### Dropout Weights
+In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. W is the weights between visible and hiiden units. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0.
 <html>
-<img src="/uploads/dropout.png" height="500" width="500"> 
+<img src="/uploads/dropout.png" height="200" width="500"> 
 
-**DropConnect Weights**
+
+
+#### DropConnect Weights
+DropConnect drops connections between visible and hidden units with probability `1-opts.dropconnect`. The picture shows W with dropconnect enabled (left) and the original weights (right)
 <html>
-<img src="/uploads/dropconnect.png" height="500" width="500"> 
+<img src="/uploads/dropconnect.png" height="200" width="500"> 
 
+####
+Early stopping is always enabled. The early stopping patience is set with `opts.patience`. If you want to disable early stopping set `opts.patience = Inf`. 
 
-** Early Stopping**  
-Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
+## Using the CPU / GPU
 
-## Hidden Layer Sizes
+`opts.gpu` switches between CPU and GPU. GPU requires the MATLAB Parallel Computing Toolbox.
 
-In the example a RBM with 500 hidden units is created and trained. You do not need to set the size of the visible units.
-
-```MATLAB
-sizes = [500];                        % hidden layer size
-opts = dbncreateopts();   % create default opts struct
-dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
-rbm = dbn.rbm{1};
-rbm = rbmtrain(rbm, train_x, opts);       % train  rbm
-```
-## Using the GPU
-
-To use GPU set `opts.gpu = 1`. Setting `opts.gpu = 0` uses CPU and `opts.gpu = -1` is for testing. 
-When `opts.gpu`is 1 then `opts.thisgpu` must be set to `gpuDevice()`. 
-
-
-## Sampling statistics
-The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
-Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
- `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100. 
+ * `opts.gpu = 1` : Use GPU. Requires that `opts.thisgpu` is set to a reference to the selected GPU (use `opts.thisgpu = gpuDevice()`).
+ * `opts.gpu = 0` : Use CPU. 
+ * `opts.gpu = -1`: For testing
 
 # Examples
 
 Reproducing results from [7], specifically the results from the table reproduced below:
 
-| Model  |Objective   										| Errror (%) 	| Example  |
-|---	 |---		  										|---			|---	   |
-|   	 | Generative(lr = 0.005, H = 6000)    		  		|	3.39		|    4     |
-|ClassRBM| Discriminative(lr = 0.05, H = 500)   		  	|	1.81		|    5     |
-|   	 | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)  		|	1.28		|    6     |
-|   	 | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |	1.16		|    7     |
+| Model  |Objective                                         | Errror (%)    | Example  |
+|---     |---                                               |---            |---       |
+|        | Generative(lr = 0.005, H = 6000)                 |   3.39        |    4     |
+|ClassRBM| Discriminative(lr = 0.05, H = 500)               |   1.81        |    5     |
+|        | Hybrid(alpha = 0.01, lr = 0.05, H = 1500)        |   1.28        |    6     |
+|        | Sparse Hybrid( idem + H = 3000, sparsity=10^-4)  |   1.16        |    7     |
 lr = learning rate
 H = hidden layer size
 
