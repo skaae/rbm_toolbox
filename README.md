@@ -18,7 +18,19 @@ RBM toolbox is a MATLAB toolbox for online training of RBM and stacked RBM's.
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
 
-This README first describes settings in the toolbox. Usage examples are given afterwards. Note that a single layer DBN is a RBM. 
+This README first describes a classification RBM and the notation used, then settings in the toolbox are explained and finally some usage examples are given.
+
+% Classification RBMs
+RBM's are exaplained in [3]. Classification RBM's (cRBM) differ from *regular* RBM's in that they augment the data to the visible units of the RBM. A normal RBM models `p(x)` a  cRBM models either `p(x,y)`or `p(x|y)`. The labels are passed to the RBM by augmenting them to the x values, a single input to the cRBM is then **x**<sup>n</sup><sub>input</sub> = {**x**<sup>n</sup>, **y**<sup>n</sup>}. A cRBM is shown below, the picture is taken from [7], which also has a more through explanation of the cRBM.
+
+<html>
+<img src="/uploads/classRBM.png" height="300" width="400">    
+
+We use the notation given in the picture. Biases are:
+
+* __b__: x_visible bias
+* __c__: hidden layer bias
+* __d__: y_visible bias
 
 # Settings
 Settings in the toolbox are generally controlled with the `opts` struct. An `opts` struct with default values can be created with
@@ -142,14 +154,16 @@ The following regularization options are implemented:
  * Early-stopping
 
 #### Dropout Weights
-In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. W is the weights between visible and hiiden units. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0.
+In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0. Hidden biases, c, of dropped units are clamped to zero.    
+
 <html>
-<img src="/up dloads/dropout.png" height="200" width="500"> 
+<img src="/uploads/dropout.png" height="200" width="500"> 
 
 
 
 #### DropConnect Weights
-DropConnect drops connections between visible and hidden units with probability `1-opts.dropconnect`. The picture shows W with dropconnect enabled (left) and the original weights (right)
+DropConnect drops connections between visible and hidden units with probability `1-opts.dropconnect`. The picture shows W with dropconnect enabled (left) and the original weights (right). Hidden biases, c, are also dropped with probability `1-opts.dropconnect`.    
+
 <html>
 <img src="/uploads/dropconnect.png" height="200" width="500"> 
 
@@ -399,15 +413,15 @@ save(f,'rbm','opts');
 
 # References
 
-[1] N. Srivastava and G. Hinton, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach.  …, 2014.  
-[2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” … 25th Int. Conf. Mach. …, 2008.  
-[3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, 2010.  
-[4] G. E. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” Jul. 2012.  
-[5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., 2002.  
-[6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” … 25th Int. Conf. Mach. …, 2008.  
-[7] H. Larochelle and M. Mandel, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach.  …, 2012.
-[8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” …  25th Int. Conf. …, 2008.   
-[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” 2011.  
+[1] Srivastava Nitish, G. Hinton, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Dropout: A Simple Way to Prevent Neural Networks from Overfitting,” J. Mach. Learn. Res., vol. 5(Jun), no. 2, p. 1929−1958, 2014.    
+[2] H. Larochelle and Y. Bengio, “Classification using discriminative restricted Boltzmann machines,” in Proceedings of the 25th international conference on Machine learning. ACM,, 2008.     
+[3] G. Hinton, “A practical guide to training restricted Boltzmann machines,” Momentum, vol. 9, no. 1, p. 926, 2010.    
+[4] G. Hinton, N. Srivastava, A. Krizhevsky, I. Sutskever, and R. R. Salakhutdinov, “Improving neural networks by preventing co-adaptation of feature detectors,” arXiv Prepr., vol. 1207.0580, no. Hinton, Geoffrey E., et al. "Improving neural networks by preventing co-adaptation of feature detectors." arXiv preprint arXiv:1207.0580 (2012)., Jul. 2012.    
+[5] G. Hinton, “Training products of experts by minimizing contrastive divergence,” Neural Comput., vol. 14, no. 8, pp. 1771–1800, 2002.     
+[6] T. Tieleman, “Training restricted Boltzmann machines using approximations to the likelihood gradient,” in Proceedings of the 25th international conference on Machine learning. ACM, 2008.    
+[7] H. Larochelle, M. Mandel, R. Pascanu, and Y. Bengio, “Learning algorithms for the classification restricted boltzmann machine,” J. Mach. Learn. Res., vol. 13, no. 1, pp. 643–669, 2012.    
+[8] R. Salakhutdinov and I. Murray, “On the quantitative analysis of deep belief networks,” in Proceedings of the 25th international conference on Machine learning. ACM,, 2008.    
+[9] Y. Tang and I. Sutskever, “Data normalization in the learning of restricted Boltzmann machines,” Dep. Comput. Sci. Toronto Univ., vol. UTML-TR-11, 2011.     
 [10] L. Wan, M. Zeiler, S. Zhang, Y. Le Cun, and R. Fergus, “Regularization of Neural Networks using DropConnect,” in Proceedings of The 30th International Conference on Machine Learning, 2013, pp. 1058–1066. 
 
 Copyright (c) 2014, Søren Kaae Sønderby (skaaesonderby@gmail.com) All rights reserved.
