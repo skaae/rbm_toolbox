@@ -17,12 +17,17 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
 
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
-# Settings
 
-The following section describes different settings for training in the RBM toolbox. 
-Refer to `dbncreateopts` for a description of all settings.
+This README first describes settings in the toolbox. Usage examples are given afterwards.
 
 ## Training Objectives
+The toolbox support three different training objectives:
+
+ * Generative training: optimizes -log(p(x,y))`
+ * Discrminative training: optimizes  `p(y I x)`
+
+ &#9824
+
 Training objectives are controlled with:
 
  * opts.alpha: Controls the weight for generative training. 1 is pure generative, 0 is pure discriminative, intermediate values are hybrid training
@@ -121,7 +126,7 @@ The following regularization options are implemented
 <html>
 <img src="/uploads/dropout.png" height="200" width="500"> 
 
-**DropConnect Weights**
+**DropConnect Weights**  
 <html>
 <img src="/uploads/dropconnect.png" height="200" width="500"> 
 
