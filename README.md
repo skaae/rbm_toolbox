@@ -2,7 +2,7 @@
 
 # RBM Toolbox
 
-RBM toolbox is a MATLAB toolbox for training RBM's.
+RBM toolbox is a MATLAB toolbox for online training of RBM and stacked RBM's.
 
  * Support for training RBM's with class labels including:
     * Generative training objective [2,7]
@@ -18,72 +18,112 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
 
-This README first describes settings in the toolbox. Usage examples are given afterwards.
+This README first describes settings in the toolbox. Usage examples are given afterwards. Note that a single layer DBN is a RBM. 
+
+# Settings
+Settings in the toolbox are generally controlled with the `opts` struct. An `opts` struct with default values can be created with
+
+```MATLAB
+opts = dbncreateopts();
+```
+
+The DBN network is then created and trained with:
+
+```MATLAB
+sizes = [50]
+dbn = dbnsetup(sizes,x_train,opts);
+dbn = dbntrain(dbn,x_train,opts);
+```
+
+Here sizes specifies the sizes of the hidden layers in the RBM's. In the example a single RBM with 50 hidden units is created. If sizes is `sizes = [50 100]`, a RBM with 50 hidden units and a RBM with 100 hidden units are stacked. Sizes of visible layers are infeered from the data.
 
 ## Training Objectives
 The toolbox support three different training objectives:
 
  * Generative    : optimizes `-log( p(x,y) )` 
  * Discrminative : optimizes `-log( p(y | x) )`
- * Hybrid        : optimizes `-alpha * log( p(x,y) ) - (1-alpha) * log( p(y I x) )`
+ * Hybrid        : optimizes `-alpha * log( p(x,y) ) - (1-alpha) * log( p(y | x) )`
 
-Furthermore semisupervised training is available supported. Weights in the RBM is updated using the equation:
-
-`grads = alpha * generative + (1-alpha) * discriminative  + beta * semisupervised`
+Furthermore semisupervised training is available. In semisupervised training unlabled data is used in conjunction with the labeled data. 
 
 
-Training objectives are controlled with:
+RBM weights are updated using the equation:
 
- * opts.alpha: Controls the weight for generative training. 1 is pure generative, 0 is pure discriminative, intermediate values are hybrid training
- * opts.beta : Controls semisupervied weight. 0 is no semisupervised, you must supply opts.x_semisup for opts.beta > 0 
+`grads = alpha * grads_generative + (1-alpha) * grads_discriminative  + beta * grads_semisupervised`
 
+From the equation it follows that:
 
-#### Generative training
-Generative training and discriminative training are the basic training objectives in the RBM toolbox. The hybrid and semi-supervised training objectives are different combinations of generative and discriminative training. In generative training the objective `-log(p(x,y))` is optimized.
+ * `opts.alpha = 0` is discriminative training
+ * `opts.alpha = 1` is generative training
+ * `opts.alpha = ]0;1[` is hybrid training
 
-#### Discriminative training
-Discriminative training optimizes `p(y I x)`.
+ Semisupervised training is added by setting `opts.beta > 0`. In semisupervised training we partly train on unlabeled data. 
+ The toolbox uses y values sampled from `p(y|x)` as labels for the semisupervised samples.  The procedure is described in [7].
 
+## Specifying training, validation and semisupervised data
 
-#### Semi-supervised training
-Semi-supervised training combines unsupervised and supervised training. The following formulae is used to combine the objectives:
+ * `x_train`        : pass x training data to the toolbox with `dbntrain(dbn,x_train,opts)`
+ * `opts.y_train`   : y training data  
+ * `opts.x_val`     : x validation data (optional)
+ * `opts.y_val`     : y validation data (optional)
+ * `oots.x_semisup` : x semisupervised data (optional)
 
-`grads = grads + opts.semisup_beta * grads_generative`
+ During training training and validatiion performance is monitored. The number of epochs between calcualtion of training and validaiton performance is controlled with `opts.testinterval`.
 
-Here `grads` is the gradients obtained from the labeled samples. We use samples of p(y I x) as labels for the unsupervised training.
+ If the traning set is large it might be costly to evaluate the training performance using the whole training set. `opts.traintestbatch` controls the number of samples used for calculation of training performance. 
 
 ## Learning rate and momentum
 
 The learning rate is controlled with `opts.learningrate`. `opts.learningrate` should be a handle to a function taking current epoch and momentum as input, this allows for decaying learning rate.
 
-Decaying learning rate can be specified with:   
+Learning rate is set with:   
 
 ```MATLAB
+% Decaying learning rate
 eps               = 0.001;    % initial learning rate
 f                 = 0.99;      % learning rate decay
 opts.learningrate = @(t,momentum) eps.*f.^t*(1-momentum);
-```
-Constant learning rate can be spcified with
 
-```MATLAB
-opts.learningrate = @(t,momentum) 0.01;
+% Constant learning rate
+opts.learningrate =  0.01;
 ```
 
 Momentum is controlled through `opts.momentum`. `opts.momentum` should be a function taking current epoch as input.
 
-Ramp up momentum can be specified with:
+Momentum is set with:
 
 ```MATLAB
+% Momentum with ramp-up
 T             = 50;       % momentum ramp up epoch
 p_f           = 0.9;    % final momentum
 p_i           = 0.5;    % initial momentum
-opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f,p_f);
+opts.momentum = @(t) ifelse(t < T, p_i*(1-t/T)+(t/T)*p_f, p_f);
+
+% Constant momentum
+opts.momentum =  0.9;
 ```
 
-Constant momentum can be specified with:
+## Sampling statistics
+
+The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
+
+ * Contrastive divergence: `opts.traintype = 'CD'`
+ * Persistent contrastive divergence:  `opts.traintype = 'PCD'`
+
+The number of Gibbs steps before the statistics is collected is controlled with `opts.cdn`. `opts.cdn` is eiether a scalar in wich case the same number of gibbs steps is used for all epochs. 
+
+Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
+ `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100.
+
+ The number of Gibbs steps before the negative statistics is collected is controlled with `opts.cdn`. `opts.cdn` is specified similarly to the learning rate and momentum, i.e:
 
 ```MATLAB
-opts.momentum = @(t) 0.9;
+% Increasing Cdn
+T = 5;
+opts.cdn = @(epoch) ifelse(t < T,1,5);
+
+% Constant CDn
+opts.cdn =  1;
 ```
 
 ## Initial Weight Sizes
@@ -138,27 +178,11 @@ The following regularization options are implemented
 ** Early Stopping**  
 Early stopping is always enabled. The early stopping patience is set with opts.patience. If you want to disable early stopping set `opts.patience = Inf`. 
 
-## Hidden Layer Sizes
 
-In the example a RBM with 500 hidden units is created and trained. You do not need to set the size of the visible units.
-
-```MATLAB
-sizes = [500];                        % hidden layer size
-opts = dbncreateopts();   % create default opts struct
-dbn = dbnsetup(sizes, train_x, opts);     % create dbn struct
-rbm = dbn.rbm{1};
-rbm = rbmtrain(rbm, train_x, opts);       % train  rbm
-```
-## Using the GPU
+## Using the CPU / GPU
 
 To use GPU set `opts.gpu = 1`. Setting `opts.gpu = 0` uses CPU and `opts.gpu = -1` is for testing. 
 When `opts.gpu`is 1 then `opts.thisgpu` must be set to `gpuDevice()`. 
-
-
-## Sampling statistics
-The toolbox support Contrastive divergence (`CD`)[5] and persistent contrastive divergcence (`PCD`) [6] for collecting statistics. 
-Choose the sampling method with `opts.traintype`. For `PCD` the number of persistent chains is controlled with `opts.npcdchains`. 
- `opts.npcdchains` must be less than the the number of samples and the number of semisupervised samples, the default number of chains is 100. 
 
 # Examples
 
