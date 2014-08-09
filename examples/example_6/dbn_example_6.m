@@ -1,12 +1,15 @@
 %% Example 6 - Hybrid
 % Tries to reproduce discriminative result from table 1 in 
 % "Learning algorithms for the classification Restricted boltzmann machine"
+usegpu = 1;
 if ~ismac
     current_dir = pwd();
     cd('../..');
     addpath(genpath(pwd()));
     cd(current_dir)
     
+end
+if usegpu
     getenv('ML_GPUDEVICE')
     gpuidx = str2num(getenv('ML_GPUDEVICE')) + 1
 
@@ -20,9 +23,6 @@ else
     gpu = [];
 end
 
-
-
-
 name = 'example_6';
 rng('default');rng(0);
  [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
@@ -33,7 +33,7 @@ sizes = [1500 ];   % hidden layer size
 opts = dbncreateopts();
 opts.alpha = 0.01; % 0 = discriminative, 1 = generative
 opts.beta = 0;
-opts.gpu   = 1;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.gpu   = usegpu;                  % use GPU other optsion are 0: CPU, -1: CPU test
 opts.cdn = 1;   
 opts.thisgpu = gpu;              % ref to gpu,  must be set if opts.gpu =1
 opts.gpubatch = size(train_x,1); 
@@ -59,6 +59,7 @@ opts.gpu
 opts.numepochs
 fprintf('\n\n')
 
+disp(dbn.rbm{1})
 dbn = dbntrain(dbn,train_x,opts);
 
 opts.thisgpu = [];

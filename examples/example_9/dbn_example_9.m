@@ -1,12 +1,15 @@
 %% Example 8 - Sparse hybrid trained on subset. Baseline for semisupervised 
 % Training set is resized to 5000 samples and validation set to 1000 samples.
 % The test set is not resized.
+usegpu = 1;
 if ~ismac
     current_dir = pwd();
     cd('../..');
     addpath(genpath(pwd()));
     cd(current_dir)
     
+end
+if usegpu
     getenv('ML_GPUDEVICE')
     gpuidx = str2num(getenv('ML_GPUDEVICE')) + 1
 
@@ -43,7 +46,7 @@ opts = dbncreateopts();
 opts.x_semisup = semisup_x;
 opts.alpha = 0.01; % 0 = discriminative, 1 = generative
 opts.beta = 0.1;
-opts.gpu   = 1;                  % use GPU other optsion are 0: CPU, -1: CPU test
+opts.gpu   = usegpu;                  % use GPU other optsion are 0: CPU, -1: CPU test
 opts.cdn = 1;   
 opts.sparsity = 10^-4;
 opts.thisgpu = gpu;              % ref to gpu,  must be set if opts.gpu =1
@@ -70,6 +73,7 @@ opts.gpu
 opts.numepochs
 fprintf('\n\n')
 
+disp(dbn.rbm{1})
 dbn = dbntrain(dbn,train_x,opts);
 
 opts.thisgpu = [];
