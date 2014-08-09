@@ -12,7 +12,7 @@ RBM toolbox is a MATLAB toolbox for training RBM's.
  * CD - k (contrastive divergence k) [5]
  * RBM/DBN sampling functions (pictures / movies)
  * RBM/DBN Classification support [2,7]
- * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [1] 
+ * Regularization: L1, L2, sparsity, early-stopping, dropout [1],dropconnect[10], momentum [3] 
 
 The code in the toolbox is partly based on the DeepLearnToolbox by Rasmus Berg Palm. 
 
