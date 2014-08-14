@@ -4,15 +4,15 @@ dbn_cRBM_tests_gpu()
 
 % test that everything runs for a few epochs
 [train_x,val_x,test_x,train_y,val_y,test_y] =setupmnist(0.001);
-sizes = [33];
+sizes = [7];
 [opts] = dbncreateopts();
 opts.gpu = -1;
 opts.testinterval = 1;
-opts.y_train = train_y;
+opts.y_train = train_y(:,1:10);
 
 % test single epoch
 opts.numepochs = 1;
-dbn_no_gpu = dbnsetup(sizes, train_x, opts);
+dbn_no_gpu = dbnsetup(sizes, train_x(), opts);
 dbntrain(dbn_no_gpu, train_x, opts);
 
 % test cdn larger than 1

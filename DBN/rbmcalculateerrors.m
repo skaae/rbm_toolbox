@@ -7,7 +7,7 @@ mom   = num2str(rbm.momentum(epoch));
 
 
 x_train_probs = rbmclassprobs( rbm,x_train(rbm.traintestbatch,:) );
-[herr_train, ~] = accuracy(x_train_probs,y_train);
+[herr_train, ~] = accuracy(x_train_probs,y_train(rbm.traintestbatch,:) );
 if ~isempty(x_val)
     x_val_probs = rbmclassprobs( rbm,x_val );
     [herr_val, ~] = accuracy(x_val_probs,y_val);

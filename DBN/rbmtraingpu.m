@@ -102,6 +102,7 @@ for epoch = 1 : opts.numepochs
             end
             
             if drbm.dropout > 0
+                warning('Dropout is not correctly implemented, see lua code')
                 do_mask = drbm.rand([size(drbm.W,1),1]) > drbm.dropout;
                 drbm.W = bsxfun(@times,drbm.W, do_mask);
                 drbm.U = bsxfun(@times,drbm.U, do_mask);
@@ -219,7 +220,7 @@ for epoch = 1 : opts.numepochs
     
     if mod(epoch,drbm.testinterval) == 0
         valtimer = tic;
-        hrbm = cpRBMtoHOST(drbm);
+        hrbm = drbm.cpToHOST(drbm);
         
         % update errors on cpu
         [herrors,errstr] =rbmcalculateerrors(hrbm,herrors,epoch,...

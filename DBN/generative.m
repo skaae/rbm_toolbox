@@ -26,6 +26,7 @@ for n = rbm.colon(1, (rbm.curcdn - 1) )  % matlab crashes gpu crash with a:b not
     visx = double(visx > rbm.rand(size(visx))); 
     visy = exp(bsxfun(@plus,rbm.d',hid * rbm.U));
     visy = bsxfun(@rdivide, visy, visy * rbm.ones([size(visy,2),1]));
+    visy = samplevec(rbm,visy);
     hid = arrayfun(@sigm, bsxfun(@plus,rbm.c',visx * rbm.W') +  visy*rbm.U');
     hid = double(hid > rbm.rand(size(hid)));
     
