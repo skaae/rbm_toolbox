@@ -94,19 +94,15 @@ for epoch = 1 : opts.numepochs
             
             
             %% apply dropout and dropconnect
-            % copy original weights if dropout or dropconnect is enabled
-            if drbm.dropout > 0 || drbm.dropconnect > 0
+            % copy original weights if dropconnect is enabled
+            if drbm.dropconnect > 0
                 W_org = drbm.W;   
                 U_org = drbm.U; 
                 c_org = drbm.c; 
             end
             
             if drbm.dropout > 0
-                warning('Dropout is not correctly implemented, see lua code')
-                do_mask = drbm.rand([size(drbm.W,1),1]) > drbm.dropout;
-                drbm.W = bsxfun(@times,drbm.W, do_mask);
-                drbm.U = bsxfun(@times,drbm.U, do_mask);
-                drbm.c = drbm.c .* do_mask;
+                drbm.dropout_mask =  drbm.rand(1,[size(drbm.W,1),1]) > drbm.dropout;
             end
             
             if drbm.dropconnect > 0
@@ -159,8 +155,8 @@ for epoch = 1 : opts.numepochs
                 db_ =drbm.beta * db_s;
             end
             
-            %% restore original weighs if dropout or dropconnect
-            if drbm.dropout > 0 || drbm.dropconnect > 0
+            %% restore original weighs if dropconnect
+            if  drbm.dropconnect > 0
                 drbm.W = W_org;   
                 drbm.U = U_org; 
                 drbm.c = c_org; 

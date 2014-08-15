@@ -153,14 +153,6 @@ The following regularization options are implemented:
  * `opts.dropconnect`: dropout on connections, specify 1-probability of connection being zeroed, see [10]
  * Early-stopping
 
-#### Dropout Weights
-In dropout the hidden units are dropped with `1-opts.dropout`. During each weight update rows of the incoming weights and biases to the hidden units are clamped to zero. In dropout rows of W are clamped to zero. The picture below shows the dropout W (left) and the original W (right). Black is a wieght value equal to zero and white is a weight value > 0. Hidden biases, c, of dropped units are clamped to zero.    
-
-<html>
-<img src="/uploads/dropout.png" height="200" width="500"> 
-
-
-
 #### DropConnect Weights
 DropConnect drops connections between visible and hidden units with probability `1-opts.dropconnect`. The picture shows W with dropconnect enabled (left) and the original weights (right). Hidden biases, c, are also dropped with probability `1-opts.dropconnect`.    
 
