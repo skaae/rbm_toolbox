@@ -1,14 +1,13 @@
     function [dw,dc,du,dd,p_y_given_x] = discriminative(rbm,dx,dy,cwx)
-         %   rbm.dropout_mask = [1 0 0 1 1 0 0];  rbm.dropout = 0.5;% added
         [n_hidden, n_classes] = size(rbm.U);
         F   = bsxfun(@plus, rbm.U, cwx);       % [hid x classes]        
         if rbm.dropout > 0
-            F = bsxfun(@times,F,rbm.dropout_mask');  % added
+            F = bsxfun(@times,F,rbm.dropout_mask');  % apply dropout
         end
 
         F_soft = arrayfun(@softplus,F);
         if rbm.dropout > 0
-            F_soft = bsxfun(@times,F_soft,rbm.dropout_mask');  % added
+            F_soft = bsxfun(@times,F_soft,rbm.dropout_mask');  % apply dropout
         end
         
         p_y_given_x_log_prob = rbm.ones([1 ,n_hidden]) *  F_soft + rbm.d';
@@ -17,7 +16,7 @@
         
         F_sigm = arrayfun(@sigm, F);
         if rbm.dropout > 0
-            F_sigm = bsxfun(@times,F_sigm,rbm.dropout_mask');  % added
+            F_sigm = bsxfun(@times,F_sigm,rbm.dropout_mask');  % apply dropout
         end
         
         

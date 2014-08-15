@@ -102,7 +102,7 @@ for epoch = 1 : opts.numepochs
             end
             
             if drbm.dropout > 0
-                drbm.dropout_mask =  drbm.rand(1,[size(drbm.W,1),1]) > drbm.dropout;
+                drbm.dropout_mask =  drbm.rand([1,size(drbm.W,1)]) > drbm.dropout;
             end
             
             if drbm.dropconnect > 0

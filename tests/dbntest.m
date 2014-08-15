@@ -42,9 +42,10 @@ dbntrain(dbn_no_gpu, train_x, opts);
 
 % test dropout
 opts.dropout = 0.5;
+opts.alpha = 0.5
 dbn_no_gpu = dbnsetup([50], train_x(:,1:50), opts);
 dbntrain(dbn_no_gpu, train_x(:,1:50), opts);
-
+opts.alha = 1;
 % test dropconnect
 opts.dropout = 0;
 opts.dropconnect = 0.5;
