@@ -166,9 +166,9 @@ for epoch = 1 : opts.numepochs
             %% regularization
             % sparsity
             if drbm.sparsity > 0
-                db_ = bsxfun(@minus,db_,drbm.sparsity);
+                %db_ = bsxfun(@minus,db_,drbm.sparsity);
                 dc_ = bsxfun(@minus,dc_,drbm.sparsity);
-                dd_ = bsxfun(@minus,dd_,drbm.sparsity);
+                %dd_ = bsxfun(@minus,dd_,drbm.sparsity);
             end
             
             % L2
