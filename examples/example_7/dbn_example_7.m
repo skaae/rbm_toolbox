@@ -1,7 +1,7 @@
 %% Example 7 - Sparse hybrid
 % Tries to reproduce discriminative result from table 1 in 
 % "Learning algorithms for the classification Restricted boltzmann machine"
-usegpu = 1;
+usegpu = 0;
 if ~ismac
     current_dir = pwd();
     cd('../..');
@@ -27,29 +27,30 @@ end
 
 name = 'example_6';
 rng('default');rng(0);
- [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist();
+ [train_x,val_x,test_x,train_y,val_y,test_y] = setupmnist(0.1);
 f = fullfile(pwd,[name '.mat'])
 
 % Setup DBN
-sizes = [3000 ];   % hidden layer size
+sizes = [100 ];   % hidden layer size
 opts = dbncreateopts();
 opts.alpha = 0.01; % 0 = discriminative, 1 = generative
 opts.beta = 0;
 opts.gpu   = usegpu;                  % use GPU other optsion are 0: CPU, -1: CPU test
 opts.cdn = 1;   
-opts.sparsity = 10^-4;
+opts.sparsity = 0;
 opts.thisgpu = gpu;              % ref to gpu,  must be set if opts.gpu =1
 opts.gpubatch = size(train_x,1); 
 opts.outfile = [name '_intermediate.mat'];
 opts.patience = 15;
 opts.numepochs = 1000;
+opts.dropout = 0.5
 opts.testinterval = 1;
 opts.init_type = 'cRBM';
 opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = val_x;
 opts.y_val = val_y;
-opts.traintestbatch = 10000;
+%opts.traintestbatch = 10000;
 
 %% Set learningrate and momentum
 opts.learningrate = @(t,momentum) 0.05;

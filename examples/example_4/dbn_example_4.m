@@ -1,7 +1,7 @@
 %% Example 4 - Discriminative training
 % Tries to reproduce discriminative result from table 1 in 
 % "Learning algorithms for the classification Restricted boltzmann machine"
-usegpu = 1;
+usegpu = 0;
 if ~ismac
     current_dir = pwd();
     cd('../..');
@@ -50,7 +50,7 @@ opts.classRBM = 1;
 opts.y_train = train_y;
 opts.x_val = val_x;
 opts.y_val = val_y;
-opts.traintestbatch = 10000;
+%opts.traintestbatch = 10000;
 
 
 %% Set learningrate and momentum
