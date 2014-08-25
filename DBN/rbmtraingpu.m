@@ -86,7 +86,7 @@ for epoch = 1 : opts.numepochs
         
         %% iter over samples in gpubatch
         for i = 1:(d_end - d_start + 1)
-            
+            drbm.i = i;
             
             % online learning, take single sample of y and y. d means device
             dx = dx_train(i,:);
@@ -196,6 +196,16 @@ for epoch = 1 : opts.numepochs
             drbm.c = drbm.c + drbm.vc;
             drbm.U = drbm.U + drbm.vU;
             drbm.d = drbm.d + drbm.vd;
+            
+            
+            
+%              if mod(i,100) == 0
+%                  hist(drbm.U(:),100)
+%                  pause;            
+%              end
+            
+            
+            
             
             
             drbm.reconerror  = curr_err;

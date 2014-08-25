@@ -29,8 +29,7 @@ for n = rbm.colon(1, (rbm.curcdn - 1) )  % matlab crashes gpu crash with a:b not
     % go down and up + sample
     visx = arrayfun(@sigm, bsxfun(@plus,rbm.b',hid * rbm.W));
     visx = double(visx > rbm.rand(size(visx))); 
-    visy = exp(bsxfun(@plus,rbm.d',hid * rbm.U));
-    visy = bsxfun(@rdivide, visy, visy * rbm.ones([size(visy,2),1]));
+    visy = normalizeexprowvec(bsxfun(@plus,rbm.d',hid * rbm.U));
     visy = samplevec(rbm,visy);
     hid = arrayfun(@sigm, bsxfun(@plus,rbm.c',visx * rbm.W') +  visy*rbm.U');
     hid = double(hid > rbm.rand(size(hid)));
@@ -44,9 +43,12 @@ vkx = arrayfun(@sigm,bsxfun(@plus,rbm.b',hid * rbm.W));
 vkx = double(vkx > rbm.rand(size(vkx)));
 
 
-vky = exp(bsxfun(@plus,rbm.d',hid * rbm.U));
-vky = bsxfun(@rdivide, vky, vky * rbm.ones([size(vky,2),1]));
+vky  = normalizeexprowvec(bsxfun(@plus,rbm.d',hid * rbm.U));
 vky = samplevec(rbm,vky); % sample visible state
+
+
+%assert(sum(vky) == 1)
+
 %% up
 %hk = sigm(bsxfun(@plus,rbm.c',vkx * rbm.W') +  vky * rbm.U');
 hk = arrayfun(@sigm, bsxfun(@plus,rbm.c',vkx * rbm.W') +  vky * rbm.U');%%
